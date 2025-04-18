@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="button" id="loginButton">Login</button>
+    </form>
+    <br>
+    <p>Don't have an account? <a href="/register">Register here</a></p>
+    <p><a href="/forgot-password">Forgot your password?</a></p> <!-- Added forgot password link -->
+
+    <script>
+        $(document).ready(function() {
+            $('#loginButton').click(function() {
+                const username = $('#username').val();
+                const password = $('#password').val();
+
+                if (!username || !password) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+
+                // Send AJAX POST request to the server
+                $.ajax({
+                    url: '/login',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        username: username,
+                        password: password
+                    }),
+                    success: function(response) {
+                        alert('Login successful! Redirecting...');
+                        window.location.href = '/test'; // Redirect to the main page
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Invalid username or password.';
+                        alert(errorMessage);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
