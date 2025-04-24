@@ -9,9 +9,5 @@
 - 
 - 
 
-### Checklist
-- [ ] Code is properly formatted.
-- [ ] Tests are added/updated (if applicable).
-
 ### Additional Notes
 <!-- Add any other relevant information here. -->

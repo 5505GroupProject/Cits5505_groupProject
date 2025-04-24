@@ -1,9 +1,3 @@
-### Issue Type
-- [ ] Bug
-- [ ] Feature Request
-- [ ] Enhancement
-- [ ] Documentation
-
 ### Description
 <!-- Provide a clear and concise description of the issue or feature. -->
 
