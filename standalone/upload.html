@@ -35,17 +35,9 @@
                     <h1>SentiNews</h1>
                     <p class="lead mb-0">News Sentiment Analysis Tool</p>
                 </div>
-                <!--
                 <div class="col-md-6 text-end">
-                    
-                    <nav>
-                        <button class="btn btn-outline-light me-2">Home</button>
-                        <button class="btn btn-outline-light me-2">Dashboard</button>
-                        <button class="btn btn-outline-light me-2">Share</button>
-                        <button class="btn btn-outline-light">Account</button>
-                    </nav>
+                    <a href="login_standalone.html" class="btn btn-outline-light">Log Out</a>
                 </div>
-                -->
             </div>
         </div>
     </header>
@@ -97,11 +89,36 @@
             document.getElementById('fileUpload').value = '';
         });
         
-        // Placeholder for analyze button functionality
+        // Updated functionality for analyze button to redirect to visualization page
         document.getElementById('uploadForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Analysis functionality will be implemented in future versions!');
             
+            // Check if text content is provided
+            const newsContent = document.getElementById('newsContent').value.trim();
+            if (!newsContent) {
+                alert('Please enter or upload news content for analysis.');
+                return;
+            }
+            
+            // Save the content to sessionStorage so it can be accessed on the visualization page
+            sessionStorage.setItem('analyzedText', newsContent);
+            
+            // Redirect to the visualization page
+            window.location.href = 'visualization.html';
+        });
+        
+        // Handle file upload
+        document.getElementById('fileUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('newsContent').value = e.target.result;
+                };
+                
+                reader.readAsText(file);
+            }
         });
     </script>
 </body>
