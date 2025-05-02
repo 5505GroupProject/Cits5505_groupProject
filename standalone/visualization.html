@@ -55,7 +55,7 @@
         <div class="row align-items-center">
             <div class="col-md-6">
                 <h1>SentiNews</h1>
-                <p class="lead mb-0">News Sentiment Analysis Tool</p>
+               
             </div>
             <div class="col-md-6 text-end">
                 <a href="login_standalone.html" class="btn btn-outline-light">Log Out</a>
@@ -128,6 +128,29 @@
     </div>
   </div>
 </main>
+
+<!-- Share Button -->
+<div class="container">
+  <div class="text-center my-4">
+    <button class="btn btn-primary" id="shareButton">Share</button>
+  </div>
+</div>
+
+<!-- Share Modal/Card -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shareModalLabel">Share</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="shareModalBody">
+        <!-- Using iframe to load SharePage.html content -->
+        <iframe src="SharePage.html" width="100%" height="500" frameborder="0" id="sharePageFrame" style="border: none;"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Footer -->
 <footer class="container mt-5 pb-3">
@@ -228,6 +251,12 @@ function draw(words) {
     .attr("transform", d => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")")
     .text(d => d.text);
 }
+
+// Share Button Functionality
+document.getElementById('shareButton').addEventListener('click', function() {
+  const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+  shareModal.show();
+});
 </script>
 </body>
 </html>
