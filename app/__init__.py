@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required
 from flask_wtf.csrf import CSRFProtect
 import os
 
@@ -38,6 +38,7 @@ def create_app(config_class=None):
     
     # Add route for the upload page that users will be redirected to after login
     @app.route('/upload')
+    @login_required
     def upload():
         return render_template('upload.html')
     
