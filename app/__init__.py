@@ -40,7 +40,8 @@ def create_app(config_class=None):
     @app.route('/upload')
     @login_required
     def upload():
-        return render_template('upload.html')
+        from flask_login import current_user
+        return render_template('upload.html', user=current_user)
     
     # Create database tables if they don't exist
     with app.app_context():
