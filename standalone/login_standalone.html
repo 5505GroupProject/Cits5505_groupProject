@@ -3,15 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>SentiNews - Home</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS to be added to your stylesheet -->
+    <!-- CSS to be added to your stylesheet -->
+    <style>
+        .site-header {
+            background-color: black;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-nav .nav-link {
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: yellowgreen !important;
+        }
+        
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: yellowgreen;
+            transition: width 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Buttons for login/register */
+        .btn-fancy-login {
+            background: linear-gradient(135deg, yellowgreen, yellowgreen);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(73, 209, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-fancy-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 50px rgba(50, 201, 45, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .btn-fancy-register {
+            background: linear-gradient(135deg, yellowgreen, yellowgreen);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(77, 211, 59, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-fancy-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(89, 207, 71, 0.5);
+            color: white;
+        }
+
+        /* Intro section */
+        .intro-section {
+            background-color: #f1f1dd;
+            min-height: calc(100vh - 70px); /* Full viewport height minus header height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .intro-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .intro-section p {
+            font-size: 1.2rem;
+            color: #6c757d;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Features section */
+        .features-section {
+            padding: 40px 0;
+            background-color: #f1f1dd;
+            text-align: center;
+        }
+
+        .feature-card {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background-color: whitesmoke;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: yellowgreen;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        /* Testimonials section */
+        .testimonials-section {
+            padding: 40px 0;
+            text-align: center;
+            background-color: #f1f1dd;
+
+        .testimonial-card {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .testimonial-card h6 {
+            margin-top: 10px;
+            color: #343a40;
+        }
+
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="bg-dark text-white py-4" style="height: 100px; margin: 0;">
-        <!-- Header content empty -->
-    </div>
+
+    <!-- Header Section -->
+    <header class="site-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Logo on the left -->
+                <div class="col-md-3">
+                    <a href="index.html" class="text-decoration-none text-white">
+                        <h1 class="mb-0"><i class="bi bi-newspaper me-2"></i><span style="color: yellowgreen;">S</span>enti<span style="color: yellowgreen;">N</span>ews</h1>
+                    </a>
+                </div>
+
+                <!-- Navigation buttons in the middle -->
+                <div class="col-md-6">
+                    <nav class="navbar navbar-expand">
+                        <div class="container-fluid justify-content-center">
+                            <ul class="navbar-nav">
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="index.html">
+                                        <i class="bi bi-house-door-fill me-1"></i>Home
+                                    </a>
+                                </li>
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="upload.html">
+                                        <i class="bi bi-upload me-1"></i>Upload News
+                                    </a>
+                                </li>
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="share.html">
+                                        <i class="bi bi-share-fill me-1"></i>Share
+                                    </a>
+                                </li>
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="analysis.html">
+                                        <i class="bi bi-graph-up me-1"></i>Analysis
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+
+                <!-- Login/Register on the right -->
+                <div class="col-md-3 text-end">
+                    <a href="login.html" class="btn btn-fancy-login me-2">
+                        <i class="bi bi-person-circle me-1"></i>Login
+                    </a>
+                    <a href="register.html" class="btn btn-fancy-register">
+                        <i class="bi bi-person-plus-fill me-1"></i>Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Intro Section -->
+    <section class="intro-section">
+        <div class="container">
+            <h1>Welcome to SentiNews</h1>
+            <p>Discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
+            <a href="register.html" class="btn btn-fancy-register mt-3">Get Started</a>
+        </div>
+    </section>
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="container">
+                <h2 class="mb-4">What We Offer</h2>
+                <div class="row">
+                    <div class="col-md-4 feature-card">
+                        <i class="bi bi-upload"></i>
+                        <h4>Upload News</h4>
+                        <p>Share your own news articles and contribute to our growing database.</p>
+                        <a href="upload.html" class="btn btn-primary">Explore</a>
+                    </div>
+                    <div class="col-md-4 feature-card">
+                        <i class="bi bi-share-fill"></i>
+                        <h4>Share</h4>
+                        <p>Connect with others by sharing and discussing the latest news.</p>
+                        <a href="share.html" class="btn btn-primary">Join Now</a>
+                    </div>
+                    <div class="col-md-4 feature-card">
+                        <i class="bi bi-graph-up"></i>
+                        <h4>Analysis</h4>
+                        <p>Gain insights with our sentiment analysis tools for a deeper understanding.</p>
+                        <a href="analysis.html" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+        <!-- Testimonials Section -->
+        <section class="testimonials-section">
+            <div class="container">
+                <h2 class="mb-4">What Our Users Say</h2>
+                <div class="row">
+                    <div class="col-md-4 testimonial-card">
+                        <p>"SentiNews has transformed the way I stay informed. The sentiment analysis is incredibly insightful!"</p>
+                        <h6>Doge</h6>
+                    </div>
+                    <div class="col-md-4 testimonial-card">
+                        <p>"I love how easy it is to share and discuss news with the community."</p>
+                        <h6>Elon</h6>
+                    </div>
+                    <div class="col-md-4 testimonial-card">
+                        <p>"A fantastic platform for anyone interested in understanding news on a deeper level."</p>
+                        <h6>Mathew</h6>
+                    </div>
+                </div>
+            </div>
+        </section>
 
     <!-- Main Content -->
     <div class="container my-4">
@@ -275,9 +535,11 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-dark text-white py-4" style="height: 100px; margin: 0;">
-        <!-- Footer content empty -->
-    </div>
+    <footer class="container mt-5 pb-3">
+        <div class="border-top pt-3">
+            <p class="text-center text-muted">footer</p>
+        </div>
+    </footer>
     
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -344,19 +606,30 @@
                 $('#loginContainer').show();
             });
             
-            // Form submission handling (simulation)
+            // Form submission handling - Updated to redirect to upload.html with any credentials
             $('#loginForm').submit(function(e) {
                 e.preventDefault();
                 if (this.checkValidity()) {
-                    showFlashMessage('Login successful! This is a demo message.', 'success');
+                    showFlashMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect to upload page after short delay
+                    setTimeout(function() {
+                        window.location.href = 'upload.html';
+                    }, 1000);
                 }
                 $(this).addClass('was-validated');
             });
             
+            // Register form submission - Also redirect to upload
             $('#registerForm').submit(function(e) {
                 e.preventDefault();
                 if (this.checkValidity() && $('#reg_password').val() === $('#confirm-password').val()) {
-                    showFlashMessage('Registration successful! This is a demo message.', 'success');
+                    showFlashMessage('Registration successful! Redirecting...', 'success');
+                    
+                    // Redirect to upload page after short delay
+                    setTimeout(function() {
+                        window.location.href = 'upload.html';
+                    }, 1000);
                 }
                 $(this).addClass('was-validated');
             });
@@ -368,9 +641,14 @@
                                   $(document.activeElement).val() : 'verify_code';
                     
                     if (action === 'send_code') {
-                        showFlashMessage('Verification code sent! This is a demo message.', 'info');
+                        showFlashMessage('Verification code sent!', 'info');
                     } else {
-                        showFlashMessage('Code verified! This is a demo message.', 'success');
+                        showFlashMessage('Code verified! Redirecting...', 'success');
+                        
+                        // Redirect to upload page after password reset
+                        setTimeout(function() {
+                            window.location.href = 'upload.html';
+                        }, 1000);
                     }
                 }
                 $(this).addClass('was-validated');
