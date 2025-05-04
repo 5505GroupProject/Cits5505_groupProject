@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Analyzed News Sentiment Data</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 5px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #b4b3b3;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        #shareImagePreview {
+            display: block;
+            max-width: 100%;
+            margin-top: 5px;
+            border: 1px solid #b4b3b3;
+            border-radius: 5px;
+        }
+        .share-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .share-buttons button {
+            width: 30%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Share Analyzed News Sentiment Data</h1>
+        <form id="shareForm">
+            <div class="form-group">
+                <label for="colleagueSelect">Choose Colleague:</label>
+                <select id="colleagueSelect" required>
+                    <option value="">Select a Colleague</option>
+                    <option value="colleague1">Colleague 1</option>
+                    <option value="colleague2">Colleague 2</option>
+                    <option value="colleague3">Colleague 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="shareImageUpload">Upload shareImage:</label>
+                <input type="file" id="shareImageUpload" accept="image/*" required>
+                <img id="shareImagePreview" alt="shareImage Preview" style="display: none;">
+            </div>
+            <div class="form-group share-buttons">
+                <button type="button" onclick="sharedNewsSentimentDataByEmail()">Email</button>
+                <button type="button" onclick="sharedNewsSentimentDataToGoogleDocs()">Google Docs</button>
+                <button type="button" onclick="sharedNewsSentimentDataInstantMessage()">Instant Message</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const shareImageUpload = document.getElementById('shareImageUpload');
+        const shareImagePreview = document.getElementById('shareImagePreview');
+
+        shareImageUpload.addEventListener('change', function () {
+            const shareFile = this.files[0];
+            if (shareFile) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    shareImagePreview.src = e.target.result;
+                    shareImagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(shareFile);
+            }
+        });
+
+        function sharedNewsSentimentDataByEmail() {
+            const colleague = document.getElementById('colleagueSelect').value;
+            if (!colleague) {
+                alert('Please select a colleague you would like to share!');
+                return;
+            }
+            alert(`Share via Email to ${colleague}`);
+        }
+
+        function sharedNewsSentimentDataToGoogleDocs() {
+            const colleague = document.getElementById('colleagueSelect').value;
+            if (!colleague) {
+                alert('Please select a colleague you would like to share!');
+                return;
+            }
+            alert(`Share to Google Docs for ${colleague}`);
+        }
+
+        function sharedNewsSentimentDataInstantMessage() {
+            const colleague = document.getElementById('colleagueSelect').value;
+            if (!colleague) {
+                alert('Please select a colleague you would like to share!');
+                return;
+            }
+            alert(`Share via Instant Message to ${colleague}`);
+        }
+    </script>
+</body>
+</html>

@@ -1,44 +1,26 @@
-
-```markdown
 # Cits5505 Group Project
 
-## Environment Setup
+## Quick Start Guide
 
-### 1. Create a Virtual Environment
-```bash
+### Environment Setup
+
+1. **Create Virtual Environment**
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\activate  # For Windows
+# source venv/bin/activate  # For Linux/Mac
 ```
 
-### 2. Install Dependencies
-If a `requirements.txt` file exists, install dependencies with:
-```bash
-pip install -r requirements.txt
-```
-
-If `requirements.txt` is empty, manually install Flask and SQLAlchemy:
-```bash
+2. **Install Dependencies**
+# Core dependencies
 pip install flask flask-sqlalchemy
 ```
 
-### 3. Initialize the Database
-Run the following commands to create the SQLite database:
+### Launch Application
+
+1. **Run the Application**
 ```bash
-python
->>> from app import db
->>> db.create_all()
->>> exit()
+python run.py
 ```
 
-### 4. Run the Application
-Start the Flask development server:
-```bash
-python app.py
-```
-
-### 5. Access the Application
-Open your browser and go to:
-```
-http://127.0.0.1:5000/
-```
-```
+2. **Access the Application**
+Open in browser: http://127.0.0.1:5000/
