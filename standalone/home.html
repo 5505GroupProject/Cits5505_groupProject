@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SentiNews - Home</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS to be added to your stylesheet -->
-    <!-- CSS to be added to your stylesheet -->
+      <!-- Bootstrap CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+      <!-- Font Awesome for icons -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+      <!-- Bootstrap Icons 
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> -->
     <style>
         .site-header {
             background-color: black;
@@ -60,26 +62,9 @@
             transition: all 0.3s ease;
         }
 
-        .btn-fancy-register {
-            background: linear-gradient(135deg, yellowgreen, yellowgreen);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 8px 20px;
-            font-weight: 500;
-            box-shadow: 0 2px 10px rgba(77, 211, 59, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-fancy-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(89, 207, 71, 0.5);
-            color: white;
-        }
-
         /* Intro section */
         .intro-section {
-            background-color: #f1f1dd;
+            background-color: whitesmoke;
             min-height: calc(100vh - 70px); /* Full viewport height minus header height */
             display: flex;
             align-items: center;
@@ -141,6 +126,7 @@
             padding: 40px 0;
             text-align: center;
             background-color: #f1f1dd;
+        }
 
         .testimonial-card {
             margin: 20px 0;
@@ -157,6 +143,51 @@
         .testimonial-card h6 {
             margin-top: 10px;
             color: #343a40;
+        }
+                /* Footer section */
+        .site-footer {
+            background-color: black;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        .site-footer a {
+            color: #d3d3d3;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: yellowgreen;
+        }
+
+        .site-footer h5 {
+            color: yellowgreen;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .site-footer p {
+            color: #d3d3d3;
+            font-size: 0.9rem;
+        }
+
+        .site-footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .site-footer ul li {
+            margin-bottom: 10px;
+        }
+
+        .site-footer .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #d3d3d3;
+            font-size: 0.85rem;
         }
 
     </style>
@@ -209,9 +240,6 @@
                     <a href="login.html" class="btn btn-fancy-login me-2">
                         <i class="bi bi-person-circle me-1"></i>Login
                     </a>
-                    <a href="register.html" class="btn btn-fancy-register">
-                        <i class="bi bi-person-plus-fill me-1"></i>Register
-                    </a>
                 </div>
             </div>
         </div>
@@ -222,517 +250,108 @@
         <div class="container">
             <h1>Welcome to SentiNews</h1>
             <p>Discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
-            <a href="register.html" class="btn btn-fancy-register mt-3">Get Started</a>
+            <a href="#" class="btn btn-fancy-login mt-3">Get Started</a>
         </div>
     </section>
-        <!-- Features Section -->
-        <section class="features-section">
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="mb-4">What We Offer</h2>
+            <div class="row">
+                <div class="col-md-4 feature-card">
+                    <i class="bi bi-upload"></i>
+                    <h4>Upload News</h4>
+                    <p>Share your own news articles and contribute to our growing database.</p>
+                    <p class="text-muted small"><strong>Example:</strong> Upload a local news story about a community event, and our platform will analyze its sentiment to highlight its positive impact.</p>
+                    <a href="upload.html" class="btn btn-primary">Explore</a>
+                </div>
+                <div class="col-md-4 feature-card">
+                    <i class="bi bi-share-fill"></i>
+                    <h4>Share</h4>
+                    <p>Connect with others by sharing and discussing the latest news.</p>
+                    <p class="text-muted small"><strong>Example:</strong> Share a trending article on social media directly from SentiNews, sparking a discussion with your followers about its implications.</p>
+                    <a href="share.html" class="btn btn-primary">Join Now</a>
+                </div>
+                <div class="col-md-4 feature-card">
+                    <i class="bi bi-graph-up"></i>
+                    <h4>Analysis</h4>
+                    <p>Gain insights with our sentiment analysis tools for a deeper understanding.</p>
+                    <p class="text-muted small"><strong>Example:</strong> Analyze a political news article to see if it carries a positive, negative, or neutral tone, helping you understand media bias.</p>
+                    <a href="analysis.html" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Slide-bar -->
+    <section class="testimonials-section">
+        <div class="container">
+            <h2 class="mb-4">What Our Users Say</h2>
+            <!-- Bootstrap carousel -->
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000">
+                <div class="carousel-inner">
+                    <!-- Slide 1 (active) -->
+                    <div class="carousel-item active text-center p-4">
+                        <p class="fst-italic">"SentiNews helped me understand the tone of news articles about my favorite topics.As i analyzed a tech article and discovered its optimistic outlook!"</p>
+                        <h6 class="mt-2">Doge</h6>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="carousel-item text-center p-4">
+                        <p class="fst-italic">"Sharing news on SentiNews is so easy! I shared a local election story with my community, and it sparked a great discussion."</p>
+                        <h6 class="mt-2">Elon</h6>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="carousel-item text-center p-4">
+                        <p class="fst-italic">"Uploading my own articles to SentiNews was a game-changer. I uploaded a piece about a charity event, and the sentiment analysis showed its positive impact."</p>
+                        <h6 class="mt-2">Mathew</h6>
+                    </div>
+                </div>
+                <!-- Navigation arrows -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev" aria-label="Previous testimonial">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next" aria-label="Next testimonial">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </section>
+        <!-- Footer Section -->
+        <footer class="site-footer">
             <div class="container">
-                <h2 class="mb-4">What We Offer</h2>
                 <div class="row">
-                    <div class="col-md-4 feature-card">
-                        <i class="bi bi-upload"></i>
-                        <h4>Upload News</h4>
-                        <p>Share your own news articles and contribute to our growing database.</p>
-                        <a href="upload.html" class="btn btn-primary">Explore</a>
+                    <!-- Logo and Description -->
+                    <div class="col-md-4 mb-4">
+                        <h5><i class="bi bi-newspaper me-2"></i>SentiNews</h5>
+                        <p>SentiNews is your platform to discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
                     </div>
-                    <div class="col-md-4 feature-card">
-                        <i class="bi bi-share-fill"></i>
-                        <h4>Share</h4>
-                        <p>Connect with others by sharing and discussing the latest news.</p>
-                        <a href="share.html" class="btn btn-primary">Join Now</a>
+                    <!-- Navigation Links -->
+                    <div class="col-md-4 mb-4">
+                        <h5>Quick Links</h5>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="upload.html">Upload News</a></li>
+                            <li><a href="share.html">Share</a></li>
+                            <li><a href="analysis.html">Analysis</a></li>
+                        </ul>
                     </div>
-                    <div class="col-md-4 feature-card">
-                        <i class="bi bi-graph-up"></i>
-                        <h4>Analysis</h4>
-                        <p>Gain insights with our sentiment analysis tools for a deeper understanding.</p>
-                        <a href="analysis.html" class="btn btn-primary">Learn More</a>
+                    <!-- Account Links -->
+                    <div class="col-md-4 mb-4">
+                        <h5>Account</h5>
+                        <ul>
+                            <li><a href="login.html">Login</a></li>
+                            <li><a href="register.html">Register</a></li>
+                        </ul>
                     </div>
                 </div>
+                <!-- Copyright -->
+                <div class="copyright">
+                    <p>&copy; 2025 SentiNews. All rights reserved.</p>
+                </div>
             </div>
-        </section>
+        </footer>
+
     
-        <!-- Testimonials Section -->
-        <section class="testimonials-section">
-            <div class="container">
-                <h2 class="mb-4">What Our Users Say</h2>
-                <div class="row">
-                    <div class="col-md-4 testimonial-card">
-                        <p>"SentiNews has transformed the way I stay informed. The sentiment analysis is incredibly insightful!"</p>
-                        <h6>Doge</h6>
-                    </div>
-                    <div class="col-md-4 testimonial-card">
-                        <p>"I love how easy it is to share and discuss news with the community."</p>
-                        <h6>Elon</h6>
-                    </div>
-                    <div class="col-md-4 testimonial-card">
-                        <p>"A fantastic platform for anyone interested in understanding news on a deeper level."</p>
-                        <h6>Mathew</h6>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    <!-- Main Content -->
-    <div class="container my-4">
-        <div class="row">
-            <!-- Flash messages -->
-            <div class="col-12 mb-3" id="flashMessages">
-                <!-- Flash messages will be inserted here dynamically -->
-            </div>
-
-            <!-- Login/Register forms container - 30% width -->
-            <div class="col-md-4">
-                <!-- Login Form -->
-                <div id="loginContainer">
-                    <h2 class="mb-4">Login</h2>
-                    <form id="loginForm" action="#" method="post" class="needs-validation" novalidate>
-                        <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username:</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                            <div class="invalid-feedback">
-                                Please enter your username.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password:</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                            <div class="invalid-feedback">
-                                Please enter your password.
-                            </div>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
-                            <label class="form-check-label" for="rememberMe">Remember me</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </form>
-                    <div class="card mt-3 p-3">
-                        <p>Don't have an account? <a href="#" id="showRegisterForm">Register here</a></p>
-                        <p class="mb-0"><a href="#" id="showForgotPasswordForm">Forgot your password?</a></p>
-                    </div>
-                </div>
-                
-                <!-- Register Form (hidden by default) -->
-                <div id="registerContainer" style="display: none;">
-                    <h2 class="mb-4">Register</h2>
-                    <form id="registerForm" action="#" method="post" class="needs-validation" novalidate>
-                        <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
-                        <div class="mb-3">
-                            <label for="reg_username" class="form-label">Username:</label>
-                            <input type="text" class="form-control" id="reg_username" name="username" required minlength="3" maxlength="20">
-                            <div class="invalid-feedback">
-                                Username must be between 3-20 characters.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email:</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                            <div class="invalid-feedback">
-                                Please enter a valid email address.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="reg_password" class="form-label">Password:</label>
-                            <input type="password" class="form-control" id="reg_password" name="password" required minlength="8">
-                            <div class="invalid-feedback">
-                                Password must be at least 8 characters long.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirm-password" class="form-label">Confirm Password:</label>
-                            <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
-                            <div class="invalid-feedback" id="password-match-feedback">
-                                Passwords do not match.
-                            </div>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="termsAgree" name="terms_agree" required>
-                            <label class="form-check-label" for="termsAgree">I agree to the Terms and Conditions</label>
-                            <div class="invalid-feedback">
-                                You must agree to the terms and conditions.
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </form>
-                    <div class="card mt-3 p-3">
-                        <p class="mb-0">Already have an account? <a href="#" id="showLoginForm">Login here</a></p>
-                    </div>
-                </div>
-                
-                <!-- Forgot Password Form (hidden by default) -->
-                <div id="forgotPasswordContainer" style="display: none;">
-                    <h2 class="mb-4">Forgot Password</h2>
-                    <form id="forgotPasswordForm" action="#" method="post" class="needs-validation" novalidate>
-                        <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
-                        <div class="mb-3">
-                            <label for="fp_email" class="form-label">Enter your email address:</label>
-                            <input type="email" class="form-control" id="fp_email" name="email" required>
-                            <div class="invalid-feedback">
-                                Please enter a valid email address.
-                            </div>
-                        </div>
-                        <div class="mb-3 d-grid">
-                            <button type="submit" name="action" value="send_code" class="btn btn-primary">Send Verification Code</button>
-                        </div>
-                        <div class="mb-3">
-                            <label for="verificationCode" class="form-label">Enter the verification code:</label>
-                            <input type="text" class="form-control" id="verificationCode" name="verification_code" pattern="[0-9]{6}" title="6-digit code">
-                            <div class="invalid-feedback">
-                                Please enter a valid 6-digit verification code.
-                            </div>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" name="action" value="verify_code" class="btn btn-primary">Verify Code</button>
-                        </div>
-                    </form>
-                    <div class="card mt-3 p-3">
-                        <p class="mb-0">Remember your password? <a href="#" id="backToLoginForm">Back to login</a></p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Right content - 70% width -->
-            <div class="col-md-8">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-column">
-                        <h3 class="card-title mb-4">Project Description</h3>
-                        
-                        <!-- Carousel Slider - centered in the container -->
-                        <div id="projectCarousel" class="carousel slide position-relative flex-grow-1 d-flex flex-column justify-content-center" data-bs-interval="false">
-                            <!-- Carousel indicators -->
-                            <div class="carousel-indicators">
-                                <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                            </div>
-                            
-                            <!-- Split Carousel content with 40:60 ratio -->
-                            <div class="carousel-inner px-5">
-                                <!-- Slide 1 -->
-                                <div class="carousel-item active">
-                                    <div class="row">
-                                        <!-- Left side - 40% width -->
-                                        <div class="col-5">
-                                            <div class="h-100 d-flex align-items-center justify-content-center">
-                                                <img src="../app/static/image/data_visualization.svg" alt="Slide 1" class="img-fluid" onerror="this.onerror=null; this.src='../app/static/image/placeholder.png';">
-                                            </div>
-                                        </div>
-                                        <!-- Right side - 60% width -->
-                                        <div class="col-7">
-                                            <div class="d-block w-100 p-3">
-                                                <h4>Slide 1</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Slide 2 -->
-                                <div class="carousel-item">
-                                    <div class="row">
-                                        <!-- Left side - 40% width -->
-                                        <div class="col-5">
-                                            <div class="h-100 d-flex align-items-center justify-content-center">
-                                                <img src="../app/static/image/analytics.svg" alt="Slide 2" class="img-fluid" onerror="this.onerror=null; this.src='../app/static/image/placeholder.png';">
-                                            </div>
-                                        </div>
-                                        <!-- Right side - 60% width -->
-                                        <div class="col-7">
-                                            <div class="d-block w-100 p-3">
-                                                <h4>Slide 2</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Slide 3 -->
-                                <div class="carousel-item">
-                                    <div class="row">
-                                        <!-- Left side - 40% width -->
-                                        <div class="col-5">
-                                            <div class="h-100 d-flex align-items-center justify-content-center">
-                                                <img src="../app/static/image/collaboration.svg" alt="Slide 3" class="img-fluid" onerror="this.onerror=null; this.src='../app/static/image/placeholder.png';">
-                                            </div>
-                                        </div>
-                                        <!-- Right side - 60% width -->
-                                        <div class="col-7">
-                                            <div class="d-block w-100 p-3">
-                                                <h4>Slide 3</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Carousel controls with centered positioning -->
-                            <button class="carousel-control-prev position-absolute" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev" 
-                                    style="width: auto; left: -15px; top: 50%; transform: translateY(-50%);">
-                                <span class="carousel-control-prev-icon bg-secondary rounded-circle p-2" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next position-absolute" type="button" data-bs-target="#projectCarousel" data-bs-slide="next" 
-                                    style="width: auto; right: -15px; top: 50%; transform: translateY(-50%);">
-                                <span class="carousel-control-next-icon bg-secondary rounded-circle p-2" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- New container, height 200px -->
-        <div class="card mt-4" style="height: 200px;">
-            <div class="card-body">
-                <div class="row h-100">
-                    <!-- Chart 1 -->
-                    <div class="col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body d-flex align-items-center justify-content-center">
-                                <div class="text-center">
-                                    <h5>Example Chart</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Chart 2 -->
-                    <div class="col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body d-flex align-items-center justify-content-center">
-                                <div class="text-center">
-                                    <h5>Example Chart</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Chart 3 -->
-                    <div class="col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body d-flex align-items-center justify-content-center">
-                                <div class="text-center">
-                                    <h5>Example Chart</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Chart 4 -->
-                    <div class="col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body d-flex align-items-center justify-content-center">
-                                <div class="text-center">
-                                    <h5>Example Chart</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="container mt-5 pb-3">
-        <div class="border-top pt-3">
-            <p class="text-center text-muted">footer</p>
-        </div>
-    </footer>
-    <footer class="container mt-5 pb-3">
-        <div class="border-top pt-3">
-            <p class="text-center text-muted">footer</p>
-        </div>
-    </footer>
-    
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery (still included as it might be needed for other scripts) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <script>
-        $(document).ready(function() {
-            // Function to show a flash message (simulation)
-            function showFlashMessage(message, category) {
-                const alertHTML = `
-                    <div class="alert alert-${category} alert-dismissible fade show" role="alert">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                `;
-                $('#flashMessages').append(alertHTML);
-                
-                // Auto dismiss after 5 seconds
-                setTimeout(function() {
-                    $('.alert').alert('close');
-                }, 5000);
-            }
-            
-            // Function to hide all containers
-            function hideAllContainers() {
-                $('#loginContainer').hide();
-                $('#registerContainer').hide();
-                $('#forgotPasswordContainer').hide();
-            }
-            
-            // Check if we should specifically show the login form (from register page)
-            if(localStorage.getItem('showLoginForm') === 'true') {
-                hideAllContainers();
-                $('#loginContainer').show();
-                localStorage.removeItem('showLoginForm'); // Clear the flag
-            }
-            
-            // Show register form
-            $('#showRegisterForm').click(function(e) {
-                e.preventDefault();
-                hideAllContainers();
-                $('#registerContainer').show();
-            });
-            
-            // Show login form
-            $('#showLoginForm').click(function(e) {
-                e.preventDefault();
-                hideAllContainers();
-                $('#loginContainer').show();
-            });
-            
-            // Show forgot password form
-            $('#showForgotPasswordForm').click(function(e) {
-                e.preventDefault();
-                hideAllContainers();
-                $('#forgotPasswordContainer').show();
-            });
-            
-            // Back to login from forgot password
-            $('#backToLoginForm').click(function(e) {
-                e.preventDefault();
-                hideAllContainers();
-                $('#loginContainer').show();
-            });
-            
-            // Form submission handling - Updated to redirect to upload.html with any credentials
-            // Form submission handling - Updated to redirect to upload.html with any credentials
-            $('#loginForm').submit(function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    showFlashMessage('Login successful! Redirecting...', 'success');
-                    
-                    // Redirect to upload page after short delay
-                    setTimeout(function() {
-                        window.location.href = 'upload.html';
-                    }, 1000);
-                    showFlashMessage('Login successful! Redirecting...', 'success');
-                    
-                    // Redirect to upload page after short delay
-                    setTimeout(function() {
-                        window.location.href = 'upload.html';
-                    }, 1000);
-                }
-                $(this).addClass('was-validated');
-            });
-            
-            // Register form submission - Also redirect to upload
-            // Register form submission - Also redirect to upload
-            $('#registerForm').submit(function(e) {
-                e.preventDefault();
-                if (this.checkValidity() && $('#reg_password').val() === $('#confirm-password').val()) {
-                    showFlashMessage('Registration successful! Redirecting...', 'success');
-                    
-                    // Redirect to upload page after short delay
-                    setTimeout(function() {
-                        window.location.href = 'upload.html';
-                    }, 1000);
-                    showFlashMessage('Registration successful! Redirecting...', 'success');
-                    
-                    // Redirect to upload page after short delay
-                    setTimeout(function() {
-                        window.location.href = 'upload.html';
-                    }, 1000);
-                }
-                $(this).addClass('was-validated');
-            });
-            
-            $('#forgotPasswordForm').submit(function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    const action = $(document.activeElement).attr('name') === 'action' ? 
-                                  $(document.activeElement).val() : 'verify_code';
-                    
-                    if (action === 'send_code') {
-                        showFlashMessage('Verification code sent!', 'info');
-                        showFlashMessage('Verification code sent!', 'info');
-                    } else {
-                        showFlashMessage('Code verified! Redirecting...', 'success');
-                        
-                        // Redirect to upload page after password reset
-                        setTimeout(function() {
-                            window.location.href = 'upload.html';
-                        }, 1000);
-                        showFlashMessage('Code verified! Redirecting...', 'success');
-                        
-                        // Redirect to upload page after password reset
-                        setTimeout(function() {
-                            window.location.href = 'upload.html';
-                        }, 1000);
-                    }
-                }
-                $(this).addClass('was-validated');
-            });
-            
-            // Form validation for all forms
-            function validateForm(formId) {
-                $(formId).submit(function(event) {
-                    if (!this.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    
-                    // For registration form, check if passwords match
-                    if (formId === '#registerForm') {
-                        if ($('#reg_password').val() !== $('#confirm-password').val()) {
-                            $('#confirm-password').removeClass('is-valid').addClass('is-invalid');
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                    }
-                    
-                    $(this).addClass('was-validated');
-                });
-                
-                // Live validation as user types
-                $(formId + ' input').on('blur', function() {
-                    if (this.checkValidity()) {
-                        $(this).removeClass('is-invalid').addClass('is-valid');
-                    } else {
-                        $(this).removeClass('is-valid').addClass('is-invalid');
-                    }
-                });
-                
-                // For checkboxes
-                $(formId + ' input[type="checkbox"]').on('change', function() {
-                    if (this.checkValidity()) {
-                        $(this).removeClass('is-invalid').addClass('is-valid');
-                    } else {
-                        $(this).removeClass('is-valid').addClass('is-invalid');
-                    }
-                });
-            }
-            
-            // Initialize validation
-            validateForm('#loginForm');
-            validateForm('#registerForm');
-            validateForm('#forgotPasswordForm');
-            
-            // Special validation for password confirmation
-            $('#confirm-password, #reg_password').on('keyup', function() {
-                if ($('#reg_password').val() !== $('#confirm-password').val()) {
-                    $('#confirm-password').removeClass('is-valid').addClass('is-invalid');
-                } else {
-                    $('#confirm-password').removeClass('is-invalid').addClass('is-valid');
-                }
-            });
-        });
-    </script>
 </body>
 </html>
