@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SentiNews - Home</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS to be added to your stylesheet -->
+      <!-- Bootstrap CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+      <!-- Font Awesome for icons -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+      <!-- Bootstrap Icons 
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> -->
     <style>
         .site-header {
             background-color: black;
@@ -59,26 +62,9 @@
             transition: all 0.3s ease;
         }
 
-        .btn-fancy-register {
-            background: linear-gradient(135deg, yellowgreen, yellowgreen);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 8px 20px;
-            font-weight: 500;
-            box-shadow: 0 2px 10px rgba(77, 211, 59, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-fancy-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(89, 207, 71, 0.5);
-            color: white;
-        }
-
         /* Intro section */
         .intro-section {
-            background-color: #f1f1dd;
+            background-color: whitesmoke;
             min-height: calc(100vh - 70px); /* Full viewport height minus header height */
             display: flex;
             align-items: center;
@@ -159,7 +145,7 @@
             color: #343a40;
         }
                 /* Footer section */
-                .site-footer {
+        .site-footer {
             background-color: black;
             color: white;
             padding: 40px 0 20px;
@@ -207,7 +193,7 @@
     </style>
 </head>
 <body>
-    
+
     <!-- Header Section -->
     <header class="site-header">
         <div class="container">
@@ -254,9 +240,6 @@
                     <a href="login.html" class="btn btn-fancy-login me-2">
                         <i class="bi bi-person-circle me-1"></i>Login
                     </a>
-                    <a href="register.html" class="btn btn-fancy-register">
-                        <i class="bi bi-person-plus-fill me-1"></i>Register
-                    </a>
                 </div>
             </div>
         </div>
@@ -267,7 +250,7 @@
         <div class="container">
             <h1>Welcome to SentiNews</h1>
             <p>Discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
-            <a href="register.html" class="btn btn-fancy-register mt-3">Get Started</a>
+            <a href="#" class="btn btn-fancy-login mt-3">Get Started</a>
         </div>
     </section>
 

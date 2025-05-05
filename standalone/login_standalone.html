@@ -1,308 +1,509 @@
-<!-- Main Content -->
-<div class="container my-4">
-    <div class="row">
-        <!-- Flash messages -->
-        <div class="col-12 mb-3" id="flashMessages">
-            <!-- Flash messages will be inserted here dynamically -->
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentiNews - Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Bootstrap Icons
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">  -->
+    <style>
+        .site-header {
+            background-color: black;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-nav .nav-link {
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: yellowgreen !important;
+        }
+        
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: yellowgreen;
+            transition: width 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .btn-fancy-login {
+            background: linear-gradient(135deg, yellowgreen, yellowgreen);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(73, 209, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-fancy-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 50px rgba(50, 201, 45, 0.5);
+            transition: all 0.3s ease;
+        }
 
-        <!-- Login/Register forms container - 30% width -->
-        <div class="col-md-4">
-            <!-- Login Form -->
-            <div id="loginContainer">
-                <h2 class="mb-4">Login</h2>
-                <form id="loginForm" action="#" method="post" class="needs-validation" novalidate>
-                    <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username:</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                        <div class="invalid-feedback">
-                            Please enter your username.
-                        </div>
+        .site-footer {
+            background-color: black;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        .site-footer a {
+            color: #d3d3d3;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: yellowgreen;
+        }
+
+        .site-footer h5 {
+            color: yellowgreen;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .site-footer p {
+            color: #d3d3d3;
+            font-size: 0.9rem;
+        }
+
+        .site-footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .site-footer ul li {
+            margin-bottom: 10px;
+        }
+
+        .site-footer .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #d3d3d3;
+            font-size: 0.85rem;
+        }
+
+        .login-section {
+            background-color: #f1f1dd;
+            min-height: calc(100vh - 70px);
+            padding: 40px 0;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+        <!-- Header Section -->
+        <header class="site-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <!-- Logo on the left -->
+                    <div class="col-md-3">
+                        <a href="index.html" class="text-decoration-none text-white">
+                            <h1 class="mb-0"><i class="bi bi-newspaper me-2"></i><span style="color: yellowgreen;">S</span>enti<span style="color: yellowgreen;">N</span>ews</h1>
+                        </a>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password:</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <div class="invalid-feedback">
-                            Please enter your password.
-                        </div>
+    
+                    <!-- Navigation buttons in the middle -->
+                    <div class="col-md-6">
+                        <nav class="navbar navbar-expand">
+                            <div class="container-fluid justify-content-center">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item mx-2">
+                                        <a class="nav-link text-white" href="index.html">
+                                            <i class="bi bi-house-door-fill me-1"></i>Home
+                                        </a>
+                                    </li>
+                                    <li class="nav-item mx-2">
+                                        <a class="nav-link text-white" href="upload.html">
+                                            <i class="bi bi-upload me-1"></i>Upload News
+                                        </a>
+                                    </li>
+                                    <li class="nav-item mx-2">
+                                        <a class="nav-link text-white" href="share.html">
+                                            <i class="bi bi-share-fill me-1"></i>Share
+                                        </a>
+                                    </li>
+                                    <li class="nav-item mx-2">
+                                        <a class="nav-link text-white" href="analysis.html">
+                                            <i class="bi bi-graph-up me-1"></i>Analysis
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
                     </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
-                        <label class="form-check-label" for="rememberMe">Remember me</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
-                <div class="card mt-3 p-3">
-                    <p>Don't have an account? <a href="#" id="showRegisterForm">Register here</a></p>
-                    <p class="mb-0"><a href="#" id="showForgotPasswordForm">Forgot your password?</a></p>
-                </div>
-            </div>
-            
-            <!-- Register Form (hidden by default) -->
-            <div id="registerContainer" style="display: none;">
-                <h2 class="mb-4">Register</h2>
-                <form id="registerForm" action="#" method="post" class="needs-validation" novalidate>
-                    <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
-                    <div class="mb-3">
-                        <label for="reg_username" class="form-label">Username:</label>
-                        <input type="text" class="form-control" id="reg_username" name="username" required minlength="3" maxlength="20">
-                        <div class="invalid-feedback">
-                            Username must be between 3-20 characters.
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email:</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                        <div class="invalid-feedback">
-                            Please enter a valid email address.
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="reg_password" class="form-label">Password:</label>
-                        <input type="password" class="form-control" id="reg_password" name="password" required minlength="8">
-                        <div class="invalid-feedback">
-                            Password must be at least 8 characters long.
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="confirm-password" class="form-label">Confirm Password:</label>
-                        <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
-                        <div class="invalid-feedback" id="password-match-feedback">
-                            Passwords do not match.
-                        </div>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="termsAgree" name="terms_agree" required>
-                        <label class="form-check-label" for="termsAgree">I agree to the Terms and Conditions</label>
-                        <div class="invalid-feedback">
-                            You must agree to the terms and conditions.
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </form>
-                <div class="card mt-3 p-3">
-                    <p class="mb-0">Already have an account? <a href="#" id="showLoginForm">Login here</a></p>
-                </div>
-            </div>
-            
-            <!-- Forgot Password Form (hidden by default) -->
-            <div id="forgotPasswordContainer" style="display: none;">
-                <h2 class="mb-4">Forgot Password</h2>
-                <form id="forgotPasswordForm" action="#" method="post" class="needs-validation" novalidate>
-                    <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
-                    <div class="mb-3">
-                        <label for="fp_email" class="form-label">Enter your email address:</label>
-                        <input type="email" class="form-control" id="fp_email" name="email" required>
-                        <div class="invalid-feedback">
-                            Please enter a valid email address.
-                        </div>
-                    </div>
-                    <div class="mb-3 d-grid">
-                        <button type="submit" name="action" value="send_code" class="btn btn-primary">Send Verification Code</button>
-                    </div>
-                    <div class="mb-3">
-                        <label for="verificationCode" class="form-label">Enter the verification code:</label>
-                        <input type="text" class="form-control" id="verificationCode" name="verification_code" pattern="[0-9]{6}" title="6-digit code">
-                        <div class="invalid-feedback">
-                            Please enter a valid 6-digit verification code.
-                        </div>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" name="action" value="verify_code" class="btn btn-primary">Verify Code</button>
-                    </div>
-                </form>
-                <div class="card mt-3 p-3">
-                    <p class="mb-0">Remember your password? <a href="#" id="backToLoginForm">Back to login</a></p>
+
+                <!-- Login/Register on the right -->
+                <div class="col-md-3 text-end">
+                    <a href="login.html" class="btn btn-fancy-login meToyota Camry me-2">
+                        <i class="bi bi-person-circle me-1"></i>Login
+                    </a>
                 </div>
             </div>
         </div>
-</div>
- <!-- Bootstrap Bundle with Popper -->
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
- <!-- jQuery (still included as it might be needed for other scripts) -->
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
- 
- <script>
-     $(document).ready(function() {
-         // Function to show a flash message (simulation)
-         function showFlashMessage(message, category) {
-             const alertHTML = `
-                 <div class="alert alert-${category} alert-dismissible fade show" role="alert">
-                     ${message}
-                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                 </div>
-             `;
-             $('#flashMessages').append(alertHTML);
-             
-             // Auto dismiss after 5 seconds
-             setTimeout(function() {
-                 $('.alert').alert('close');
-             }, 5000);
-         }
-         
-         // Function to hide all containers
-         function hideAllContainers() {
-             $('#loginContainer').hide();
-             $('#registerContainer').hide();
-             $('#forgotPasswordContainer').hide();
-         }
-         
-         // Check if we should specifically show the login form (from register page)
-         if(localStorage.getItem('showLoginForm') === 'true') {
-             hideAllContainers();
-             $('#loginContainer').show();
-             localStorage.removeItem('showLoginForm'); // Clear the flag
-         }
-         
-         // Show register form
-         $('#showRegisterForm').click(function(e) {
-             e.preventDefault();
-             hideAllContainers();
-             $('#registerContainer').show();
-         });
-         
-         // Show login form
-         $('#showLoginForm').click(function(e) {
-             e.preventDefault();
-             hideAllContainers();
-             $('#loginContainer').show();
-         });
-         
-         // Show forgot password form
-         $('#showForgotPasswordForm').click(function(e) {
-             e.preventDefault();
-             hideAllContainers();
-             $('#forgotPasswordContainer').show();
-         });
-         
-         // Back to login from forgot password
-         $('#backToLoginForm').click(function(e) {
-             e.preventDefault();
-             hideAllContainers();
-             $('#loginContainer').show();
-         });
-         
-         // Form submission handling - Updated to redirect to upload.html with any credentials
-         // Form submission handling - Updated to redirect to upload.html with any credentials
-         $('#loginForm').submit(function(e) {
-             e.preventDefault();
-             if (this.checkValidity()) {
-                 showFlashMessage('Login successful! Redirecting...', 'success');
-                 
-                 // Redirect to upload page after short delay
-                 setTimeout(function() {
-                     window.location.href = 'upload.html';
-                 }, 1000);
-                 showFlashMessage('Login successful! Redirecting...', 'success');
-                 
-                 // Redirect to upload page after short delay
-                 setTimeout(function() {
-                     window.location.href = 'upload.html';
-                 }, 1000);
-             }
-             $(this).addClass('was-validated');
-         });
-         
-         // Register form submission - Also redirect to upload
-         // Register form submission - Also redirect to upload
-         $('#registerForm').submit(function(e) {
-             e.preventDefault();
-             if (this.checkValidity() && $('#reg_password').val() === $('#confirm-password').val()) {
-                 showFlashMessage('Registration successful! Redirecting...', 'success');
-                 
-                 // Redirect to upload page after short delay
-                 setTimeout(function() {
-                     window.location.href = 'upload.html';
-                 }, 1000);
-                 showFlashMessage('Registration successful! Redirecting...', 'success');
-                 
-                 // Redirect to upload page after short delay
-                 setTimeout(function() {
-                     window.location.href = 'upload.html';
-                 }, 1000);
-             }
-             $(this).addClass('was-validated');
-         });
-         
-         $('#forgotPasswordForm').submit(function(e) {
-             e.preventDefault();
-             if (this.checkValidity()) {
-                 const action = $(document.activeElement).attr('name') === 'action' ? 
-                               $(document.activeElement).val() : 'verify_code';
-                 
-                 if (action === 'send_code') {
-                     showFlashMessage('Verification code sent!', 'info');
-                     showFlashMessage('Verification code sent!', 'info');
-                 } else {
-                     showFlashMessage('Code verified! Redirecting...', 'success');
-                     
-                     // Redirect to upload page after password reset
-                     setTimeout(function() {
-                         window.location.href = 'upload.html';
-                     }, 1000);
-                     showFlashMessage('Code verified! Redirecting...', 'success');
-                     
-                     // Redirect to upload page after password reset
-                     setTimeout(function() {
-                         window.location.href = 'upload.html';
-                     }, 1000);
-                 }
-             }
-             $(this).addClass('was-validated');
-         });
-         
-         // Form validation for all forms
-         function validateForm(formId) {
-             $(formId).submit(function(event) {
-                 if (!this.checkValidity()) {
-                     event.preventDefault();
-                     event.stopPropagation();
-                 }
-                 
-                 // For registration form, check if passwords match
-                 if (formId === '#registerForm') {
-                     if ($('#reg_password').val() !== $('#confirm-password').val()) {
-                         $('#confirm-password').removeClass('is-valid').addClass('is-invalid');
-                         event.preventDefault();
-                         event.stopPropagation();
-                     }
-                 }
-                 
-                 $(this).addClass('was-validated');
-             });
-             
-             // Live validation as user types
-             $(formId + ' input').on('blur', function() {
-                 if (this.checkValidity()) {
-                     $(this).removeClass('is-invalid').addClass('is-valid');
-                 } else {
-                     $(this).removeClass('is-valid').addClass('is-invalid');
-                 }
-             });
-             
-             // For checkboxes
-             $(formId + ' input[type="checkbox"]').on('change', function() {
-                 if (this.checkValidity()) {
-                     $(this).removeClass('is-invalid').addClass('is-valid');
-                 } else {
-                     $(this).removeClass('is-valid').addClass('is-invalid');
-                 }
-             });
-         }
-         
-         // Initialize validation
-         validateForm('#loginForm');
-         validateForm('#registerForm');
-         validateForm('#forgotPasswordForm');
-         
-         // Special validation for password confirmation
-         $('#confirm-password, #reg_password').on('keyup', function() {
-             if ($('#reg_password').val() !== $('#confirm-password').val()) {
-                 $('#confirm-password').removeClass('is-valid').addClass('is-invalid');
-             } else {
-                 $('#confirm-password').removeClass('is-invalid').addClass('is-valid');
-             }
-         });
-     });
- </script>
+    </header>
+
+    <!-- Login Section -->
+    <section class="login-section">
+        <div class="container my-4">
+            <div class="row justify-content-center">
+                <!-- Flash messages -->
+                <div class="col-12 mb-3" id="flashMessages">
+                    <!-- Flash messages will be inserted here dynamically -->
+                </div>
+
+                <!-- Login/Register forms container -->
+                <div class="col-md-4 form-container">
+                    <!-- Login Form -->
+                    <div id="loginContainer">
+                        <h2 class="mb-4">Login</h2>
+                        <form id="loginForm" action="#" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username:</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                                <div class="invalid-feedback">
+                                    Please enter your username.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password:</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="invalid-feedback">
+                                    Please enter your password.
+                                </div>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                                <label class="form-check-label" for="rememberMe">Remember me</label>
+                            </div>
+                            <button type="submit" class="btn btn-fancy-login">Login</button>
+                        </form>
+                        <div class="card mt-3 p-3">
+                            <p>Don't have an account? <a href="#" id="showRegisterForm">Register here  </a></p>
+                            <p class="mb-0"><a href="#" id="showForgotPasswordForm">Forgot your password?</a></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Register Form (hidden by default) -->
+                    <div id="registerContainer" style="display: none;">
+                        <h2 class="mb-4">Register</h2>
+                        <form id="registerForm" action="#" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
+                            <div class="mb-3">
+                                <label for="reg_username" class="form-label">Username:</label>
+                                <input type="text" class="form-control" id="reg_username" name="username" required minlength="3" maxlength="20">
+                                <div class="invalid-feedback">
+                                    Username must be between 3-20 characters.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reg_password" class="form-label">Password:</label>
+                                <input type="password" class="form-control" id="reg_password" name="password" required minlength="8">
+                                <div class="invalid-feedback">
+                                    Password must be at least 8 characters long.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm-password" class="form-label">Confirm Password:</label>
+                                <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
+                                <div class="invalid-feedback" id="password-match-feedback">
+                                    Passwords do not match.
+                                </div>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="termsAgree" name="terms_agree" required>
+                                <label class="form-check-label" for="termsAgree">I agree to the Terms and Conditions</label>
+                                <div class="invalid-feedback">
+                                    You must agree to the terms and conditions.
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-fancy-register">Register</button>
+                        </form>
+                        <div class="card mt-3 p-3">
+                            <p class="mb-0">Already have an account? <a href="#" id="showLoginForm">Login here</a></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Forgot Password Form (hidden by default) -->
+                    <div id="forgotPasswordContainer" style="display: none;">
+                        <h2 class="mb-4">Forgot Password</h2>
+                        <form id="forgotPasswordForm" action="#" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" name="csrf_token" value="dummy-csrf-token" />
+                            <div class="mb-3">
+                                <label for="fp_email" class="form-label">Enter your email address:</label>
+                                <input type="email" class="form-control" id="fp_email" name="email" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address.
+                                </div>
+                            </div>
+                            <div class="mb-3 d-grid">
+                                <button type="submit" name="action" value="send_code" class="btn btn-fancy-login">Send Verification Code</button>
+                            </div>
+                            <div class="mb-3">
+                                <label for="verificationCode" class="form-label">Enter the verification code:</label>
+                                <input type="text" class="form-control" id="verificationCode" name="verification_code" pattern="[0-9]{6}" title="6-digit code">
+                                <div class="invalid-feedback">
+                                    Please enter a valid 6-digit verification code.
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" name="action" value="verify_code" class="btn btn-fancy-login">Verify Code</button>
+                            </div>
+                        </form>
+                        <div class="card mt-3 p-3">
+                            <p class="mb-0">Remember your password? <a href="#" id="backToLoginForm">Back to login</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <!-- Logo and Description -->
+                <div class="col-md-4 mb-4">
+                    <h5><i class="bi bi-newspaper me-2"></i>SentiNews</h5>
+                    <p>SentiNews is your platform to discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
+                </div>
+                <!-- Navigation Links -->
+                <div class="col-md-4 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="upload.html">Upload News</a></li>
+                        <li><a href="share.html">Share</a></li>
+                        <li><a href="analysis.html">Analysis</a></li>
+                    </ul>
+                </div>
+                <!-- Account Links -->
+                <div class="col-md-4 mb-4">
+                    <h5>Account</h5>
+                    <ul>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Copyright -->
+            <div class="copyright">
+                <p>&copy; 2025 SentiNews. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Function to show a flash message
+            function showFlashMessage(message, category) {
+                const alertHTML = `
+                    <div class="alert alert-${category} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                $('#flashMessages').append(alertHTML);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(function() {
+                    $('.alert').alert('close');
+                }, 5000);
+            }
+            
+            // Function to hide all containers
+            function hideAllContainers() {
+                $('#loginContainer').hide();
+                $('#registerContainer').hide();
+                $('#forgotPasswordContainer').hide();
+            }
+            
+            // Check if we should specifically show the login form
+            if(localStorage.getItem('showLoginForm') === 'true') {
+                hideAllContainers();
+                $('#loginContainer').show();
+                localStorage.removeItem('showLoginForm');
+            }
+            
+            // Show register form
+            $('#showRegisterForm').click(function(e) {
+                e.preventDefault();
+                hideAllContainers();
+                $('#registerContainer').show();
+            });
+            
+            // Show login form
+            $('#showLoginForm').click(function(e) {
+                e.preventDefault();
+                hideAllContainers();
+                $('#loginContainer').show();
+            });
+            
+            // Show forgot password form
+            $('#showForgotPasswordForm').click(function(e) {
+                e.preventDefault();
+                hideAllContainers();
+                $('#forgotPasswordContainer').show();
+            });
+            
+            // Back to login from forgot password
+            $('#backToLoginForm').click(function(e) {
+                e.preventDefault();
+                hideAllContainers();
+                $('#loginContainer').show();
+            });
+            
+            // Form submission handling
+            $('#loginForm').submit(function(e) {
+                e.preventDefault();
+                if (this.checkValidity()) {
+                    showFlashMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect to upload page after short delay
+                    setTimeout(function() {
+                        window.location.href = 'upload.html';
+                    }, 1000);
+                }
+                $(this).addClass('was-validated');
+            });
+            
+            // Register form submission
+            $('#registerForm').submit(function(e) {
+                e.preventDefault();
+                if (this.checkValidity() && $('#reg_password').val() === $('#confirm-password').val()) {
+                    showFlashMessage('Registration successful! Redirecting...', 'success');
+                    
+                    // Redirect to upload page after short delay
+                    setTimeout(function() {
+                        window.location.href = 'upload.html';
+                    }, 1000);
+                }
+                $(this).addClass('was-validated');
+            });
+            
+            $('#forgotPasswordForm').submit(function(e) {
+                e.preventDefault();
+                if (this.checkValidity()) {
+                    const action = $(document.activeElement).attr('name') === 'action' ? 
+                                  $(document.activeElement).val() : 'verify_code';
+                    
+                    if (action === 'send_code') {
+                        showFlashMessage('Verification code sent!', 'info');
+                    } else {
+                        showFlashMessage('Code verified! Redirecting...', 'success');
+                        
+                        // Redirect to upload page after password reset
+                        setTimeout(function() {
+                            window.location.href = 'upload.html';
+                        }, 1000);
+                    }
+                }
+                $(this).addClass('was-validated');
+            });
+            
+            // Form validation for all forms
+            function validateForm(formId) {
+                $(formId).submit(function(event) {
+                    if (!this.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    
+                    // For registration form, check if passwords match
+                    if (formId === '#registerForm') {
+                        if ($('#reg_password').val() !== $('#confirm-password').val()) {
+                            $('#confirm-password').removeClass('is-valid').addClass('is-invalid');
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    }
+                    
+                    $(this).addClass('was-validated');
+                });
+                
+                // Live validation as user types
+                $(formId + ' input').on('blur', function() {
+                    if (this.checkValidity()) {
+                        $(this).removeClass('is-invalid').addClass('is-valid');
+                    } else {
+                        $(this).removeClass('is-valid').addClass('is-invalid');
+                    }
+                });
+                
+                // For checkboxes
+                $(formId + ' input[type="checkbox"]').on('change', function() {
+                    if (this.checkValidity()) {
+                        $(this).removeClass('is-invalid').addClass('is-valid');
+                    } else {
+                        $(this).removeClass('is-valid').addClass('is-invalid');
+                    }
+                });
+            }
+            
+            // Initialize validation
+            validateForm('#loginForm');
+            validateForm('#registerForm');
+            validateForm('#forgotPasswordForm');
+            
+            // Special validation for password confirmation
+            $('#confirm-password, #reg_password').on('keyup', function() {
+                if ($('#reg_password').val() !== $('#confirm-password').val()) {
+                    $('#confirm-password').removeClass('is-valid').addClass('is-invalid');
+                } else {
+                    $('#confirm-password').removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
