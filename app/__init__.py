@@ -1,8 +1,13 @@
+
 from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required
+from flask_login import LoginManager, login_required, current_user
 from flask_wtf.csrf import CSRFProtect
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 # Initialize extensions before they are registered with the app
 db = SQLAlchemy()
@@ -31,6 +36,10 @@ def create_app(config_class=None):
     from app.routes.auth import auth_bp
     app.register_blueprint(auth_bp)
     
+    # Register the new upload blueprint
+    from app.routes.upload import upload_bp
+    app.register_blueprint(upload_bp)
+    
     # Add route for the main page to load the login interface
     @app.route('/')
     def index():
@@ -43,12 +52,14 @@ def create_app(config_class=None):
         from flask_login import current_user
         return render_template('upload.html', user=current_user)
     
-    # Create database tables if they don't exist
+# Create database tables if they don't exist
     with app.app_context():
+        # Import models here to avoid circular imports
+        from app.models.user import User
+        from app.models.upload import Upload
         db.create_all()
         
     return app
 
 # For backwards compatibility and easier imports
 app = create_app()
-
