@@ -5,6 +5,20 @@
 {% block content %}
 <h2>Text Analysis Results</h2>
 
+<h3>Named Entity Recognition Results</h3>
+{% if ner_data and ner_data.entity_types %}
+    {% for entity_type, entities in ner_data.entity_types.items() %}
+    <h4>{{ entity_type }}</h4>
+    <ul>
+        {% for entity in entities %}
+        <li>{{ entity }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+{% else %}
+<p>No named entities found in the text.</p>
+{% endif %}
+
 <h3>Sentiment Analysis Results</h3>
 {% if sentiment_data %}
 <p>Overall Sentiment: {{ sentiment_data.sentiment }}</p>

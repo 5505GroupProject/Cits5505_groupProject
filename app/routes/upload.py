@@ -6,6 +6,7 @@ from app import db
 from flask_wtf.csrf import validate_csrf, ValidationError
 from app.utils.sentiment_utils import get_sentiment_summary
 from app.utils.ngram_utils import get_multiple_ngrams
+from app.utils.ner_utils import perform_ner_analysis
 import os
 import traceback
 
@@ -65,9 +66,13 @@ def upload():
                     # Perform N-gram analysis
                     ngram_data = get_multiple_ngrams(file_content)
                     
+                    # Perform NER analysis
+                    ner_data = perform_ner_analysis(file_content)
+                    
                     # Store data in session for test page
                     session['sentiment_data'] = sentiment_data
                     session['ngram_data'] = ngram_data
+                    session['ner_data'] = ner_data
                     session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
                     session['upload_id'] = new_upload.id
                     
@@ -98,9 +103,13 @@ def upload():
                     # Perform N-gram analysis
                     ngram_data = get_multiple_ngrams(text_content)
                     
+                    # Perform NER analysis
+                    ner_data = perform_ner_analysis(text_content)
+                    
                     # Store data in session for test page
                     session['sentiment_data'] = sentiment_data
                     session['ngram_data'] = ngram_data
+                    session['ner_data'] = ner_data
                     session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
                     session['upload_id'] = new_upload.id
                     
@@ -128,6 +137,7 @@ def test_page():
     # 从session获取分析数据
     sentiment_data = session.get('sentiment_data')
     ngram_data = session.get('ngram_data')
+    ner_data = session.get('ner_data')
     text_content = session.get('text_content')
     upload_id = session.get('upload_id')
     
@@ -135,6 +145,7 @@ def test_page():
     return render_template('test_page.html', 
                           sentiment_data=sentiment_data,
                           ngram_data=ngram_data,
+                          ner_data=ner_data,
                           text_content=text_content,
                           upload_id=upload_id)
 
@@ -156,9 +167,18 @@ def upload_text():
         db.session.add(new_upload)
         db.session.commit()
         
+        # 执行文本分析
+        sentiment_data = get_sentiment_summary(content)
+        ngram_data = get_multiple_ngrams(content)
+        ner_data = perform_ner_analysis(content)
+        
         return jsonify({
             'success': True,
-            'message': 'Content uploaded successfully!'
+            'message': 'Content uploaded successfully!',
+            'sentiment_data': sentiment_data,
+            'ngram_data': ngram_data,
+            'ner_data': ner_data,
+            'upload_id': new_upload.id
         })
         
     except Exception as e:
@@ -199,11 +219,19 @@ def upload_file():
         db.session.add(new_upload)
         db.session.commit()
         
+        # 执行文本分析
+        sentiment_data = get_sentiment_summary(file_content)
+        ngram_data = get_multiple_ngrams(file_content)
+        ner_data = perform_ner_analysis(file_content)
+        
         return jsonify({
             'success': True,
             'message': 'File uploaded successfully',
             'upload_id': new_upload.id,
-            'content': file_content
+            'sentiment_data': sentiment_data,
+            'ngram_data': ngram_data,
+            'ner_data': ner_data,
+            'content': file_content[:1000] + '...' if len(file_content) > 1000 else file_content
         }), 200
         
     except Exception as e:

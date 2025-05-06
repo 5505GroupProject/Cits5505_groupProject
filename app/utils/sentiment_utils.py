@@ -1,5 +1,6 @@
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
+import nltk.data
 
 # 下载必要的NLTK资源（仅首次运行时需要）
 def download_nltk_resources():
