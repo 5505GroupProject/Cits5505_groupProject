@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Sentiment Analysis{% endblock %}
+
+{% block content %}
+{% if sentiment_data %}
+Sentiment: {{ sentiment_data.sentiment }}
+Compound Score: {{ sentiment_data.compound_score }}
+Positive Score: {{ sentiment_data.positive_score }}
+Negative Score: {{ sentiment_data.negative_score }}
+Neutral Score: {{ sentiment_data.neutral_score }}
+{% else %}
+No sentiment analysis data available.
+{% endif %}
+{% endblock %}

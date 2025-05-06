@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from app.models import UploadedText
 from app import db
 from flask_wtf.csrf import validate_csrf, ValidationError
+from app.utils.sentiment_utils import get_sentiment_summary
 import os
 import traceback
 
@@ -57,9 +58,17 @@ def upload():
                     db.session.add(new_upload)
                     db.session.commit()
                     
-                    # Flash success message and redirect to same page
-                    flash('File uploaded successfully!', 'success')
-                    return redirect(url_for('upload.upload'))
+                    # Perform sentiment analysis
+                    sentiment_data = get_sentiment_summary(file_content)
+                    
+                    # Store data in session for test page
+                    session['sentiment_data'] = sentiment_data
+                    session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
+                    session['upload_id'] = new_upload.id
+                    
+                    # Flash success message and redirect to test page
+                    flash('File uploaded and analyzed successfully!', 'success')
+                    return redirect(url_for('upload.test_page'))
                 else:
                     flash('No file selected!', 'warning')
                 
@@ -78,9 +87,17 @@ def upload():
                     db.session.add(new_upload)
                     db.session.commit()
                     
-                    # Flash success message and redirect to same page
-                    flash('Text content uploaded successfully!', 'success')
-                    return redirect(url_for('upload.upload'))
+                    # Perform sentiment analysis
+                    sentiment_data = get_sentiment_summary(text_content)
+                    
+                    # Store data in session for test page
+                    session['sentiment_data'] = sentiment_data
+                    session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
+                    session['upload_id'] = new_upload.id
+                    
+                    # Flash success message and redirect to test page
+                    flash('Text content uploaded and analyzed successfully!', 'success')
+                    return redirect(url_for('upload.test_page'))
                 else:
                     flash('No content provided!', 'danger')
             
@@ -94,6 +111,21 @@ def upload():
 
     # Render template with uploads for both GET and unsuccessful POST
     return render_template('upload.html', uploads=recent_uploads)
+
+# 添加新路由用于显示情感分析结果
+@upload_bp.route('/test-page', methods=['GET'])
+@login_required
+def test_page():
+    # 从session获取情感分析数据
+    sentiment_data = session.get('sentiment_data')
+    text_content = session.get('text_content')
+    upload_id = session.get('upload_id')
+    
+    # 渲染test_page模板并传入分析结果
+    return render_template('test_page.html', 
+                          sentiment_data=sentiment_data,
+                          text_content=text_content,
+                          upload_id=upload_id)
 
 @upload_bp.route('/text', methods=['POST'])
 @login_required

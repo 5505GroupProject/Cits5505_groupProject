@@ -30,82 +30,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Handle text upload form submission
+    // File upload button functionality
+    const fileInput = document.getElementById('file');
+    const fileSelectBtn = document.getElementById('fileSelectBtn');
+    const selectedFileName = document.getElementById('selectedFileName');
+    
+    if (fileSelectBtn && fileInput && selectedFileName) {
+        fileSelectBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                selectedFileName.textContent = this.files[0].name;
+            } else {
+                selectedFileName.textContent = 'No file selected';
+            }
+        });
+    }
+    
+    // Handle text upload form submission via AJAX (if using API endpoint directly)
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (uploadStatus) {
-                uploadStatus.className = 'alert mt-3';
-                uploadStatus.style.display = 'none';
-            }
-            
-            const formData = new FormData(this);
+            // If we want to handle via normal form submission (which will redirect to test_page after analysis)
+            // then we don't need to prevent default
+            // e.preventDefault();
             
             // Disable the submit button to prevent double submission
             const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Uploading...';
-            
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Upload response:', data);
+            if (submitBtn) {
+                const originalBtnText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Uploading & Analyzing...';
                 
-                // Show status message
-                if (uploadStatus) {
-                    uploadStatus.style.display = 'block';
-                    
-                    if (data.success) {
-                        uploadStatus.className = 'alert alert-success mt-3';
-                        statusMessage.textContent = data.message;
-                        
-                        // Clear form if upload successful
-                        textArea.value = '';
-                        const titleInput = document.getElementById('newsTitle');
-                        if (titleInput) titleInput.value = '';
-                        wordCount.textContent = '0 words, 0 characters';
-                        
-                        // Reload history after successful upload
-                        loadUploadHistory();
-                    } else {
-                        uploadStatus.className = 'alert alert-danger mt-3';
-                        statusMessage.textContent = data.error || 'Upload failed.';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                if (uploadStatus) {
-                    uploadStatus.className = 'alert alert-danger mt-3';
-                    statusMessage.textContent = 'An unexpected error occurred.';
-                    uploadStatus.style.display = 'block';
-                }
-            })
-            .finally(() => {
-                // Re-enable the button
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
-            });
+                // Enable the button after a short delay (form will reload page)
+                setTimeout(function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }, 1500);
+            }
         });
     }
     
     // Handle file upload form submission
     if (fileUploadForm) {
         fileUploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (uploadStatus) {
-                uploadStatus.className = 'alert mt-3';
-                uploadStatus.style.display = 'none';
-            }
-            
-            const formData = new FormData(this);
+            // We're handling via normal form submission now for sentiment analysis
+            // e.preventDefault();
             
             // Check if file is selected
             const fileInput = this.querySelector('input[type="file"]');
@@ -115,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     statusMessage.textContent = 'Please select a file to upload.';
                     uploadStatus.style.display = 'block';
                 }
+                e.preventDefault(); // Prevent form submission only if no file selected
                 return;
             }
             
@@ -122,53 +94,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Disable the submit button
             const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Uploading...';
-            
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('File upload response:', data);
+            if (submitBtn) {
+                const originalBtnText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Uploading & Analyzing...';
                 
-                // Show status message
-                if (uploadStatus) {
-                    uploadStatus.style.display = 'block';
-                    
-                    if (data.success) {
-                        uploadStatus.className = 'alert alert-success mt-3';
-                        statusMessage.textContent = data.message;
-                        
-                        // Clear file input and title
-                        fileInput.value = '';
-                        const titleInput = document.getElementById('fileTitle');
-                        if (titleInput) titleInput.value = '';
-                        
-                        // Reload history after successful upload
-                        loadUploadHistory();
-                    } else {
-                        uploadStatus.className = 'alert alert-danger mt-3';
-                        statusMessage.textContent = data.error || 'Upload failed.';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                if (uploadStatus) {
-                    uploadStatus.className = 'alert alert-danger mt-3';
-                    statusMessage.textContent = 'An unexpected error occurred.';
-                    uploadStatus.style.display = 'block';
-                }
-            })
-            .finally(() => {
-                // Re-enable the button
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
-            });
+                // Enable the button after a short delay (form will reload page)
+                setTimeout(function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }, 1500);
+            }
         });
     }
     
