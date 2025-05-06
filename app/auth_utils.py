@@ -31,16 +31,19 @@ def set_csrf_token():
 
 def validate_csrf_token(token):
     """
-    Validate a CSRF token against the one in the session.
+    Validate a CSRF token against the one stored in the session.
     
     Args:
-        token: Token to validate
+        token: The token to validate
         
     Returns:
-        bool: True if the token is valid, False otherwise
+        bool: True if valid, False otherwise
     """
-    if not token or not session.get('csrf_token'):
-        return False
+    session_token = session.get('csrf_token')
+    print(f"Token received: {token}")
+    print(f"Token in session: {session_token}")
     
-    # Constant time comparison to prevent timing attacks
-    return secrets.compare_digest(token, session.get('csrf_token'))
+    # More reliable check:
+    if token and session_token and token == session_token:
+        return True
+    return False

@@ -1,0 +1,1343 @@
+/* Reset and General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5dc; /* Light beige background for landing page */
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Styles */
+.site-header {
+    background-color: #000;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+.site-header .navbar-nav .nav-link {
+    color: white;
+    font-size: 1.1rem;
+    padding: 8px 15px;
+    transition: color 0.3s ease;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+    color: yellowgreen;
+}
+
+.site-header .btn-fancy-login {
+    background-color: yellowgreen;
+    color: black;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.site-header .btn-fancy-login:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Intro Section (Home Page) */
+.intro-section {
+    background: linear-gradient(to right, #000, #333);
+    color: white;
+    text-align: center;
+    padding: 120px 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intro-section h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+}
+
+.intro-section p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.intro-section .btn-fancy-login {
+    background-color: yellowgreen;
+    color: black;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.intro-section .btn-fancy-login:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Features Section */
+.features-section {
+    padding: 40px 0;
+    background-color: #f8f9fa;  /* Light gray background */
+    text-align: center;
+}
+
+.feature-card {
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(154, 205, 50, 0.2);  /* Yellowgreen shadow */
+    border: 1px solid rgba(154, 205, 50, 0.3);  /* Subtle yellowgreen border */
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    color: #9ACD32;  /* Pure yellowgreen */
+    margin-bottom: 15px;
+}
+
+.feature-card h4 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+    padding: 40px 0;
+    text-align: center;
+    background-color: #eef7e4;  /* Very light yellowgreen tint */
+}
+
+.testimonial-card {
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(154, 205, 50, 0.1);
+}
+
+.testimonial-card p {
+    font-style: italic;
+    color: #495057;  /* Darker gray for better readability */
+}
+
+.testimonial-card h6 {
+    margin-top: 10px;
+    color: #2c3e50;  /* Dark blue-gray */
+    font-weight: 600;
+}
+
+/* Footer Styles */
+.site-footer {
+    background-color: #000;
+    color: white;
+    padding: 50px 0;
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+.site-footer h5 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.site-footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.site-footer ul li {
+    margin-bottom: 10px;
+}
+
+.site-footer ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.site-footer ul li a:hover {
+    color: yellowgreen;
+}
+
+.site-footer .copyright {
+    text-align: center;
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+    font-size: 0.9rem;
+}
+
+/* Buttons (Restored Original Style for Non-Intro Buttons) */
+.btn-primary {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: yellowgreen;
+    color: black;
+    opacity: 0.9;
+}
+
+/* Login Page Specific Styles - Enhanced */
+.login-section {
+    min-height: calc(100vh - 76px); /* Full height minus header */
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f5dc 0%, #e8f5e9 100%);
+    padding: 2rem 0;
+    margin: 0;
+}
+
+/* Fix spacing between header and content */
+main.container {
+    flex: 1 0 auto;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+}
+
+/* Make the first section of each page cover the whole viewport */
+.page-section-full {
+    min-height: calc(100vh - 76px); /* Adjust 76px to match your header height */
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Content centered in full height pages */
+.content-centered {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 2rem 0;
+}
+
+/* Apply to specific page sections */
+.upload-container {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0; /* Remove border radius for full-width look */
+    box-shadow: none;
+    min-height: calc(100vh - 76px);
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    width: 100%;
+}
+
+.upload-container-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2.5rem;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+    border-top: 4px solid yellowgreen;
+    width: 100%;
+}
+
+/* Remove any default margins/paddings that might be causing issues */
+.container-fluid, .container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Make sure rows span full width */
+.row {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+}
+
+/* Login button specific styling (just for the login page) */
+#loginForm .btn-fancy-login, 
+#loginForm button[type="submit"],
+.login-section .btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, yellowgreen 0%, #88b04b 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: none;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 8px rgba(154, 205, 50, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+#loginForm .btn-fancy-login:hover,
+#loginForm button[type="submit"]:hover,
+.login-section .btn-login:hover {
+    background: linear-gradient(135deg, #88b04b 0%, #6d9c2e 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(154, 205, 50, 0.4);
+}
+
+#loginForm .btn-fancy-login:active,
+#loginForm button[type="submit"]:active,
+.login-section .btn-login:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(154, 205, 50, 0.3);
+}
+
+/* Add subtle shine effect on hover */
+#loginForm .btn-fancy-login::before,
+#loginForm button[type="submit"]::before,
+.login-section .btn-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    transition: left 0.7s ease;
+}
+
+#loginForm .btn-fancy-login:hover::before,
+#loginForm button[type="submit"]:hover::before,
+.login-section .btn-login:hover::before {
+    left: 100%;
+}
+
+/* Fix for checkbox in login form */
+#loginForm .form-check {
+    margin: 15px 0;
+}
+
+#loginForm .form-check-input {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+#loginForm .form-check-input:checked {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+}
+
+#loginForm .form-check-label {
+    padding-left: 5px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Form Element Improvements */
+.form-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.form-control:focus {
+    border-color: yellowgreen;
+    box-shadow: 0 0 0 3px rgba(154, 205, 50, 0.2);
+    background-color: white;
+}
+
+/* Fix for checkbox alignment */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+}
+
+.form-check-input {
+    margin-right: 0.5rem;
+}
+
+/* Button adjustments for consistency */
+.btn-login {
+    width: 100%;
+    padding: 0.75rem;
+    background: yellowgreen;
+    border: none;
+    border-radius: 12px;
+    color: black;  /* Changed to match your color scheme */
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    box-shadow: 0 4px 6px rgba(154, 205, 50, 0.1);
+}
+
+.btn-login:hover {
+    background: #88b04b;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(154, 205, 50, 0.3);
+    color: white;  /* Changed to match your hover style */
+}
+
+/* Form divider for visual separation */
+.form-divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.form-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.form-divider span {
+    position: relative;
+    background: white;
+    padding: 0 15px;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Fix for flash messages */
+.alert {
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1rem 1rem 1.5rem;
+    border-left: 4px solid transparent;
+}
+
+.alert-danger {
+    background-color: #fff5f5;
+    color: #c53030;
+    border-left-color: #c53030;
+}
+
+.alert-success {
+    background-color: #f0fff4;
+    color: #276749;
+    border-left-color: #276749;
+}
+
+/* Enhanced Alert Styling for Login Prompts */
+.login-alert {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-left: 4px solid yellowgreen;
+    color: #333;
+    padding: 16px 20px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+.login-alert p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.login-alert .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #777;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    transition: color 0.2s ease;
+}
+
+.login-alert .close-btn:hover {
+    color: #333;
+}
+
+.login-alert-icon {
+    color: yellowgreen;
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
+
+/* Animation for the alert */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Animation for closing the alert */
+.login-alert.hiding {
+    animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+/* Upload Page Specific Styles */
+.upload-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+    border-top: 4px solid yellowgreen;
+}
+
+.upload-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(154, 205, 50, 0.25);
+}
+
+/* Form Controls */
+.upload-container .form-control {
+    border: 2px solid #eaeaea;
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+    background-color: #f9f9f9;
+}
+
+.upload-container .form-control:focus {
+    border-color: yellowgreen;
+    box-shadow: 0 0 0 3px rgba(154, 205, 50, 0.2);
+    background-color: #ffffff;
+}
+
+/* Text Area Specific */
+.upload-container textarea.form-control {
+    min-height: 200px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+/* Word Count Badge */
+.word-count {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f0f0f0;
+    color: #555;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    margin-left: auto;
+    float: right;
+}
+
+/* Form Labels */
+.upload-container .form-label {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Button Styling */
+.upload-container .btn {
+    padding: 10px 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Primary Action Button - Upload & Analyze */
+.upload-container .btn-primary {
+    background: linear-gradient(135deg, yellowgreen 0%, #88b04b 100%);
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    box-shadow: 0 4px 15px rgba(154, 205, 50, 0.3);
+}
+
+.upload-container .btn-primary:hover {
+    background: linear-gradient(135deg, #88b04b 0%, #6a8f29 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(154, 205, 50, 0.4);
+}
+
+.upload-container .btn-primary:active {
+    transform: translateY(-1px);
+}
+
+/* Secondary Button - Clear */
+.upload-container .btn-secondary {
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+}
+
+.upload-container .btn-secondary:hover {
+    background-color: #dde2e6;
+    color: #343a40;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Glow Effect */
+.upload-container .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    transition: left 0.7s ease;
+}
+
+.upload-container .btn:hover::before {
+    left: 100%;
+}
+
+/* Improved File Input Styling */
+.upload-container .custom-file-upload {
+    border: 2px dashed yellowgreen;
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+    background-color: rgba(154, 205, 50, 0.05);
+    display: block;
+}
+
+.upload-container .custom-file-upload:hover {
+    background-color: rgba(154, 205, 50, 0.1);
+    border-color: #88b04b;
+}
+
+.upload-container input[type="file"] {
+    display: none;
+}
+
+/* Upload Status Message */
+.upload-container .alert {
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid transparent;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.upload-container .alert-success {
+    background-color: #f0fff4;
+    border-left-color: #68d391;
+    color: #2f855a;
+}
+
+.upload-container .alert-danger {
+    background-color: #fff5f5;
+    border-left-color: #fc8181;
+    color: #c53030;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Upload History Section */
+.upload-history {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eaeaea;
+}
+
+.upload-history h3 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 15px;
+}
+
+.upload-history h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background-color: yellowgreen;
+    border-radius: 2px;
+}
+
+/* History Table Styling */
+.upload-history .table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.upload-history .table thead {
+    background-color: rgba(154, 205, 50, 0.1);
+}
+
+.upload-history .table thead th {
+    font-weight: 600;
+    color: #333;
+    border-bottom: none;
+    padding: 15px;
+}
+
+.upload-history .table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.upload-history .table tbody tr:hover {
+    background-color: rgba(154, 205, 50, 0.05);
+}
+
+.upload-history .table td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+/* Preview text in table */
+.preview-text {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* View Button in Table */
+.upload-history .btn-sm {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+}
+
+.upload-history .btn-outline-primary {
+    color: yellowgreen;
+    border-color: yellowgreen;
+}
+
+.upload-history .btn-outline-primary:hover {
+    background-color: yellowgreen;
+    color: white;
+}
+
+/* View Upload Page */
+.view-upload-page {
+    min-height: calc(100vh - 76px);
+    background-color: #f5f5dc; /* Match your site background */
+    margin: 0;
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.view-upload-container {
+    max-width: 900px;
+    width: 100%;
+    margin: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
+}
+
+.view-upload-header {
+    background: linear-gradient(135deg, yellowgreen 0%, #88b04b 100%);
+    color: white;
+    padding: 2rem;
+    position: relative;
+}
+
+.view-upload-header:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+}
+
+.view-upload-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.view-upload-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.view-upload-content {
+    padding: 2.5rem;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.file-info {
+    background-color: #f9f9fa;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.file-info i {
+    margin-right: 10px;
+    color: #88b04b;
+}
+
+.content-display {
+    flex: 1;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid #eaeaea;
+    margin: 1rem 0;
+    overflow-y: auto;
+    position: relative;
+}
+
+.content-display pre {
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    margin: 0;
+    color: #333;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.view-upload-actions {
+    padding: 1.5rem 2.5rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-upload-actions .btn {
+    padding: 10px 24px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.view-upload-actions .btn-primary {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+    color: white;
+    box-shadow: 0 4px 12px rgba(154, 205, 50, 0.2);
+}
+
+.view-upload-actions .btn-primary:hover {
+    background-color: #88b04b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(154, 205, 50, 0.3);
+}
+
+.view-upload-actions .btn-outline-secondary {
+    border: 2px solid #dee2e6;
+    color: #495057;
+}
+
+.view-upload-actions .btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    color: #212529;
+}
+
+/* Share Page Specific Styles */
+.share-page {
+    min-height: calc(100vh - 76px);
+    background-color: #f5f5dc;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 3rem 0;
+}
+
+.share-box {
+    background-color: white;
+    border-radius: 15px;
+    padding: 3rem;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    border-top: 5px solid yellowgreen;
+}
+
+.share-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.share-box h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.share-box h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 4px;
+    background-color: yellowgreen;
+    border-radius: 2px;
+}
+
+.share-box .form-control {
+    border: 2px solid #eaeaea;
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.share-box .form-control:focus {
+    border-color: yellowgreen;
+    box-shadow: 0 0 0 4px rgba(154, 205, 50, 0.1);
+    background-color: #fff;
+}
+
+.share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.share-buttons .btn {
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.share-buttons .btn i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+.btn-twitter {
+    background-color: #1DA1F2;
+    color: white;
+    border: none;
+}
+
+.btn-twitter:hover {
+    background-color: #0d8fd9;
+    box-shadow: 0 5px 15px rgba(29, 161, 242, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-facebook {
+    background-color: #4267B2;
+    color: white;
+    border: none;
+}
+
+.btn-facebook:hover {
+    background-color: #365899;
+    box-shadow: 0 5px 15px rgba(66, 103, 178, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-linkedin {
+    background-color: #0077B5;
+    color: white;
+    border: none;
+}
+
+.btn-linkedin:hover {
+    background-color: #00669c;
+    box-shadow: 0 5px 15px rgba(0, 119, 181, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-email {
+    background-color: #EA4335;
+    color: white;
+    border: none;
+}
+
+.btn-email:hover {
+    background-color: #d33828;
+    box-shadow: 0 5px 15px rgba(234, 67, 53, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-copy {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.btn-copy:hover {
+    background-color: #5a6268;
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+    transform: translateY(-2px);
+}
+
+.copy-success {
+    padding: 5px 15px;
+    background-color: rgba(154, 205, 50, 0.2);
+    border-radius: 20px;
+    color: #2f855a;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    display: none;
+}
+
+/* Visualization Page Specific Styles */
+.visualization-page {
+    min-height: calc(100vh - 76px);
+    background-color: #f5f5dc;
+    margin: 0;
+    padding: 2rem 0;
+}
+
+.visualization-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.visualization-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.visualization-header h1 {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.visualization-header p {
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.visualization-header:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background-color: yellowgreen;
+    border-radius: 2px;
+}
+
+.summary-box {
+    background-color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid yellowgreen;
+}
+
+.summary-box h3 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.summary-box p {
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+
+.chart-container {
+    background-color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.chart-container h3 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.fulltext-box {
+    background-color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.fulltext-box h3 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.fulltext-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+#sentimentChart, #wordCloud, #entityChart {
+    height: 350px;
+    width: 100%;
+}
+
+.action-buttons {
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.action-buttons .btn {
+    margin: 0 10px 10px 0;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn-primary {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+    color: white;
+}
+
+.action-buttons .btn-primary:hover {
+    background-color: #88b04b;
+    border-color: #88b04b;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(154, 205, 50, 0.3);
+}
+
+.action-buttons .btn-outline-secondary {
+    border: 2px solid #dee2e6;
+    color: #495057;
+}
+
+.action-buttons .btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .intro-section {
+        padding: 60px 0;
+        min-height: 80vh;
+    }
+
+    .intro-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .intro-section p {
+        font-size: 1.1rem;
+    }
+
+    .feature-card {
+        margin-bottom: 30px;
+    }
+
+    .site-header .navbar-nav {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .site-header .nav-item {
+        margin: 5px 0;
+    }
+
+    .share-box, 
+    .summary-box,
+    .chart-container,
+    .fulltext-box {
+        padding: 1.5rem;
+    }
+    
+    .view-upload-content,
+    .view-upload-header,
+    .view-upload-actions {
+        padding: 1.5rem;
+    }
+    
+    .action-buttons .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .share-buttons {
+        flex-direction: column;
+    }
+    
+    .share-buttons .btn {
+        width: 100%;
+    }
+    
+    #sentimentChart, 
+    #wordCloud, 
+    #entityChart {
+        height: 300px;
+    }
+}
+
+@media (max-width: 576px) {
+    #loginForm, #registerForm, #forgotPasswordForm {
+        margin: 10px;
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+
+    .form-container h2 {
+        font-size: 1.75rem;
+    }
+}

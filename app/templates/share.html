@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Share{% endblock %}
+
+{% block content %}
+    <section class="share-section">
+        <div class="container share-container">
+            <h1>Share Analyzed News Sentiment Data</h1>
+            <form id="shareForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="colleagueSelect">Choose Colleague:</label>
+                    <select id="colleagueSelect" name="colleague" required>
+                        <option value="">Select a Colleague</option>
+                        <option value="colleague1">Colleague 1</option>
+                        <option value="colleague2">Colleague 2</option>
+                        <option value="colleague3">Colleague 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shareImageUpload">Upload Image:</label>
+                    <input type="file" id="shareImageUpload" name="image" accept="image/*" required>
+                    <img id="shareImagePreview" alt="Image Preview" style="display: none;">
+                </div>
+                <div class="form-group share-buttons">
+                    <button type="button" onclick="shareViaEmail()">Email</button>
+                    <button type="button" onclick="shareToGoogleDocs()">Google Docs</button>
+                    <button type="button" onclick="shareViaInstantMessage()">Instant Message</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/share.js') }}"></script>
+{% endblock %}

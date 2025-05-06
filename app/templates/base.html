@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - SentiNews</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    {% if login_required_message %}
+    <div class="login-alert" id="loginAlert">
+        <div style="display: flex; align-items: center;">
+            <i class="bi bi-lock-fill login-alert-icon"></i>
+            <p>{{ login_required_message }}</p>
+        </div>
+        <button type="button" class="close-btn" id="closeLoginAlert">&times;</button>
+    </div>
+    {% endif %}
+    
+    <!-- Header Section -->
+    <header class="site-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Logo on the left -->
+                <div class="col-md-3">
+                    <a href="{{ url_for('main.home') }}" class="text-decoration-none text-white">
+                        <h1 class="mb-0"><i class="bi bi-newspaper me-2"></i><span style="color: yellowgreen;">S</span>enti<span style="color: yellowgreen;">N</span>ews</h1>
+                    </a>
+                </div>
+                <!-- Navigation buttons in the middle -->
+                <div class="col-md-6">
+                    <nav class="navbar navbar-expand">
+                        <div class="container-fluid justify-content-center">
+                            <ul class="navbar-nav">
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="{{ url_for('main.home') }}">
+                                        <i class="bi bi-house-door-fill me-1"></i>Home
+                                    </a>
+                                </li>
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="{{ url_for('main.upload') }}">
+                                        <i class="bi bi-upload me-1"></i>Upload News
+                                    </a>
+                                </li>
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="{{ url_for('main.share') }}">
+                                        <i class="bi bi-share-fill me-1"></i>Share
+                                    </a>
+                                </li>
+                                <li class="nav-item mx-2">
+                                    <a class="nav-link text-white" href="{{ url_for('main.visualization') }}">
+                                        <i class="bi bi-graph-up me-1"></i>Analysis
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <!-- Login/Register on the right -->
+                <div class="col-md-3 text-end">
+                    {% if current_user.is_authenticated %}
+                        <span class="text-white me-2">Hi, {{ current_user.username }}</span>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-fancy-login">Log Out</a>
+                    {% else %}
+                        <a href="{{ url_for('main.login') }}" class="btn btn-fancy-login me-2">
+                            <i class="bi bi-person-circle me-1"></i>Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <!-- Logo and Description -->
+                <div class="col-md-4 mb-4">
+                    <h5><i class="bi bi-newspaper me-2"></i>SentiNews</h5>
+                    <p>SentiNews is your platform to discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
+                </div>
+                <!-- Navigation Links -->
+                <div class="col-md-4 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="{{ url_for('main.home') }}">Home</a></li>
+                        <li><a href="{{ url_for('main.upload') }}">Upload News</a></li>
+                        <li><a href="{{ url_for('main.share') }}">Share</a></li>
+                        <li><a href="{{ url_for('main.visualization') }}">Analysis</a></li>
+                    </ul>
+                </div>
+                <!-- Account Links -->
+                <div class="col-md-4 mb-4">
+                    <h5>Account</h5>
+                    <ul>
+                        <li><a href="{{ url_for('main.login') }}">Login</a></li>
+                        <li><a href="{{ url_for('main.login') }}#register">Register</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Copyright -->
+            <div class="copyright">
+                <p>© 2025 SentiNews. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    {% block scripts %}
+    <!-- Add script tags here -->
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+    {% endblock %}
+</body>
+</html>
