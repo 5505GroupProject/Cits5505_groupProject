@@ -7,6 +7,7 @@ from flask_wtf.csrf import validate_csrf, ValidationError
 from app.utils.sentiment_utils import get_sentiment_summary
 from app.utils.ngram_utils import get_multiple_ngrams
 from app.utils.ner_utils import perform_ner_analysis
+from app.utils.word_frequency_utils import analyze_word_frequency
 import os
 import traceback
 
@@ -69,10 +70,14 @@ def upload():
                     # Perform NER analysis
                     ner_data = perform_ner_analysis(file_content)
                     
+                    # Perform word frequency analysis
+                    word_freq_data = analyze_word_frequency(file_content)
+                    
                     # Store data in session for test page
                     session['sentiment_data'] = sentiment_data
                     session['ngram_data'] = ngram_data
                     session['ner_data'] = ner_data
+                    session['word_freq_data'] = word_freq_data
                     session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
                     session['upload_id'] = new_upload.id
                     
@@ -106,10 +111,14 @@ def upload():
                     # Perform NER analysis
                     ner_data = perform_ner_analysis(text_content)
                     
+                    # Perform word frequency analysis
+                    word_freq_data = analyze_word_frequency(text_content)
+                    
                     # Store data in session for test page
                     session['sentiment_data'] = sentiment_data
                     session['ngram_data'] = ngram_data
                     session['ner_data'] = ner_data
+                    session['word_freq_data'] = word_freq_data
                     session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
                     session['upload_id'] = new_upload.id
                     
@@ -138,6 +147,7 @@ def test_page():
     sentiment_data = session.get('sentiment_data')
     ngram_data = session.get('ngram_data')
     ner_data = session.get('ner_data')
+    word_freq_data = session.get('word_freq_data')
     text_content = session.get('text_content')
     upload_id = session.get('upload_id')
     
@@ -146,6 +156,7 @@ def test_page():
                           sentiment_data=sentiment_data,
                           ngram_data=ngram_data,
                           ner_data=ner_data,
+                          word_freq_data=word_freq_data,
                           text_content=text_content,
                           upload_id=upload_id)
 
@@ -171,6 +182,7 @@ def upload_text():
         sentiment_data = get_sentiment_summary(content)
         ngram_data = get_multiple_ngrams(content)
         ner_data = perform_ner_analysis(content)
+        word_freq_data = analyze_word_frequency(content)
         
         return jsonify({
             'success': True,
@@ -178,6 +190,7 @@ def upload_text():
             'sentiment_data': sentiment_data,
             'ngram_data': ngram_data,
             'ner_data': ner_data,
+            'word_freq_data': word_freq_data,
             'upload_id': new_upload.id
         })
         
@@ -223,6 +236,7 @@ def upload_file():
         sentiment_data = get_sentiment_summary(file_content)
         ngram_data = get_multiple_ngrams(file_content)
         ner_data = perform_ner_analysis(file_content)
+        word_freq_data = analyze_word_frequency(file_content)
         
         return jsonify({
             'success': True,
@@ -231,6 +245,7 @@ def upload_file():
             'sentiment_data': sentiment_data,
             'ngram_data': ngram_data,
             'ner_data': ner_data,
+            'word_freq_data': word_freq_data,
             'content': file_content[:1000] + '...' if len(file_content) > 1000 else file_content
         }), 200
         

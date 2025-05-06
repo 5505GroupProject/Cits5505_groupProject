@@ -4,7 +4,7 @@ from nltk.tree import Tree
 
 def download_nltk_resources():
     """
-    下载 NER 所需的 NLTK 资源
+    Download NLTK resources needed for NER
     """
     try:
         nltk.data.find('tokenizers/punkt')
@@ -26,19 +26,19 @@ def download_nltk_resources():
     except LookupError:
         nltk.download('words')
 
-# 初始化下载NLTK资源
+# Initialize NLTK resource download
 download_nltk_resources()
 
 def perform_ner_analysis(text):
     """
-    使用NLTK进行命名实体识别（NER）分析
-    返回识别出的命名实体及其类型
+    Perform Named Entity Recognition (NER) analysis using NLTK
+    Returns identified named entities and their types
     
-    参数:
-    text (str): 要分析的文本
+    Parameters:
+    text (str): Text to analyze
     
-    返回:
-    dict: 包含命名实体及其类型的字典
+    Returns:
+    dict: Dictionary containing named entities and their types
     """
     # Tokenize and POS tag the words
     tokens = nltk.word_tokenize(text)

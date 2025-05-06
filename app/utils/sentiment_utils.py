@@ -2,28 +2,28 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 import nltk.data
 
-# 下载必要的NLTK资源（仅首次运行时需要）
+# Download necessary NLTK resources (only needed for first run)
 def download_nltk_resources():
     try:
         nltk.data.find('sentiment/vader_lexicon.zip')
     except LookupError:
         nltk.download('vader_lexicon')
 
-# 初始化下载NLTK资源
+# Initialize NLTK resource download
 download_nltk_resources()
 
 def analyze_sentiment(text):
     """
-    使用NLTK的VADER情感分析器分析文本情感
-    返回一个包含情感分数的字典
+    Use NLTK's VADER sentiment analyzer to analyze text sentiment
+    Returns a dictionary containing sentiment scores
     """
-    # 初始化情感分析器
+    # Initialize sentiment analyzer
     sia = SentimentIntensityAnalyzer()
     
-    # 获取情感分数
+    # Get sentiment scores
     sentiment_scores = sia.polarity_scores(text)
     
-    # 添加文本情感标签
+    # Add text sentiment label
     if sentiment_scores['compound'] >= 0.05:
         sentiment_scores['sentiment'] = 'Positive'
     elif sentiment_scores['compound'] <= -0.05:
@@ -35,7 +35,7 @@ def analyze_sentiment(text):
 
 def get_sentiment_summary(text):
     """
-    分析文本并返回简洁的总结信息
+    Analyze text and return a concise summary
     """
     scores = analyze_sentiment(text)
     
