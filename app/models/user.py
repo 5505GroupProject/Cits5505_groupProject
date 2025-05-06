@@ -17,6 +17,9 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    # Relationship with uploads
+    uploads = db.relationship('UploadedText', backref='user', lazy=True)
+    
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
