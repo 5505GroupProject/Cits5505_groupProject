@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+     {% block title %}Home{% endblock %}
+
+     {% block content %}
+         <!-- Intro Section -->
+         <section class="intro-section">
+             <div class="container">
+                 <h1>Welcome to SentiNews</h1>
+                 <p>Discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
+                 <a href="{{ url_for('main.upload') }}" class="btn btn-fancy-login mt-3">Get Started</a>
+             </div>
+         </section>
+
+         <!-- Features Section -->
+         <section class="features-section">
+             <div class="container">
+                 <h2 class="mb-4">What We Offer</h2>
+                 <div class="row">
+                     <div class="col-md-4 feature-card">
+                         <i class="bi bi-upload"></i>
+                         <h4>Upload News</h4>
+                         <p>Share your own news articles and contribute to our growing database.</p>
+                         <p class="text-muted small"><strong>Example:</strong> Upload a local news story about a community event, and our platform will analyze its sentiment to highlight its positive impact.</p>
+                         <a href="{{ url_for('main.upload') }}" class="btn btn-primary">Explore</a>
+                     </div>
+                     <div class="col-md-4 feature-card">
+                         <i class="bi bi-share-fill"></i>
+                         <h4>Share</h4>
+                         <p>Connect with others by sharing and discussing the latest news.</p>
+                         <p class="text-muted small"><strong>Example:</strong> Share a trending article on social media directly from SentiNews, sparking a discussion with your followers about its implications.</p>
+                         <a href="{{ url_for('main.share') }}" class="btn btn-primary">Join Now</a>
+                     </div>
+                     <div class="col-md-4 feature-card">
+                         <i class="bi bi-graph-up"></i>
+                         <h4>Analysis</h4>
+                         <p>Gain insights with our sentiment analysis tools for a deeper understanding.</p>
+                         <p class="text-muted small"><strong>Example:</strong> Analyze a political news article to see if it carries a positive, negative, or neutral tone, helping you understand media bias.</p>
+                         <a href="{{ url_for('main.visualization') }}" class="btn btn-primary">Learn More</a>
+                     </div>
+                 </div>
+             </div>
+         </section>
+
+         <!-- Testimonials Slide-bar -->
+         <section class="testimonials-section">
+             <div class="container">
+                 <h2 class="mb-4">What Our Users Say</h2>
+                 <!-- Bootstrap carousel -->
+                 <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000">
+                     <div class="carousel-inner">
+                         <!-- Slide 1 (active) -->
+                         <div class="carousel-item active text-center p-4">
+                             <p class="fst-italic">"SentiNews helped me understand the tone of news articles about my favorite topics. As I analyzed a tech article and discovered its optimistic outlook!"</p>
+                             <h6 class="mt-2">Doge</h6>
+                         </div>
+                         <!-- Slide 2 -->
+                         <div class="carousel-item text-center p-4">
+                             <p class="fst-italic">"Sharing news on SentiNews is so easy! I shared a local election story with my community, and it sparked a great discussion."</p>
+                             <h6 class="mt-2">Elon</h6>
+                         </div>
+                         <!-- Slide 3 -->
+                         <div class="carousel-item text-center p-4">
+                             <p class="fst-italic">"Uploading my own articles to SentiNews was a game-changer. I uploaded a piece about a charity event, and the sentiment analysis showed its positive impact."</p>
+                             <h6 class="mt-2">Mathew</h6>
+                         </div>
+                     </div>
+                     <!-- Navigation arrows -->
+                     <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev" aria-label="Previous testimonial">
+                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                     </button>
+                     <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next" aria-label="Next testimonial">
+                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                     </button>
+                 </div>
+             </div>
+         </section>
+     {% endblock %}

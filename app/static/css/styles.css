@@ -1,0 +1,684 @@
+/* Reset and General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5dc; /* Light beige background for landing page */
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header Styles */
+.site-header {
+    background-color: #000;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.site-header .navbar-nav .nav-link {
+    color: white;
+    font-size: 1.1rem;
+    padding: 8px 15px;
+    transition: color 0.3s ease;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+    color: yellowgreen;
+}
+
+.site-header .btn-fancy-login {
+    background-color: yellowgreen;
+    color: black;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.site-header .btn-fancy-login:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Intro Section (Home Page) */
+.intro-section {
+    background: linear-gradient(to right, #000, #333);
+    color: white;
+    text-align: center;
+    padding: 120px 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intro-section h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+}
+
+.intro-section p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.intro-section .btn-fancy-login {
+    background-color: yellowgreen;
+    color: black;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.intro-section .btn-fancy-login:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Features Section */
+.features-section {
+    padding: 40px 0;
+    background-color: #f8f9fa;  /* Light gray background */
+    text-align: center;
+}
+
+.feature-card {
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(154, 205, 50, 0.2);  /* Yellowgreen shadow */
+    border: 1px solid rgba(154, 205, 50, 0.3);  /* Subtle yellowgreen border */
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    color: #9ACD32;  /* Pure yellowgreen */
+    margin-bottom: 15px;
+}
+
+.feature-card h4 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+    padding: 40px 0;
+    text-align: center;
+    background-color: #eef7e4;  /* Very light yellowgreen tint */
+}
+
+.testimonial-card {
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(154, 205, 50, 0.1);
+}
+
+.testimonial-card p {
+    font-style: italic;
+    color: #495057;  /* Darker gray for better readability */
+}
+
+.testimonial-card h6 {
+    margin-top: 10px;
+    color: #2c3e50;  /* Dark blue-gray */
+    font-weight: 600;
+}
+
+/* Footer Styles */
+.site-footer {
+    background-color: #000;
+    color: white;
+    padding: 50px 0;
+}
+
+.site-footer h5 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.site-footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.site-footer ul li {
+    margin-bottom: 10px;
+}
+
+.site-footer ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.site-footer ul li a:hover {
+    color: yellowgreen;
+}
+
+.site-footer .copyright {
+    text-align: center;
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+    font-size: 0.9rem;
+}
+
+/* Buttons (Restored Original Style for Non-Intro Buttons) */
+.btn-primary {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: yellowgreen;
+    color: black;
+    opacity: 0.9;
+}
+
+/* Login Page Specific Styles - Enhanced */
+.login-section {
+    min-height: calc(100vh - 76px); /* Full height minus header */
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f5dc 0%, #e8f5e9 100%);
+    padding: 2rem 0;
+}
+
+#loginForm, #registerForm, #forgotPasswordForm {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 2.5rem;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(154, 205, 50, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#loginForm::before, #registerForm::before, #forgotPasswordForm::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, yellowgreen, #88b04b);
+}
+
+#loginForm:hover, #registerForm:hover, #forgotPasswordForm:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(154, 205, 50, 0.2);
+}
+
+/* Login button specific styling (just for the login page) */
+#loginForm .btn-fancy-login, 
+#loginForm button[type="submit"],
+.login-section .btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, yellowgreen 0%, #88b04b 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: none;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 8px rgba(154, 205, 50, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+#loginForm .btn-fancy-login:hover,
+#loginForm button[type="submit"]:hover,
+.login-section .btn-login:hover {
+    background: linear-gradient(135deg, #88b04b 0%, #6d9c2e 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(154, 205, 50, 0.4);
+}
+
+#loginForm .btn-fancy-login:active,
+#loginForm button[type="submit"]:active,
+.login-section .btn-login:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(154, 205, 50, 0.3);
+}
+
+/* Add subtle shine effect on hover */
+#loginForm .btn-fancy-login::before,
+#loginForm button[type="submit"]::before,
+.login-section .btn-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    transition: left 0.7s ease;
+}
+
+#loginForm .btn-fancy-login:hover::before,
+#loginForm button[type="submit"]:hover::before,
+.login-section .btn-login:hover::before {
+    left: 100%;
+}
+
+/* Fix for checkbox in login form */
+#loginForm .form-check {
+    margin: 15px 0;
+}
+
+#loginForm .form-check-input {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+#loginForm .form-check-input:checked {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+}
+
+#loginForm .form-check-label {
+    padding-left: 5px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Form Element Improvements */
+.form-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.form-control:focus {
+    border-color: yellowgreen;
+    box-shadow: 0 0 0 3px rgba(154, 205, 50, 0.2);
+    background-color: white;
+}
+
+/* Fix for checkbox alignment */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+}
+
+.form-check-input {
+    margin-right: 0.5rem;
+}
+
+/* Button adjustments for consistency */
+.btn-login {
+    width: 100%;
+    padding: 0.75rem;
+    background: yellowgreen;
+    border: none;
+    border-radius: 12px;
+    color: black;  /* Changed to match your color scheme */
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    box-shadow: 0 4px 6px rgba(154, 205, 50, 0.1);
+}
+
+.btn-login:hover {
+    background: #88b04b;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(154, 205, 50, 0.3);
+    color: white;  /* Changed to match your hover style */
+}
+
+/* Form divider for visual separation */
+.form-divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.form-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.form-divider span {
+    position: relative;
+    background: white;
+    padding: 0 15px;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Fix for flash messages */
+.alert {
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1rem 1rem 1.5rem;
+    border-left: 4px solid transparent;
+}
+
+.alert-danger {
+    background-color: #fff5f5;
+    color: #c53030;
+    border-left-color: #c53030;
+}
+
+.alert-success {
+    background-color: #f0fff4;
+    color: #276749;
+    border-left-color: #276749;
+}
+
+/* Enhanced Alert Styling for Login Prompts */
+.login-alert {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-left: 4px solid yellowgreen;
+    color: #333;
+    padding: 16px 20px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+.login-alert p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.login-alert .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #777;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    transition: color 0.2s ease;
+}
+
+.login-alert .close-btn:hover {
+    color: #333;
+}
+
+.login-alert-icon {
+    color: yellowgreen;
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
+
+/* Animation for the alert */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Animation for closing the alert */
+.login-alert.hiding {
+    animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+/* Upload Page Specific Styles */
+.upload-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.upload-container .btn-primary {
+    margin-top: 10px;
+}
+
+/* Share Page Specific Styles */
+.share-box {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.share-box button {
+    margin: 5px;
+}
+
+/* Visualization Page Specific Styles */
+#sentimentChart, #wordCloud {
+    max-width: 100%;
+    height: 300px;
+}
+
+.fulltext-box, .summary-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Account Assistance Section */
+.account-help-section {
+    text-align: center;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 10px rgba(154, 205, 50, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.account-help-section p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #555;
+}
+
+.register-link {
+    display: inline-block;
+    background-color: #f8f9fa;
+    color: #333;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    border: 2px solid yellowgreen;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.register-link:hover {
+    background-color: yellowgreen;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(154, 205, 50, 0.2);
+}
+
+.forgot-password-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-block;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.forgot-password-link:hover {
+    color: yellowgreen;
+}
+
+.forgot-password-link:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: yellowgreen;
+    transition: width 0.3s ease;
+}
+
+.forgot-password-link:hover:after {
+    width: 100%;
+}
+
+/* Divider for login options */
+.option-divider {
+    position: relative;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.option-divider:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background-color: #e0e0e0;
+}
+
+.option-divider:after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background-color: #e0e0e0;
+}
+
+.option-divider span {
+    background-color: white;
+    padding: 0 12px;
+    position: relative;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .intro-section {
+        padding: 60px 0;
+        min-height: 80vh;
+    }
+
+    .intro-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .intro-section p {
+        font-size: 1.1rem;
+    }
+
+    .feature-card {
+        margin-bottom: 30px;
+    }
+
+    .site-header .navbar-nav {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .site-header .nav-item {
+        margin: 5px 0;
+    }
+}
+
+@media (max-width: 576px) {
+    #loginForm, #registerForm, #forgotPasswordForm {
+        margin: 10px;
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+
+    .form-container h2 {
+        font-size: 1.75rem;
+    }
+}

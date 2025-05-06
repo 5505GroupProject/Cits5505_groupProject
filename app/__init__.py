@@ -1,64 +1,45 @@
-from flask import Flask, render_template, redirect
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required, current_user
+from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 import os
-import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-
-# Initialize extensions before they are registered with the app
+# Create extensions
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 
-def create_app(config_class=None):
-    app = Flask(__name__, static_folder='static', template_folder='templates')
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object('config.Config')
     
-    # Load configurations
-    if config_class:
-        app.config.from_object(config_class)
-    else:
-        # Default configuration
-        app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'static_file_server')
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # If not in config, set a secure secret key for sessions
+    if 'SECRET_KEY' not in app.config:
+        app.config['SECRET_KEY'] = os.urandom(24).hex()
     
-    # Initialize and configure extensions
+    # Initialize extensions
     db.init_app(app)
-    login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
     csrf.init_app(app)
     
+    # Configure login manager
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = "Please log in to access this page."
+    login_manager.login_message_category = "info"
+    
+    from app.models import User
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+    
     # Register blueprints
+    from app.routes.main import main_bp
     from app.routes.auth import auth_bp
+    # Import other blueprints as needed
+    
+    app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    # Register other blueprints
     
-    # Register the new upload blueprint
-    from app.routes.upload import upload_bp
-    app.register_blueprint(upload_bp)
-    
-    # Add route for the main page to load the login interface
-    @app.route('/')
-    def index():
-        return render_template('login.html')
-    
-    # Add route for the upload page that users will be redirected to after login
-    @app.route('/upload')
-    @login_required
-    def upload():
-        from flask_login import current_user
-        return render_template('upload.html', user=current_user)
-    
-    # Create database tables if they don't exist
-    with app.app_context():
-        # Import models here to avoid circular imports
-        from app.models.user import User
-        from app.models.upload import UploadedText
-        db.create_all()
-        
     return app
-
-# For backwards compatibility and easier imports
-app = create_app()

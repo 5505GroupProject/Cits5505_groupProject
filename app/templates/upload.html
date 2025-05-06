@@ -1,63 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SentiNews - Upload News Content</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .upload-container {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .site-header {
-            background-color: black;
-            color: white;
-            padding: 20px 0;
-            margin-bottom: 30px;
-        }
-        .btn-primary {
-            background-color: #0d6efd;
-        }
-        .btn-secondary {
-            background-color: black;
-        }
-        #uploadStatus {
-            display: none;
-            margin-top: 20px;
-        }
-        .upload-history {
-            margin-top: 30px;
-            border-top: 1px solid #dee2e6;
-            padding-top: 20px;
-        }
-        .word-count {
-            color: #6c757d;
-            font-size: 0.9rem;
-            text-align: right;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header Section -->
-    <header class="site-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1>SentiNews</h1>
-                    <p class="lead mb-0">News Sentiment Analysis Tool</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <span>Hi, {{ user.username }}</span>
-                    <a href="/auth/logout" class="btn btn-outline-light">Log Out</a>
-                </div>
-            </div>
-        </div>
-    </header>
+{% extends "base.html" %}
 
+{% block title %}Upload News{% endblock %}
+
+{% block content %}
     <!-- Main Content -->
     <main class="container">
         <div class="row justify-content-center">
@@ -69,7 +14,7 @@
                 </div>
                 
                 <div class="upload-container">
-                    <form id="uploadForm">
+                    <form id="uploadForm" action="{{ url_for('upload.upload_text') }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
                             <label for="newsContent" class="form-label">News Content</label>
@@ -84,14 +29,14 @@
                     </form>
                     
                     <!-- Status messages -->
-                    <div id="uploadStatus" class="alert mt-3">
+                    <div id="uploadStatus" class="alert mt-3" style="display: none;">
                         <span id="statusMessage"></span>
                     </div>
                 </div>
                 
                 <div class="text-center mt-4">
                     <p class="text-muted">You can also upload a text file (.txt):</p>
-                    <form id="fileUploadForm" enctype="multipart/form-data">
+                    <form id="fileUploadForm" action="{{ url_for('upload.upload_file') }}" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="input-group">
                             <input class="form-control" type="file" id="fileUpload" accept=".txt" name="file">
@@ -104,7 +49,6 @@
                 <div class="upload-history">
                     <h3>Your Upload History</h3>
                     <div id="uploadHistory" class="list-group">
-                        <!-- Upload history will be populated here -->
                         <div class="text-center py-3" id="loadingHistory">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>
@@ -116,176 +60,6 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="container mt-5 pb-3">
-        <div class="border-top pt-3">
-            <p class="text-center text-muted">© 2025 SentiNews. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const uploadForm = document.getElementById('uploadForm');
-            const fileUploadForm = document.getElementById('fileUploadForm');
-            const newsContent = document.getElementById('newsContent');
-            const fileUpload = document.getElementById('fileUpload');
-            const clearBtn = document.getElementById('clearBtn');
-            const uploadStatus = document.getElementById('uploadStatus');
-            const statusMessage = document.getElementById('statusMessage');
-            const wordCount = document.getElementById('wordCount');
-            const uploadHistory = document.getElementById('uploadHistory');
-            const loadingHistory = document.getElementById('loadingHistory');
-            
-            // Function to show status message
-            function showStatus(message, isError = false) {
-                statusMessage.textContent = message;
-                uploadStatus.style.display = 'block';
-                
-                if (isError) {
-                    uploadStatus.className = 'alert alert-danger mt-3';
-                } else {
-                    uploadStatus.className = 'alert alert-success mt-3';
-                }
-                
-                // Auto-hide after 5 seconds
-                setTimeout(() => {
-                    uploadStatus.style.display = 'none';
-                }, 5000);
-            }
-            
-            // Function to update word and character count
-            function updateWordCount() {
-                const text = newsContent.value;
-                const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-                const charCount = text.length;
-                
-                document.getElementById('wordCount').textContent = `${wordCount} words, ${charCount} characters`;
-            }
-            
-            // Add event listener for text changes
-            newsContent.addEventListener('input', updateWordCount);
-            
-            // Initialize word count
-            updateWordCount();
-            
-            // Load upload history when page loads
-            function loadUploadHistory() {
-                fetch('/upload/list')
-                    .then(response => response.json())
-                    .then(data => {
-                        loadingHistory.style.display = 'none';
-                        
-                        if (data.success && data.uploads.length > 0) {
-                            const historyHtml = data.uploads.map(upload => `
-                                <div class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">${upload.filename}</h5>
-                                        <small>${upload.created_at}</small>
-                                    </div>
-                                    <p class="mb-1">${upload.preview}</p>
-                                </div>
-                            `).join('');
-                            
-                            uploadHistory.innerHTML = historyHtml;
-                        } else {
-                            uploadHistory.innerHTML = '<p class="text-center">No uploads found. Start by uploading text or a file!</p>';
-                        }
-                    })
-                    .catch(error => {
-                        loadingHistory.style.display = 'none';
-                        uploadHistory.innerHTML = '<p class="text-center text-danger">Error loading upload history. Please refresh the page.</p>';
-                        console.error('Error:', error);
-                    });
-            }
-            
-            // Load history on page load
-            loadUploadHistory();
-            
-            // Handle text upload form submission
-            uploadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Check if text content is provided
-                const content = newsContent.value.trim();
-                if (!content) {
-                    showStatus('Please enter news content for analysis.', true);
-                    return;
-                }
-                
-                // Create form data
-                const formData = new FormData(uploadForm);
-                
-                // Submit form using fetch API
-                fetch('/upload/text', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus('Content uploaded successfully!');
-                        loadUploadHistory(); // Refresh the upload history
-                    } else {
-                        showStatus(`Error: ${data.error}`, true);
-                    }
-                })
-                .catch(error => {
-                    showStatus('An error occurred while uploading the content.', true);
-                    console.error('Error:', error);
-                });
-            });
-            
-            // Handle file upload form submission
-            fileUploadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Check if file is selected
-                if (fileUpload.files.length === 0) {
-                    showStatus('Please select a file to upload.', true);
-                    return;
-                }
-                
-                // Check file type
-                const file = fileUpload.files[0];
-                if (!file.name.endsWith('.txt')) {
-                    showStatus('Only .txt files are allowed.', true);
-                    return;
-                }
-                
-                // Create form data
-                const formData = new FormData(fileUploadForm);
-                
-                // Submit form using fetch API
-                fetch('/upload/file', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus('File uploaded successfully!');
-                        newsContent.value = data.content; // Display file content in textarea
-                        updateWordCount(); // Update the word count
-                        loadUploadHistory(); // Refresh the upload history
-                        fileUpload.value = ''; // Clear the file input
-                    } else {
-                        showStatus(`Error: ${data.error}`, true);
-                    }
-                })
-                .catch(error => {
-                    showStatus('An error occurred while uploading the file.', true);
-                    console.error('Error:', error);
-                });
-            });
-            
-            // Handle clear button
-            clearBtn.addEventListener('click', function() {
-                newsContent.value = '';
-                fileUpload.value = '';
-                updateWordCount();
-            });
-        });
-    </script>
-</body>
-</html>
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %}
