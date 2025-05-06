@@ -5,6 +5,7 @@ from app.models import UploadedText
 from app import db
 from flask_wtf.csrf import validate_csrf, ValidationError
 from app.utils.sentiment_utils import get_sentiment_summary
+from app.utils.ngram_utils import get_multiple_ngrams
 import os
 import traceback
 
@@ -61,8 +62,12 @@ def upload():
                     # Perform sentiment analysis
                     sentiment_data = get_sentiment_summary(file_content)
                     
+                    # Perform N-gram analysis
+                    ngram_data = get_multiple_ngrams(file_content)
+                    
                     # Store data in session for test page
                     session['sentiment_data'] = sentiment_data
+                    session['ngram_data'] = ngram_data
                     session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
                     session['upload_id'] = new_upload.id
                     
@@ -90,8 +95,12 @@ def upload():
                     # Perform sentiment analysis
                     sentiment_data = get_sentiment_summary(text_content)
                     
+                    # Perform N-gram analysis
+                    ngram_data = get_multiple_ngrams(text_content)
+                    
                     # Store data in session for test page
                     session['sentiment_data'] = sentiment_data
+                    session['ngram_data'] = ngram_data
                     session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
                     session['upload_id'] = new_upload.id
                     
@@ -112,18 +121,20 @@ def upload():
     # Render template with uploads for both GET and unsuccessful POST
     return render_template('upload.html', uploads=recent_uploads)
 
-# 添加新路由用于显示情感分析结果
+# 添加新路由用于显示情感分析和N-gram分析结果
 @upload_bp.route('/test-page', methods=['GET'])
 @login_required
 def test_page():
-    # 从session获取情感分析数据
+    # 从session获取分析数据
     sentiment_data = session.get('sentiment_data')
+    ngram_data = session.get('ngram_data')
     text_content = session.get('text_content')
     upload_id = session.get('upload_id')
     
     # 渲染test_page模板并传入分析结果
     return render_template('test_page.html', 
                           sentiment_data=sentiment_data,
+                          ngram_data=ngram_data,
                           text_content=text_content,
                           upload_id=upload_id)
 

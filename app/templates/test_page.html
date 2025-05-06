@@ -1,15 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}Sentiment Analysis{% endblock %}
+{% block title %}Text Analysis Results{% endblock %}
 
 {% block content %}
+<h2>Text Analysis Results</h2>
+
+<h3>Sentiment Analysis Results</h3>
 {% if sentiment_data %}
-Sentiment: {{ sentiment_data.sentiment }}
-Compound Score: {{ sentiment_data.compound_score }}
-Positive Score: {{ sentiment_data.positive_score }}
-Negative Score: {{ sentiment_data.negative_score }}
-Neutral Score: {{ sentiment_data.neutral_score }}
+<p>Overall Sentiment: {{ sentiment_data.sentiment }}</p>
+<p>Compound Score: {{ sentiment_data.compound_score }}</p>
+<p>Positive Score: {{ sentiment_data.positive_score }}</p>
+<p>Negative Score: {{ sentiment_data.negative_score }}</p>
+<p>Neutral Score: {{ sentiment_data.neutral_score }}</p>
 {% else %}
-No sentiment analysis data available.
+<p>No sentiment analysis data available.</p>
 {% endif %}
+
+<h3>N-gram Analysis Results</h3>
+{% if ngram_data %}
+<h4>Top Unigrams (Single Words)</h4>
+{% for item in ngram_data.unigrams.ngrams %}
+<p>{{ loop.index }}. {{ item.ngram }}: {{ item.count }}</p>
+{% endfor %}
+
+<h4>Top Bigrams (Word Pairs)</h4>
+{% for item in ngram_data.bigrams.ngrams %}
+<p>{{ loop.index }}. {{ item.ngram }}: {{ item.count }}</p>
+{% endfor %}
+
+<h4>Top Trigrams (Three Word Sequences)</h4>
+{% for item in ngram_data.trigrams.ngrams %}
+<p>{{ loop.index }}. {{ item.ngram }}: {{ item.count }}</p>
+{% endfor %}
+{% else %}
+<p>No N-gram analysis data available.</p>
+{% endif %}
+
+{% if text_content %}
+<h3>Analyzed Text</h3>
+<pre>{{ text_content }}</pre>
+{% endif %}
+
+<p><a href="{{ url_for('upload.upload') }}">Back to Upload</a></p>
 {% endblock %}
