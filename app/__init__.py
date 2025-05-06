@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, current_user
@@ -52,11 +51,11 @@ def create_app(config_class=None):
         from flask_login import current_user
         return render_template('upload.html', user=current_user)
     
-# Create database tables if they don't exist
+    # Create database tables if they don't exist
     with app.app_context():
         # Import models here to avoid circular imports
         from app.models.user import User
-        from app.models.upload import Upload
+        from app.models.upload import UploadedText
         db.create_all()
         
     return app

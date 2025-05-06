@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from app.models import Upload
+from app.models import UploadedText
 from app import db
 from flask_wtf.csrf import validate_csrf
 import os
@@ -26,7 +26,7 @@ def upload_text():
             return jsonify({'error': 'No content provided'}), 400
             
         # Create new upload record
-        new_upload = Upload(
+        new_upload = UploadedText(
             user_id=current_user.id,
             content=content,
             filename=None  # No filename for direct text input
@@ -77,7 +77,7 @@ def upload_file():
             return jsonify({'error': 'File is empty'}), 400
             
         # Create new upload record
-        new_upload = Upload(
+        new_upload = UploadedText(
             user_id=current_user.id,
             content=file_content,
             filename=secure_filename(file.filename)
@@ -104,7 +104,7 @@ def upload_file():
 def list_uploads():
     """Get list of user's uploads."""
     try:
-        uploads = Upload.query.filter_by(user_id=current_user.id).order_by(Upload.created_at.desc()).all()
+        uploads = UploadedText.query.filter_by(user_id=current_user.id).order_by(UploadedText.created_at.desc()).all()
         
         upload_list = [{
             'id': upload.id,

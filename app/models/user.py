@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationship with uploads
-    uploads = db.relationship('Upload', backref='user', lazy=True)
+    uploads = db.relationship('UploadedText', backref='user', lazy=True)
     
     def __init__(self, username, email, password):
         self.username = username
