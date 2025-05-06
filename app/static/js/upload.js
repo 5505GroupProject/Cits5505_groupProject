@@ -182,12 +182,24 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Loading upload history...');
         uploadHistory.innerHTML = '<p class="text-center text-muted">Loading history...</p>';
         
-        fetch('/api/uploads/history')
+        fetch('/upload/history')
             .then(response => {
                 console.log('History API response status:', response.status);
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        uploadHistory.innerHTML = '<p class="text-center text-warning">Please log in to view your upload history.</p>';
+                    } else {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return null;
+                }
+                
                 return response.json();
             })
             .then(data => {
+                if (!data) return; // Skip processing if no data (from auth error)
+                
                 console.log('History data:', data);
                 
                 if (data.success && data.uploads) {
@@ -230,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td>${date}</td>
                             <td>${preview}</td>
                             <td>
-                                <a href="/view/${upload.id}" class="btn btn-sm btn-primary">View</a>
+                                <a href="/upload/view/${upload.id}" class="btn btn-sm btn-primary">View</a>
                             </td>
                         `;
                         
@@ -251,6 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Load upload history when page loads
-    loadUploadHistory();
+    // Load upload history when page loads, but only if the element exists
+    if (document.getElementById('uploadHistory')) {
+        loadUploadHistory();
+    }
 });
