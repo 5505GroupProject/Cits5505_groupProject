@@ -3,63 +3,127 @@
 {% block title %}Upload News{% endblock %}
 
 {% block content %}
-    <!-- Main Content -->
-    <main class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="text-center mb-4">
-                    <h2>Upload News Content</h2>
-                    <p class="lead">Hello! Upload your news article or content below for sentiment analysis.</p>
-                    <p>Our tool will analyze the text and provide insights on the overall sentiment, key topics, and emotional tone.</p>
-                </div>
-                
-                <div class="upload-container">
-                    <form id="uploadForm" action="{{ url_for('upload.upload_text') }}" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <div class="mb-3">
-                            <label for="newsContent" class="form-label">News Content</label>
-                            <div class="word-count" id="wordCount">0 words, 0 characters</div>
-                            <textarea class="form-control" id="newsContent" name="content" rows="10" placeholder="Paste or type your news content here..."></textarea>
-                        </div>
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-secondary" id="clearBtn">Clear Text</button>
-                            <button type="submit" class="btn btn-primary" id="analyzeBtn">Upload & Analyze</button>
-                        </div>
-                    </form>
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center mb-4">
+                <h2>Upload News Content</h2>
+                <p class="lead">Upload your news article or content for sentiment analysis.</p>
+            </div>
+            
+            <!-- Display flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="upload-container">
+                <!-- Text upload form -->
+                <form id="uploadForm" action="{{ url_for('main.upload') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     
-                    <!-- Status messages -->
-                    <div id="uploadStatus" class="alert mt-3" style="display: none;">
-                        <span id="statusMessage"></span>
+                    <!-- Add title field -->
+                    <div class="mb-3">
+                        <label for="newsTitle" class="form-label">Title (Optional)</label>
+                        <input type="text" class="form-control" id="newsTitle" name="title" placeholder="Enter a title for your content">
                     </div>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <p class="text-muted">You can also upload a text file (.txt):</p>
-                    <form id="fileUploadForm" action="{{ url_for('upload.upload_file') }}" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <div class="input-group">
-                            <input class="form-control" type="file" id="fileUpload" accept=".txt" name="file">
-                            <button class="btn btn-outline-secondary" type="submit" id="uploadFileBtn">Upload File</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Upload History Section -->
-                <div class="upload-history">
-                    <h3>Your Upload History</h3>
-                    <div id="uploadHistory" class="list-group">
-                        <div class="text-center py-3" id="loadingHistory">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
+                    
+                    <div class="mb-3">
+                        <label for="newsContent" class="form-label">News Content</label>
+                        <div class="word-count" id="wordCount">0 words, 0 characters</div>
+                        <textarea class="form-control" id="newsContent" name="content" rows="10" placeholder="Paste or type your news content here..."></textarea>
                     </div>
-                </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-secondary" id="clearBtn">Clear Text</button>
+                        <button type="submit" class="btn btn-primary">Upload & Analyze</button>
+                    </div>
+                </form>
+                
+                <!-- File upload form -->
+                <form id="fileUploadForm" action="{{ url_for('main.upload') }}" method="post" enctype="multipart/form-data" class="mt-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <!-- Add title field for file uploads -->
+                    <div class="mb-3">
+                        <label for="fileTitle" class="form-label">Title (Optional)</label>
+                        <input type="text" class="form-control" id="fileTitle" name="title" placeholder="Enter a title for your file">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Upload a Text File</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".txt">
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">Upload File</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Upload History (directly from template) -->
+            <div class="mt-5">
+                <h3>Your Upload History</h3>
+                
+                {% if uploads %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Date</th>
+                                <th>Preview</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for upload in uploads %}
+                                <tr>
+                                    <td>{{ upload.title or 'Untitled' }}</td>
+                                    <td>{{ upload.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ (upload.content[:100] + '...') if upload.content|length > 100 else upload.content }}</td>
+                                    <td>
+                                        <a href="{{ url_for('main.view_upload', upload_id=upload.id) }}" class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-center text-muted">No uploads yet.</p>
+                {% endif %}
             </div>
         </div>
-    </main>
+    </div>
+</main>
+{% endblock %}
 
-    <!-- Custom JavaScript -->
-    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Word counter
+        const textArea = document.getElementById('newsContent');
+        const wordCount = document.getElementById('wordCount');
+        
+        if (textArea && wordCount) {
+            textArea.addEventListener('input', function() {
+                const text = this.value;
+                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+                const chars = text.length;
+                wordCount.textContent = `${words} words, ${chars} characters`;
+            });
+        }
+        
+        // Clear button
+        const clearBtn = document.getElementById('clearBtn');
+        if (clearBtn && textArea) {
+            clearBtn.addEventListener('click', function() {
+                textArea.value = '';
+                const titleInput = document.getElementById('newsTitle');
+                if (titleInput) titleInput.value = '';
+                wordCount.textContent = '0 words, 0 characters';
+            });
+        }
+    });
+</script>
 {% endblock %}

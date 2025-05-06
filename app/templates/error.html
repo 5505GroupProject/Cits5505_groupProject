@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<main class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Error</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ message }}</p>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">Go Back</a>
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-outline-primary">Return to Upload Page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
