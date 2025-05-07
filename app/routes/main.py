@@ -19,9 +19,23 @@ def share():
 @main_bp.route('/visualization')
 @login_required
 def visualization():
-    analyzed_text = session.get('analyzedText', 'No text analyzed yet.')
-    summary = "The sentiment analysis indicates a generally positive outlook in the submitted content."
-    return render_template('visualization.html', analyzed_text=analyzed_text, summary=summary)
+    # 从session获取四种分析结果
+    sentiment_data = session.get('sentiment_data', None)
+    ngram_data = session.get('ngram_data', None)
+    ner_data = session.get('ner_data', None) 
+    word_freq_data = session.get('word_freq_data', None)
+    
+    # 获取原始文本内容
+    text_content = session.get('text_content', 'No text analyzed yet.')
+    
+    return render_template(
+        'visualization.html', 
+        sentiment_data=sentiment_data,
+        ngram_data=ngram_data, 
+        ner_data=ner_data,
+        word_freq_data=word_freq_data,
+        analyzed_text=text_content
+    )
 
 @main_bp.route('/protected-route')
 @login_required

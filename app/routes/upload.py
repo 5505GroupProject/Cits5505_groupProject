@@ -73,7 +73,7 @@ def upload():
                     # Perform word frequency analysis
                     word_freq_data = analyze_word_frequency(file_content)
                     
-                    # Store data in session for test page
+                    # Store data in session for visualization page
                     session['sentiment_data'] = sentiment_data
                     session['ngram_data'] = ngram_data
                     session['ner_data'] = ner_data
@@ -81,9 +81,9 @@ def upload():
                     session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
                     session['upload_id'] = new_upload.id
                     
-                    # Flash success message and redirect to test page
+                    # Flash success message and redirect to visualization page
                     flash('File uploaded and analyzed successfully!', 'success')
-                    return redirect(url_for('upload.test_page'))
+                    return redirect(url_for('main.visualization'))
                 else:
                     flash('No file selected!', 'warning')
                 
@@ -114,7 +114,7 @@ def upload():
                     # Perform word frequency analysis
                     word_freq_data = analyze_word_frequency(text_content)
                     
-                    # Store data in session for test page
+                    # Store data in session for visualization page
                     session['sentiment_data'] = sentiment_data
                     session['ngram_data'] = ngram_data
                     session['ner_data'] = ner_data
@@ -122,9 +122,9 @@ def upload():
                     session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
                     session['upload_id'] = new_upload.id
                     
-                    # Flash success message and redirect to test page
+                    # Flash success message and redirect to visualization page
                     flash('Text content uploaded and analyzed successfully!', 'success')
-                    return redirect(url_for('upload.test_page'))
+                    return redirect(url_for('main.visualization'))
                 else:
                     flash('No content provided!', 'danger')
             
