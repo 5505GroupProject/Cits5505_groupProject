@@ -19,13 +19,13 @@ def share():
 @main_bp.route('/visualization')
 @login_required
 def visualization():
-    # 从session获取四种分析结果
+    # Get four types of analysis results from session
     sentiment_data = session.get('sentiment_data', None)
     ngram_data = session.get('ngram_data', None)
     ner_data = session.get('ner_data', None) 
     word_freq_data = session.get('word_freq_data', None)
     
-    # 获取原始文本内容
+    # Get original text content
     text_content = session.get('text_content', 'No text analyzed yet.')
     
     return render_template(

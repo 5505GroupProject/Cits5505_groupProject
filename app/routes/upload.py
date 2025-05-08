@@ -139,11 +139,11 @@ def upload():
     # Render template with uploads for both GET and unsuccessful POST
     return render_template('upload.html', uploads=recent_uploads)
 
-# 添加新路由用于显示情感分析和N-gram分析结果
+# Added new route to display sentiment analysis and N-gram analysis results
 @upload_bp.route('/test-page', methods=['GET'])
 @login_required
 def test_page():
-    # 从session获取分析数据
+    # Get analysis data from session
     sentiment_data = session.get('sentiment_data')
     ngram_data = session.get('ngram_data')
     ner_data = session.get('ner_data')
@@ -151,7 +151,7 @@ def test_page():
     text_content = session.get('text_content')
     upload_id = session.get('upload_id')
     
-    # 渲染test_page模板并传入分析结果
+    # Render test_page template and pass analysis results
     return render_template('test_page.html', 
                           sentiment_data=sentiment_data,
                           ngram_data=ngram_data,
@@ -178,7 +178,7 @@ def upload_text():
         db.session.add(new_upload)
         db.session.commit()
         
-        # 执行文本分析
+        # Perform text analysis
         sentiment_data = get_sentiment_summary(content)
         ngram_data = get_multiple_ngrams(content)
         ner_data = perform_ner_analysis(content)
@@ -232,7 +232,7 @@ def upload_file():
         db.session.add(new_upload)
         db.session.commit()
         
-        # 执行文本分析
+        # Perform text analysis
         sentiment_data = get_sentiment_summary(file_content)
         ngram_data = get_multiple_ngrams(file_content)
         ner_data = perform_ner_analysis(file_content)
