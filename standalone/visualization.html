@@ -168,6 +168,14 @@
 <script>
 // Get text from sessionStorage
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Bootstrap accordions explicitly
+  const accordionItems = document.querySelectorAll('.accordion-collapse');
+  accordionItems.forEach(collapse => {
+    new bootstrap.Collapse(collapse, {
+      toggle: false
+    });
+  });
+  
   const analyzedText = sessionStorage.getItem('analyzedText') || 
     "The rapid advancement of artificial intelligence is transforming every aspect of our daily lives. " +
     "From voice assistants that help us schedule appointments to predictive algorithms that guide medical diagnoses, " +

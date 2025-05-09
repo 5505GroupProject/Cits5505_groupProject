@@ -39,7 +39,10 @@ def create_app():
     # Register blueprints
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
+    from app.routes.upload import upload_bp  # Import the upload blueprint
+    
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(upload_bp)  # Register the upload blueprint
     
     return app
