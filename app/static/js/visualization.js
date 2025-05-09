@@ -1,6 +1,6 @@
-// 页面加载完成后执行
+// Execute after the page is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Visualization page loaded');
     
-    // 不需要任何可视化代码，纯文本展示
+    // No visualization code needed, pure text display
 });
