@@ -22,21 +22,21 @@
                 </div>
 
                 <!-- Login/Register forms container -->
-                <div class="col-md-4 form-container">
+                <div class="col-md-5 col-lg-4 form-container">
                     <!-- Login Form -->
                     <div id="loginContainer">
-                        <h2 class="mb-4">Login</h2>
+                        <h2 class="mb-4">Welcome Back</h2>
                         <form id="loginForm" action="{{ url_for('auth.login') }}" method="post" class="needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
-                                <label for="username" class="form-label">Username:</label>
+                                <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
                                 <div class="invalid-feedback">
                                     Please enter your username.
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="password" class="form-label">Password:</label>
+                                <label for="password" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                                 <div class="invalid-feedback">
                                     Please enter your password.
@@ -46,10 +46,10 @@
                                 <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
                                 <label class="form-check-label" for="rememberMe">Remember me</label>
                             </div>
-                            <button type="submit" class="btn btn-fancy-login">Login</button>
+                            <button type="submit" class="btn btn-fancy-login">Sign In</button>
                         </form>
                         
-                        <!-- Enhanced Account Help Section (replaced the old card and duplicate) -->
+                        <!-- Enhanced Account Help Section -->
                         <div class="account-help-section">
                             <p>Don't have an account?</p>
                             <a href="#" id="showRegisterForm" class="register-link">Register here</a>
@@ -64,32 +64,32 @@
                     
                     <!-- Register Form (hidden by default) -->
                     <div id="registerContainer" style="display: none;">
-                        <h2 class="mb-4">Register</h2>
+                        <h2 class="mb-4">Create Account</h2>
                         <form id="registerForm" action="{{ url_for('auth.register') }}" method="post" class="needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
-                                <label for="reg_username" class="form-label">Username:</label>
+                                <label for="reg_username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="reg_username" name="username" required minlength="3" maxlength="20">
                                 <div class="invalid-feedback">
                                     Username must be between 3-20 characters.
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email:</label>
+                                <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                                 <div class="invalid-feedback">
                                     Please enter a valid email address.
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="reg_password" class="form-label">Password:</label>
+                                <label for="reg_password" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="reg_password" name="password" required minlength="8">
                                 <div class="invalid-feedback">
                                     Password must be at least 8 characters long.
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="confirm-password" class="form-label">Confirm Password:</label>
+                                <label for="confirm-password" class="form-label">Confirm Password</label>
                                 <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
                                 <div class="invalid-feedback" id="password-match-feedback">
                                     Passwords do not match.
@@ -102,23 +102,23 @@
                                     You must agree to the terms and conditions.
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-fancy-login">Register</button>
+                            <button type="submit" class="btn btn-fancy-login">Create Account</button>
                         </form>
                         
                         <!-- Enhanced Back to Login Link -->
                         <div class="account-help-section">
                             <p>Already have an account?</p>
-                            <a href="#" id="showLoginForm" class="register-link">Login here</a>
+                            <a href="#" id="showLoginForm" class="register-link">Sign in here</a>
                         </div>
                     </div>
                     
                     <!-- Forgot Password Form (hidden by default) -->
                     <div id="forgotPasswordContainer" style="display: none;">
-                        <h2 class="mb-4">Forgot Password</h2>
+                        <h2 class="mb-4">Reset Password</h2>
                         <form id="forgotPasswordForm" action="{{ url_for('auth.reset_password') }}" method="post" class="needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
-                                <label for="fp_email" class="form-label">Enter your email address:</label>
+                                <label for="fp_email" class="form-label">Enter your email address</label>
                                 <input type="email" class="form-control" id="fp_email" name="email" required>
                                 <div class="invalid-feedback">
                                     Please enter a valid email address.
@@ -128,7 +128,7 @@
                                 <button type="submit" name="action" value="send_code" class="btn btn-fancy-login">Send Verification Code</button>
                             </div>
                             <div class="mb-3">
-                                <label for="verificationCode" class="form-label">Enter the verification code:</label>
+                                <label for="verificationCode" class="form-label">Verification code</label>
                                 <input type="text" class="form-control" id="verificationCode" name="verification_code" pattern="[0-9]{6}" title="6-digit code">
                                 <div class="invalid-feedback">
                                     Please enter a valid 6-digit verification code.
