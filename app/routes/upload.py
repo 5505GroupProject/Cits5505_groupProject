@@ -346,3 +346,47 @@ def view_upload(upload_id):
     except Exception as e:
         current_app.logger.error(f"Error viewing upload: {str(e)}")
         return render_template('error.html', message=f"An error occurred: {str(e)}"), 500
+
+@upload_bp.route('/delete/<int:upload_id>', methods=['DELETE'])
+@login_required
+def delete_upload(upload_id):
+    """Delete a user's upload."""
+    try:
+        # Get the CSRF token from the header
+        csrf_token = request.headers.get('X-CSRFToken')
+        
+        # Validate CSRF token
+        try:
+            validate_csrf(csrf_token)
+        except ValidationError:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid CSRF token. Please refresh the page and try again.'
+            }), 400
+            
+        upload = UploadedText.query.get_or_404(upload_id)
+        
+        # Security check - ensure user can only delete their own uploads
+        if upload.user_id != current_user.id:
+            return jsonify({
+                'success': False,
+                'error': "You don't have permission to delete this upload"
+            }), 403
+            
+        # Delete the upload
+        db.session.delete(upload)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Upload deleted successfully'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        error_details = traceback.format_exc()
+        current_app.logger.error(f"Delete upload error: {str(e)}\n{error_details}")
+        return jsonify({
+            'success': False,
+            'error': f'An error occurred: {str(e)}'
+        }), 500

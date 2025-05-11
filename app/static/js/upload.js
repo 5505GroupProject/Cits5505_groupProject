@@ -143,14 +143,76 @@ function updateUploadHistoryTable(uploads) {
     // Add each upload to the table
     uploads.forEach(upload => {
         const row = document.createElement('tr');
+        row.dataset.uploadId = upload.id; // Store upload ID in the row for easy reference
         row.innerHTML = `
             <td>${upload.title || 'Untitled'}</td>
             <td>${upload.created_at}</td>
             <td>${upload.preview}</td>
             <td>
                 <a href="/upload/view/${upload.id}" class="btn btn-sm btn-primary">View</a>
+                <button type="button" class="btn btn-sm btn-danger delete-upload-btn" data-upload-id="${upload.id}">Delete</button>
             </td>
         `;
         historyTableBody.appendChild(row);
+    });
+    
+    // Add event listeners to the delete buttons
+    addDeleteButtonListeners();
+}
+
+// Function to add event listeners to delete buttons
+function addDeleteButtonListeners() {
+    const deleteButtons = document.querySelectorAll('.delete-upload-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const uploadId = this.getAttribute('data-upload-id');
+            confirmDeleteUpload(uploadId);
+        });
+    });
+}
+
+// Function to show confirmation dialog and handle delete
+function confirmDeleteUpload(uploadId) {
+    if (confirm('Are you sure you want to delete this upload? This action cannot be undone.')) {
+        deleteUpload(uploadId);
+    }
+}
+
+// Function to send delete request to server
+function deleteUpload(uploadId) {
+    // Get the CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch(`/upload/delete/${uploadId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Find and remove the row from the table
+            const rowToRemove = document.querySelector(`tr[data-upload-id="${uploadId}"]`);
+            if (rowToRemove) {
+                rowToRemove.remove();
+                
+                // If no more uploads, show "No uploads yet" message
+                const historyTableBody = document.querySelector('.upload-history table tbody');
+                if (historyTableBody && historyTableBody.children.length === 0) {
+                    const messageRow = document.createElement('tr');
+                    messageRow.innerHTML = '<td colspan="4" class="text-center text-muted">No uploads yet.</td>';
+                    historyTableBody.appendChild(messageRow);
+                }
+            }
+        } else {
+            // Show error message
+            alert('Error deleting upload: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting upload:', error);
+        alert('An error occurred while deleting the upload. Please try again.');
     });
 }
