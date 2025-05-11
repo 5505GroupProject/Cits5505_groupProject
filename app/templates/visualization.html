@@ -5,16 +5,17 @@
 {% block content %}
     <main class="container">
         <h2 class="mb-4">Text Analysis Results</h2>
-        
+
         <!-- Original text display -->
         <div>
             <h3>Analyzed Text Content</h3>
             <p>{{ analyzed_text }}</p>
         </div>
-        
+
         <!-- Accordion Container -->
         <div class="accordion" id="visualizationAccordion">
-            <!-- Sentiment analysis accordion -->
+
+            <!-- Sentiment Analysis -->
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading1">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
@@ -23,23 +24,33 @@
                 </h2>
                 <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1">
                     <div class="accordion-body">
-                        {% if sentiment_data %}
-                            <h4>Sentiment Analysis Results:</h4>
-                            <ul>
-                                <li>Overall Sentiment: {{ sentiment_data.sentiment }}</li>
-                                <li>Compound Score: {{ sentiment_data.compound_score|round(2) }}</li>
-                                <li>Positive Sentiment: {{ (sentiment_data.positive_score*100)|round(1) }}%</li>
-                                <li>Neutral Sentiment: {{ (sentiment_data.neutral_score*100)|round(1) }}%</li>
-                                <li>Negative Sentiment: {{ (sentiment_data.negative_score*100)|round(1) }}%</li>
-                            </ul>
-                        {% else %}
-                            <p>No sentiment analysis data available</p>
-                        {% endif %}
+                        <div class="sentiment-container">
+                            <!-- No Data Message -->
+                            <div id="noDataSentiment" class="no-data-message">No Data Uploaded</div>
+                            
+                            <!-- Sentiment Details -->
+                            <div class="sentiment-details">
+                                <h4>Sentiment Analysis Results:</h4>
+                                <ul>
+                                    <li>Overall Sentiment: {{ sentiment_data.sentiment }}</li>
+                                    <li>Compound Score: {{ sentiment_data.compound_score | default(0.0) | round(2) }}</li>
+                                    <li>Positive Sentiment: {{ (sentiment_data.positive_score * 100) | default(0.0) | round(1) }}%</li>
+                                    <li>Neutral Sentiment: {{ (sentiment_data.neutral_score * 100) | default(0.0) | round(1) }}%</li>
+                                    <li>Negative Sentiment: {{ (sentiment_data.negative_score * 100) | default(0.0) | round(1) }}%</li>
+                                </ul>
+                            </div>
+
+                            <!-- Sentiment Chart -->
+                            <div class="sentiment-chart">
+                                <canvas id="sentimentChart" data-chart='{{ sentiment_data | tojson }}'></canvas>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- N-gram analysis accordion -->
+            <!-- N-gram Analysis -->
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading2">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
@@ -48,35 +59,19 @@
                 </h2>
                 <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2">
                     <div class="accordion-body">
-                        {% if ngram_data %}
-                            <h4>Word Frequency:</h4>
-                            <ul>
-                                {% for gram in ngram_data.unigrams.ngrams %}
-                                    <li>{{ gram.ngram }}: {{ gram.count }}</li>
-                                {% endfor %}
-                            </ul>
-                            
-                            <h4>Two-Word Combination Frequency:</h4>
-                            <ul>
-                                {% for gram in ngram_data.bigrams.ngrams %}
-                                    <li>{{ gram.ngram }}: {{ gram.count }}</li>
-                                {% endfor %}
-                            </ul>
-                            
-                            <h4>Three-Word Combination Frequency:</h4>
-                            <ul>
-                                {% for gram in ngram_data.trigrams.ngrams %}
-                                    <li>{{ gram.ngram }}: {{ gram.count }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>No N-gram analysis data available</p>
-                        {% endif %}
+                        <div id="noDataNgram1" class="no-data-message">No Data Uploaded</div>
+                        <canvas id="ngramChart1" data-chart='{{ ngram_data.unigrams.ngrams | tojson }}'></canvas>
+
+                        <div id="noDataNgram2" class="no-data-message">No Data Uploaded</div>
+                        <canvas id="ngramChart2" data-chart='{{ ngram_data.bigrams.ngrams | tojson }}'></canvas>
+
+                        <div id="noDataNgram3" class="no-data-message">No Data Uploaded</div>
+                        <canvas id="ngramChart3" data-chart='{{ ngram_data.trigrams.ngrams | tojson }}'></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Named Entity Recognition accordion -->
+            <!-- Named Entity Recognition -->
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading3">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
@@ -85,54 +80,34 @@
                 </h2>
                 <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3">
                     <div class="accordion-body">
-                        {% if ner_data and ner_data.entity_types %}
-                            {% for entity_type, entities in ner_data.entity_types.items() %}
-                                <h4>{{ entity_type }}:</h4>
-                                <ul>
-                                    {% for entity in entities %}
-                                        <li>{{ entity }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endfor %}
-                        {% else %}
-                            <p>No named entity recognition data available</p>
-                        {% endif %}
+                        <div id="noDataNER" class="no-data-message">No Data Uploaded</div>
+                        <ul id="nerList" data-chart='{{ ner_data | tojson }}'></ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Word Frequency Analysis accordion -->
+            <!-- Word Frequency Analysis -->
+           <!-- Word Cloud Analysis -->
             <div class="accordion-item">
-                <h2 class="accordion-header" id="heading4">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
-                        Word Frequency Analysis Results
+                <h2 class="accordion-header" id="heading5">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">
+                        Word Cloud Analysis
                     </button>
                 </h2>
-                <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4">
+                <div id="collapse5" class="accordion-collapse collapse show" aria-labelledby="heading5">
                     <div class="accordion-body">
-                        {% if word_freq_data %}
-                            <h4>Word Frequency Statistics:</h4>
-                            <ul>
-                                <li>Total Words: {{ word_freq_data.total_words }}</li>
-                                <li>Unique Words: {{ word_freq_data.unique_words }}</li>
-                                <li>Vocabulary Diversity: {{ (word_freq_data.unique_words / word_freq_data.total_words * 100)|round(2) }}%</li>
-                            </ul>
-                            
-                            <h4>High-Frequency Words:</h4>
-                            <ul>
-                                {% for word in word_freq_data.top_words %}
-                                    <li>{{ word.word }}: {{ word.count }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>No word frequency analysis data available</p>
-                        {% endif %}
+                        <canvas id="wordFrequencyChart" data-chart='{{ word_freq_data | tojson | safe }}' style="display: none;"></canvas>
+                        <div id="wordCloudContainer" style="width: 500px; height: 400px; margin: 0 auto;"></div>
                     </div>
                 </div>
             </div>
+
         </div>
     </main>
-    
+
     <!-- Custom JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.0.6/wordcloud2.min.js"></script>
     <script src="{{ url_for('static', filename='js/visualization.js') }}"></script>
+
 {% endblock %}

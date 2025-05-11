@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, session, request, redirect, url_for
 from flask_login import login_required
+from ..utils.ngram_utils import get_multiple_ngrams
+
 
 main_bp = Blueprint('main', __name__)
 
@@ -21,13 +23,25 @@ def share():
 def visualization():
     # Get four types of analysis results from session
     sentiment_data = session.get('sentiment_data', None)
-    ngram_data = session.get('ngram_data', None)
     ner_data = session.get('ner_data', None) 
     word_freq_data = session.get('word_freq_data', None)
     
     # Get original text content
     text_content = session.get('text_content', 'No text analyzed yet.')
     
+    # Regenerate the N-gram data
+    if text_content and text_content != 'No text analyzed yet.':
+        ngram_data = get_multiple_ngrams(text_content)
+
+        # cleaning is done before storing the session to prevent contamination
+        word_freq_data = {
+            'top_words': [{'word': item['ngram'], 'count': item['count']} for item in ngram_data['unigrams']['ngrams']]
+        }
+
+        session['word_freq_data'] = word_freq_data
+    else:
+        ngram_data = None
+
     return render_template(
         'visualization.html', 
         sentiment_data=sentiment_data,
@@ -36,6 +50,8 @@ def visualization():
         word_freq_data=word_freq_data,
         analyzed_text=text_content
     )
+
+
 
 @main_bp.route('/protected-route')
 @login_required

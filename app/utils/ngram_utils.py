@@ -2,12 +2,29 @@ import nltk
 from nltk.util import ngrams
 from nltk.tokenize import word_tokenize
 from collections import Counter
+import string
+import re
 
 # Download necessary NLTK data if not already present
 try:
     nltk.data.find('tokenizers/punkt')
+    nltk.data.find('corpora/stopwords')
 except LookupError:
     nltk.download('punkt')
+    nltk.download('stopwords')
+
+# Define the symbol set, including Unicode symbols
+PUNCTUATION = string.punctuation + '“”‘’—…·–—'
+STOP_WORDS = set(nltk.corpus.stopwords.words('english'))
+
+def clean_token(token):
+    """
+    Clear out all symbols and special characters, and only keep letters and numbers
+    """
+    # Use regular expressions to match non-letters and non-numbers for filtering
+    cleaned_token = re.sub(r'[^a-zA-Z0-9]', '', token)
+    return cleaned_token if cleaned_token.lower() not in STOP_WORDS else None
+
 
 def analyze_ngrams(text, n=2, top_k=10):
     """
@@ -23,7 +40,10 @@ def analyze_ngrams(text, n=2, top_k=10):
     """
     # Tokenize the text
     tokens = word_tokenize(text.lower())
-    
+
+    # Clean the symbols and filter out the empty tokens
+    tokens = [clean_token(token) for token in tokens if clean_token(token)]
+
     # Generate N-grams
     n_grams = list(ngrams(tokens, n))
     
