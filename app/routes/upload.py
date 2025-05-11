@@ -22,9 +22,14 @@ def allowed_file(filename):
 @upload_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def upload():
-    # For GET requests, simply render the template with uploads
+    # For GET requests, always explicitly query the latest uploads
     if request.method == 'GET':
-        recent_uploads = UploadedText.query.filter_by(user_id=current_user.id).order_by(UploadedText.created_at.desc()).all()
+        # Force database query to get fresh data, regardless of session state
+        if current_user and hasattr(current_user, 'id'):
+            recent_uploads = UploadedText.query.filter_by(user_id=current_user.id).order_by(UploadedText.created_at.desc()).all()
+        else:
+            recent_uploads = []
+            
         return render_template('upload.html', uploads=recent_uploads)
     
     # From here on, we're handling POST requests

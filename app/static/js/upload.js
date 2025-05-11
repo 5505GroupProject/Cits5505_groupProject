@@ -101,6 +101,72 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // We're relying on server-rendered history now. The AJAX-based history loading has been removed.
-    // The server will provide the full history with the initial page load.
+    // Load upload history via AJAX to ensure fresh data after login
+    loadUploadHistory();
 });
+
+// Function to load upload history
+function loadUploadHistory() {
+    // Show loading spinner
+    const loadingSpinner = document.getElementById('historyLoadingSpinner');
+    if (loadingSpinner) {
+        loadingSpinner.style.display = 'block';
+    }
+
+    fetch('/upload/history')
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading spinner
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'none';
+            }
+
+            if (data.success && data.uploads) {
+                updateUploadHistoryTable(data.uploads);
+            } else {
+                console.error('Failed to load upload history:', data.error);
+            }
+        })
+        .catch(error => {
+            // Hide loading spinner on error too
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'none';
+            }
+            console.error('Error loading upload history:', error);
+        });
+}
+
+// Function to update the upload history table with data
+function updateUploadHistoryTable(uploads) {
+    const historyTableBody = document.querySelector('.upload-history table tbody');
+    
+    if (!historyTableBody) {
+        console.error('Upload history table not found!');
+        return;
+    }
+    
+    // Clear existing content
+    historyTableBody.innerHTML = '';
+    
+    if (uploads.length === 0) {
+        // If no uploads, show a message
+        const messageRow = document.createElement('tr');
+        messageRow.innerHTML = '<td colspan="4" class="text-center text-muted">No uploads yet.</td>';
+        historyTableBody.appendChild(messageRow);
+        return;
+    }
+    
+    // Add each upload to the table
+    uploads.forEach(upload => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${upload.title || 'Untitled'}</td>
+            <td>${upload.created_at}</td>
+            <td>${upload.preview}</td>
+            <td>
+                <a href="/upload/view/${upload.id}" class="btn btn-sm btn-primary">View</a>
+            </td>
+        `;
+        historyTableBody.appendChild(row);
+    });
+}

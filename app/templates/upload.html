@@ -67,22 +67,27 @@
                     </form>
                 </div>
                 
-                <!-- Upload History (directly from template) -->
+                <!-- Upload History (modified to support JavaScript refresh) -->
                 <div class="upload-history content-card">
                     <h3>Your Upload History</h3>
-                    
-                    {% if uploads %}
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Date</th>
-                                        <th>Preview</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                    <div id="historyLoadingSpinner" class="text-center my-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Preview</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Initially empty, will be populated by JavaScript -->
+                                {% if uploads %}
                                     {% for upload in uploads %}
                                         <tr>
                                             <td>{{ upload.title or 'Untitled' }}</td>
@@ -93,12 +98,14 @@
                                             </td>
                                         </tr>
                                     {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p class="text-center text-muted">No uploads yet.</p>
-                    {% endif %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No uploads yet.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,7 +114,9 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 <script>
+    // Keeping the existing inline JavaScript for backward compatibility
     document.addEventListener('DOMContentLoaded', function() {
         // Word counter
         const textArea = document.getElementById('newsContent');
