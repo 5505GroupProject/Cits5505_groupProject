@@ -1,6 +1,6 @@
-// Execute after the page is fully loaded
+// Wait for everything to load so we don't get those annoying null errors
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Visualization page loaded');
     
-    // No visualization code needed, pure text display
+    // Nothing to do here yet - will add charts/graphs in the next sprint
 });

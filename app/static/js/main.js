@@ -1,4 +1,4 @@
-// Login Alert Functionality
+// Quick login alert handler - needs smooth animation
 document.addEventListener('DOMContentLoaded', function() {
     const loginAlert = document.getElementById('loginAlert');
     const closeBtn = document.getElementById('closeLoginAlert');
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loginAlert.classList.add('hiding');
             setTimeout(function() {
                 loginAlert.style.display = 'none';
-            }, 300); // Match the animation duration
+            }, 300); // Match the CSS transition - looks janky otherwise
         });
     }
 });

@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Form containers
+    // Grab our form containers - keeping everything neatly organized
     const loginContainer = document.getElementById('loginContainer');
     const registerContainer = document.getElementById('registerContainer');
     const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
     
-    // Form switching handlers
+    // Form switching logic - probably could be refactored later but works for now
     document.getElementById('showRegisterForm')?.addEventListener('click', function(e) {
         e.preventDefault();
         loginContainer.style.display = 'none';
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         forgotPasswordContainer.style.display = 'none';
     });
     
-    // Password confirmation validation
+    // Make sure passwords match - simple but effective
     const passwordField = document.getElementById('reg_password');
     const confirmPasswordField = document.getElementById('confirm-password');
     
@@ -47,18 +47,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-
-    // Get form elements
+    // Get all our form elements - wish there was a cleaner way to do this
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
     const forgotPasswordForm = document.getElementById('forgotPasswordForm');
     
-    // Login form submission
+    // Login form submission - using fetch for that smooth experience
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Add form validation here instead
+            // Could use a library for this, but native validation works fine
             if (!this.checkValidity()) {
                 this.classList.add('was-validated');
                 return;
@@ -66,13 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const formData = new FormData(this);
             
-            // Prevent duplicate submissions
+            // Prevent users from rage-clicking the submit button
             const submitButton = this.querySelector('button[type="submit"]');
             if (submitButton) {
                 submitButton.disabled = true;
                 submitButton.innerHTML = 'Signing in...';
             }
             
+            // AJAX time! Much better than full page reloads
             fetch(this.action, {
                 method: 'POST',
                 body: formData,
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alertDiv.innerHTML = data.success;
                     document.getElementById('flashMessages').appendChild(alertDiv);
                     
-                    // Redirect after a short delay
+                    // Redirect after a short delay - gives time to see the message
                     setTimeout(() => {
                         window.location.href = data.redirect;
                     }, 1500);
@@ -120,12 +120,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Register form submission
+    // Register form submission - almost identical to login form but with different text
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Add form validation here instead
+            // Could use a library for this, but native validation works fine
             if (!this.checkValidity()) {
                 this.classList.add('was-validated');
                 return;
@@ -133,13 +133,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const formData = new FormData(this);
             
-            // Prevent duplicate submissions
+            // Prevent users from rage-clicking the submit button
             const submitButton = this.querySelector('button[type="submit"]');
             if (submitButton) {
                 submitButton.disabled = true;
                 submitButton.innerHTML = 'Creating Account...';
             }
             
+            // AJAX time! Much better than full page reloads
             fetch(this.action, {
                 method: 'POST',
                 body: formData,
@@ -157,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alertDiv.innerHTML = data.success;
                     document.getElementById('flashMessages').appendChild(alertDiv);
                     
-                    // Redirect after a short delay
+                    // Redirect after a short delay - gives time to see the message
                     setTimeout(() => {
                         window.location.href = data.redirect;
                     }, 1500);
@@ -193,9 +194,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Forgot Password form submission - Fixed to prevent multiple submissions
+    // Forgot Password form - this one was a pain to get right!
     if (forgotPasswordForm) {
-        // Flag to prevent duplicate submissions
+        // Flag to prevent duplicate submissions - learned this the hard way
         let isSubmitting = false;
         
         // Create a verification code display element for later use
@@ -211,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Remove any existing event listeners by cloning the node
+        // This was driving me crazy until I found this solution!
         const newForgotPasswordForm = forgotPasswordForm.cloneNode(true);
         if (forgotPasswordForm.parentNode) {
             forgotPasswordForm.parentNode.replaceChild(newForgotPasswordForm, forgotPasswordForm);
@@ -223,22 +225,22 @@ document.addEventListener('DOMContentLoaded', function() {
             resetForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                // Check if form is already being submitted
+                // Prevent double-clicks - users get impatient
                 if (isSubmitting) {
                     console.log('Preventing duplicate submission');
                     return;
                 }
                 
-                // Add form validation here instead
+                // Check validity first
                 if (!this.checkValidity()) {
                     this.classList.add('was-validated');
                     return;
                 }
                 
-                // Set flag to prevent duplicate submissions
+                // Lock it down
                 isSubmitting = true;
                 
-                // Get the active button and disable it to prevent multiple clicks
+                // Show that something's happening - UX 101
                 const activeButton = document.activeElement;
                 const originalButtonText = activeButton.innerHTML;
                 activeButton.disabled = true;

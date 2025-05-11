@@ -9,7 +9,10 @@ from app.utils.ngram_utils import get_multiple_ngrams
 from app.utils.ner_utils import perform_ner_analysis
 from app.utils.word_frequency_utils import analyze_word_frequency
 import os
+import re
 import traceback
+import requests
+from datetime import datetime, timedelta
 
 upload_bp = Blueprint('upload', __name__, url_prefix='/upload')
 
@@ -390,3 +393,237 @@ def delete_upload(upload_id):
             'success': False,
             'error': f'An error occurred: {str(e)}'
         }), 500
+
+# New route for searching online news
+@upload_bp.route('/search-news', methods=['GET'])
+@login_required
+def search_news():
+    try:
+        query = request.args.get('query', '')
+        if not query:
+            return jsonify({'error': 'No search query provided'}), 400
+            
+        # Using NewsAPI for real data
+        api_key = current_app.config.get('NEWS_API_KEY', '')
+        
+        # Check if we have a valid API key
+        if not api_key or api_key == 'your-news-api-key-here':
+            return jsonify({
+                'success': False,
+                'error': 'No valid News API key configured. Please add your News API key to the configuration or environment variables.',
+                'articles': []
+            })
+        
+        # Calculate date for last 7 days
+        current_date = datetime.now()
+        from_date = (current_date - timedelta(days=7)).strftime('%Y-%m-%d')
+        
+        # Make request to News API
+        url = f'https://newsapi.org/v2/everything'
+        params = {
+            'q': query,
+            'from': from_date,
+            'sortBy': 'relevancy',
+            'language': 'en',
+            'apiKey': api_key,
+            'pageSize': 10  # Limit to 10 results
+        }
+        
+        response = requests.get(url, params=params)
+        data = response.json()
+        
+        if response.status_code == 200 and data.get('articles'):
+            # Format the results
+            articles = []
+            for article in data.get('articles', []):
+                # Make sure we don't have future dates
+                publish_date = article.get('publishedAt', '')
+                try:
+                    # Parse and validate the date
+                    pub_date_obj = datetime.fromisoformat(publish_date.replace('Z', '+00:00'))
+                    if pub_date_obj > current_date:
+                        publish_date = current_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                except (ValueError, TypeError):
+                    publish_date = current_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                
+                # Get full content
+                content = article.get('content', '')
+                
+                # If content is truncated, try to fetch full article if URL exists
+                url = article.get('url')
+                if url and (not content or len(content) < 500 or '[+' in content):
+                    try:
+                        full_article = requests.get(url, timeout=3)
+                        if full_article.status_code == 200:
+                            # Extract article content - this is simplified and may need adjustment
+                            from bs4 import BeautifulSoup
+                            soup = BeautifulSoup(full_article.text, 'html.parser')
+                            
+                            # Try to find article content - this varies by site
+                            article_content = soup.find('article') or soup.find(class_='article-content') or soup.find(class_='story-body')
+                            
+                            if article_content:
+                                # Get paragraphs from article
+                                paragraphs = article_content.find_all('p')
+                                full_content = '\n\n'.join([p.text for p in paragraphs if len(p.text) > 20])
+                                if full_content and len(full_content) > len(content):
+                                    content = full_content
+                    except Exception as e:
+                        current_app.logger.error(f"Error fetching full article: {str(e)}")
+                
+                # Ensure we have content
+                if not content or len(content.strip()) < 100:
+                    content = article.get('description', '') * 3  # Repeat description as fallback
+                
+                # Remove "[+XXXX chars]" that NewsAPI adds
+                content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
+                
+                articles.append({
+                    'title': article.get('title', ''),
+                    'source': article.get('source', {}).get('name', 'Unknown'),
+                    'url': url,
+                    'publishedAt': publish_date,
+                    'description': article.get('description', ''),
+                    'content': content,
+                    'urlToImage': article.get('urlToImage', '')
+                })
+                
+            return jsonify({
+                'success': True,
+                'articles': articles
+            })
+        else:
+            # If API request failed, return error with more details
+            error_message = data.get('message', 'Unknown error')
+            current_app.logger.error(f"NewsAPI error: {error_message}")
+            return jsonify({
+                'success': False,
+                'error': f"News API error: {error_message}",
+                'articles': []
+            })
+            
+    except Exception as e:
+        current_app.logger.error(f"News search error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'An error occurred: {str(e)}',
+            'articles': []
+        })
+
+# New route for fetching latest news headlines
+@upload_bp.route('/latest-news', methods=['GET'])
+@login_required
+def latest_news():
+    try:
+        # Get optional category parameter
+        category = request.args.get('category', 'general')
+        
+        # Using NewsAPI for real data
+        api_key = current_app.config.get('NEWS_API_KEY', '')
+        current_date = datetime.now()
+        
+        # Check if we have a valid API key
+        if not api_key or api_key == 'your-news-api-key-here':
+            return jsonify({
+                'success': False,
+                'error': 'No valid News API key configured. Please add your News API key to the configuration or environment variables.',
+                'articles': []
+            })
+        
+        # Make request to News API
+        if category == 'general':
+            url = f'https://newsapi.org/v2/top-headlines'
+            params = {
+                'country': 'us',
+                'apiKey': api_key,
+                'pageSize': 3  # Limit to 3 results as requested
+            }
+        else:
+            url = f'https://newsapi.org/v2/top-headlines'
+            params = {
+                'category': category,
+                'country': 'us',
+                'apiKey': api_key,
+                'pageSize': 3  # Limit to 3 results as requested
+            }
+        
+        response = requests.get(url, params=params)
+        data = response.json()
+        
+        if response.status_code == 200 and data.get('articles'):
+            # Format the results
+            articles = []
+            for article in data.get('articles', [])[:3]:  # Double ensure we only get 3
+                # Make sure we don't have future dates
+                publish_date = article.get('publishedAt', '')
+                try:
+                    # Parse and validate the date
+                    pub_date_obj = datetime.fromisoformat(publish_date.replace('Z', '+00:00'))
+                    if pub_date_obj > current_date:
+                        publish_date = current_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                except (ValueError, TypeError):
+                    publish_date = current_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                
+                # Get full content
+                content = article.get('content', '')
+                
+                # If content is truncated, try to fetch full article if URL exists
+                url = article.get('url')
+                if url and (not content or len(content) < 500 or '[+' in content):
+                    try:
+                        full_article = requests.get(url, timeout=3)
+                        if full_article.status_code == 200:
+                            # Extract article content - this is simplified and may need adjustment
+                            from bs4 import BeautifulSoup
+                            soup = BeautifulSoup(full_article.text, 'html.parser')
+                            
+                            # Try to find article content - this varies by site
+                            article_content = soup.find('article') or soup.find(class_='article-content') or soup.find(class_='story-body') or soup.find(class_='entry-content')
+                            
+                            if article_content:
+                                # Get paragraphs from article
+                                paragraphs = article_content.find_all('p')
+                                full_content = '\n\n'.join([p.text for p in paragraphs if len(p.text) > 20])
+                                if full_content and len(full_content) > len(content):
+                                    content = full_content
+                    except Exception as e:
+                        current_app.logger.error(f"Error fetching full article: {str(e)}")
+                
+                # Ensure we have content
+                if not content or len(content.strip()) < 100:
+                    content = article.get('description', '') * 3  # Repeat description as fallback
+                
+                # Remove "[+XXXX chars]" that NewsAPI adds
+                content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
+                
+                articles.append({
+                    'title': article.get('title', ''),
+                    'source': article.get('source', {}).get('name', 'Unknown'),
+                    'url': url,
+                    'publishedAt': publish_date,
+                    'description': article.get('description', ''),
+                    'content': content,
+                    'urlToImage': article.get('urlToImage', '')
+                })
+                
+            return jsonify({
+                'success': True,
+                'articles': articles
+            })
+        else:
+            # If API request failed, return error with more details
+            error_message = data.get('message', 'Unknown error')
+            current_app.logger.error(f"NewsAPI error: {error_message}")
+            return jsonify({
+                'success': False,
+                'error': f"News API error: {error_message}",
+                'articles': []
+            })
+            
+    except Exception as e:
+        current_app.logger.error(f"Latest news error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'An error occurred: {str(e)}',
+            'articles': []
+        })
