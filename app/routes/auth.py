@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, session
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, session, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from app.models import User
 from app import db
 import secrets
@@ -11,6 +12,11 @@ from datetime import datetime, timedelta
 
 # Define blueprint
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+def allowed_file(filename):
+    """Check if the file has an allowed extension."""
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -286,8 +292,52 @@ def profile():
     elif request.method == 'POST':
         action = request.form.get('action')
         
+        # Update profile picture
+        if action == 'update_profile_picture':
+            if 'profile_picture' not in request.files:
+                return jsonify({'error': 'No file part'}), 400
+                
+            file = request.files['profile_picture']
+            
+            if file.filename == '':
+                return jsonify({'error': 'No selected file'}), 400
+                
+            if file and allowed_file(file.filename):
+                # Generate a secure filename with timestamp to avoid duplicates
+                filename = secure_filename(f"{current_user.username}_{int(datetime.now().timestamp())}{os.path.splitext(file.filename)[1]}")
+                
+                # Create avatars directory if it doesn't exist
+                avatars_dir = os.path.join(current_app.static_folder, 'uploads', 'avatars')
+                if not os.path.exists(avatars_dir):
+                    os.makedirs(avatars_dir)
+                
+                # Save the file
+                file_path = os.path.join(avatars_dir, filename)
+                file.save(file_path)
+                
+                # Delete old profile picture if exists
+                if user.profile_picture:
+                    old_file_path = os.path.join(avatars_dir, user.profile_picture)
+                    try:
+                        if os.path.exists(old_file_path):
+                            os.remove(old_file_path)
+                    except Exception as e:
+                        # Just log the error, but continue with updating
+                        print(f"Error removing old profile picture: {e}")
+                
+                # Update user record
+                user.profile_picture = filename
+                db.session.commit()
+                
+                return jsonify({
+                    'success': 'Profile picture updated successfully!',
+                    'profile_picture_url': url_for('static', filename=f'uploads/avatars/{filename}')
+                }), 200
+            else:
+                return jsonify({'error': 'File type not allowed. Please upload a JPG, PNG, or GIF image.'}), 400
+        
         # Update username
-        if action == 'update_username':
+        elif action == 'update_username':
             new_username = request.form.get('username')
             if not new_username:
                 return jsonify({'error': 'Username is required'}), 400

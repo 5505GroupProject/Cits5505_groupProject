@@ -15,6 +15,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     # Add the password field if it doesn't exist
     password_hash = db.Column(db.String(256))  # Store password hash, not plaintext
+    # Profile picture path
+    profile_picture = db.Column(db.String(200), nullable=True, default=None)
     
     # Other columns...
     
