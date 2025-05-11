@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("❌ Failed to parse Sentiment Data:", error.message);
     }
 
-    // === 判断是否有数据 ===
+    // === Determine whether there is data ===
     if (Object.keys(sentimentData).length === 0 || !sentimentData.sentiment) {
         console.warn("⚠️ No sentiment data found. Showing 'No Data Uploaded'.");
         document.getElementById('noDataSentiment').style.display = 'block';
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('noDataSentiment').style.display = 'none';
         document.getElementById('sentimentChart').style.display = 'block';
 
-        // === 渲染 Chart ===
+        // === Render the Chart ===
         const ctxSentiment = document.getElementById('sentimentChart').getContext('2d');
         
         new Chart(ctxSentiment, {
@@ -170,13 +170,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const wordFrequencyElement = document.getElementById('wordFrequencyChart');
     
     if (!wordFrequencyElement) {
-        console.error("⚠️ Element with ID 'wordFrequencyChart' not found in DOM.");
+        console.error(" Element with ID 'wordFrequencyChart' not found in DOM.");
     } else {
         const wordFreqDataRaw = wordFrequencyElement.dataset.chart;
         console.log("Raw Word Frequency Data:", wordFreqDataRaw);
 
         if (!wordFreqDataRaw || wordFreqDataRaw === "undefined") {
-            console.error("❌ Error: Data is undefined or not set. Cannot parse JSON.");
+            console.error(" Error: Data is undefined or not set. Cannot parse JSON.");
             return;
         }
 
@@ -187,17 +187,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (parsedData.top_words) {
                 wordFreqData = parsedData.top_words;
             } else {
-                console.error("❌ Error: No 'top_words' found in parsed data.");
+                console.error(" Error: No 'top_words' found in parsed data.");
                 return;
             }
         } catch (error) {
-            console.error("❌ Failed to parse Word Frequency Data:", error.message);
+            console.error(" Failed to parse Word Frequency Data:", error.message);
             return;
         }
 
         // === If the data is empty, rendering is not performed ===
         if (wordFreqData.length === 0) {
-            console.warn("⚠️ No word frequency data found. Skipping WordCloud rendering.");
+            console.warn(" No word frequency data found. Skipping WordCloud rendering.");
             return;
         }
 
