@@ -61,21 +61,31 @@ def reset_password():
     if request.method == 'POST':
         action = request.form.get('action')
         email = request.form.get('email')
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         
         # Send verification code
         if action == 'send_code':
             user = User.query.filter_by(email=email).first()
             if not user:
-                flash('No account found with that email address.', 'danger')
-                return redirect(url_for('auth.reset_password'))
+                if is_ajax:
+                    return jsonify({'error': 'No account found with that email address.'}), 404
+                else:
+                    flash('No account found with that email address.', 'danger')
+                    return redirect(url_for('auth.reset_password'))
             
             verification_code = ''.join(random.choices('0123456789', k=6))
             session['reset_email'] = email
             session['verification_code'] = verification_code
             session['code_expiry'] = (datetime.utcnow() + timedelta(minutes=10)).timestamp()
             
-            flash(f'Verification code: {verification_code} (this would be emailed in production)', 'info')
-            return redirect(url_for('auth.reset_password'))
+            # In production, we would send email here
+            success_msg = f'Verification code: {verification_code} (this would be emailed in production)'
+            
+            if is_ajax:
+                return jsonify({'success': success_msg}), 200
+            else:
+                flash(success_msg, 'info')
+                return redirect(url_for('auth.reset_password'))
             
         # Verify code
         elif action == 'verify_code':
@@ -88,27 +98,50 @@ def reset_password():
                 # Store a flag in session that this user is verified for password reset
                 session['password_reset_verified'] = True
                 
-                return redirect(url_for('auth.set_new_password'))
+                if is_ajax:
+                    return jsonify({
+                        'success': 'Code verified successfully!',
+                        'redirect': url_for('auth.set_new_password')
+                    }), 200
+                else:
+                    return redirect(url_for('auth.set_new_password'))
             else:
-                flash('Invalid or expired verification code.', 'danger')
+                error_msg = 'Invalid or expired verification code.'
+                if is_ajax:
+                    return jsonify({'error': error_msg}), 400
+                else:
+                    flash(error_msg, 'danger')
+                    return redirect(url_for('auth.reset_password'))
                 
         # Handle setting a new password
         elif action == 'set_password':
             # Verify the user completed previous steps
             if not session.get('password_reset_verified') or not session.get('reset_email'):
-                flash('Please verify your email first.', 'danger')
-                return redirect(url_for('auth.reset_password'))
+                error_msg = 'Please verify your email first.'
+                if is_ajax:
+                    return jsonify({'error': error_msg}), 400
+                else:
+                    flash(error_msg, 'danger')
+                    return redirect(url_for('auth.reset_password'))
                 
             new_password = request.form.get('new_password')
             confirm_password = request.form.get('confirm_password')
             
             if not new_password or not confirm_password:
-                flash('Please enter a new password.', 'danger')
-                return redirect(url_for('auth.set_new_password'))
+                error_msg = 'Please enter a new password.'
+                if is_ajax:
+                    return jsonify({'error': error_msg}), 400
+                else:
+                    flash(error_msg, 'danger')
+                    return redirect(url_for('auth.set_new_password'))
                 
             if new_password != confirm_password:
-                flash('Passwords do not match.', 'danger')
-                return redirect(url_for('auth.set_new_password'))
+                error_msg = 'Passwords do not match.'
+                if is_ajax:
+                    return jsonify({'error': error_msg}), 400
+                else:
+                    flash(error_msg, 'danger')
+                    return redirect(url_for('auth.set_new_password'))
                 
             # Update the user's password
             user = User.query.filter_by(email=session.get('reset_email')).first()
@@ -122,8 +155,15 @@ def reset_password():
                 session.pop('code_expiry', None)
                 session.pop('password_reset_verified', None)
                 
-                flash('Your password has been reset. You can now log in.', 'success')
-                return redirect(url_for('auth.login'))
+                success_msg = 'Your password has been reset. You can now log in.'
+                if is_ajax:
+                    return jsonify({
+                        'success': success_msg,
+                        'redirect': url_for('auth.login')
+                    }), 200
+                else:
+                    flash(success_msg, 'success')
+                    return redirect(url_for('auth.login'))
     
     return render_template('login.html')
 

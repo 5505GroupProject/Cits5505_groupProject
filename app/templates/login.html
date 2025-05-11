@@ -127,15 +127,19 @@
                             <div class="mb-3 d-grid">
                                 <button type="submit" name="action" value="send_code" class="btn btn-fancy-login">Send Verification Code</button>
                             </div>
-                            <div class="mb-3">
-                                <label for="verificationCode" class="form-label">Verification code</label>
-                                <input type="text" class="form-control" id="verificationCode" name="verification_code" pattern="[0-9]{6}" title="6-digit code">
-                                <div class="invalid-feedback">
-                                    Please enter a valid 6-digit verification code.
+                            
+                            <!-- Verification section will be initially hidden and shown after code is sent -->
+                            <div class="verification-section">
+                                <div class="mb-3">
+                                    <label for="verificationCode" class="form-label">Verification code</label>
+                                    <input type="text" class="form-control" id="verificationCode" name="verification_code" pattern="[0-9]{6}" title="6-digit code">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid 6-digit verification code.
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" name="action" value="verify_code" class="btn btn-fancy-login">Verify Code</button>
+                                <div class="d-grid">
+                                    <button type="submit" name="action" value="verify_code" class="btn btn-fancy-login">Verify Code</button>
+                                </div>
                             </div>
                         </form>
                         
