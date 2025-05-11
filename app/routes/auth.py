@@ -233,3 +233,119 @@ def register():
     
     # If not a POST request (which shouldn't happen with this route)
     return redirect(url_for('auth.login'))
+
+@auth_bp.route('/profile', methods=['GET', 'POST', 'DELETE'])
+@login_required
+def profile():
+    """Handle user profile management."""
+    user = User.query.get(current_user.id)
+    
+    if request.method == 'GET':
+        return render_template('profile.html', user=user)
+    
+    elif request.method == 'POST':
+        action = request.form.get('action')
+        
+        # Update username
+        if action == 'update_username':
+            new_username = request.form.get('username')
+            if not new_username:
+                return jsonify({'error': 'Username is required'}), 400
+                
+            # Check if username is already in use by another account
+            existing_username = User.query.filter(User.username == new_username, User.id != current_user.id).first()
+            if existing_username:
+                return jsonify({'error': 'Username already in use'}), 400
+            
+            user.username = new_username
+            db.session.commit()
+            return jsonify({'success': 'Username updated successfully!'}), 200
+        
+        # Update email
+        elif action == 'update_email':
+            new_email = request.form.get('email')
+            if not new_email:
+                return jsonify({'error': 'Email is required'}), 400
+                
+            # Check if email is already in use by another account
+            existing_email = User.query.filter(User.email == new_email, User.id != current_user.id).first()
+            if existing_email:
+                return jsonify({'error': 'Email already in use'}), 400
+            
+            user.email = new_email
+            db.session.commit()
+            return jsonify({'success': 'Email updated successfully!'}), 200
+        
+        # Update password
+        elif action == 'update_password':
+            current_password = request.form.get('current_password')
+            new_password = request.form.get('new_password')
+            confirm_password = request.form.get('confirm_password')
+            
+            if not current_password or not new_password or not confirm_password:
+                return jsonify({'error': 'All fields are required'}), 400
+                
+            if not user.check_password(current_password):
+                return jsonify({'error': 'Current password is incorrect'}), 400
+                
+            if new_password != confirm_password:
+                return jsonify({'error': 'Passwords do not match'}), 400
+                
+            user.set_password(new_password)
+            db.session.commit()
+            return jsonify({'success': 'Password updated successfully!'}), 200
+        
+        # Handle account deletion via POST
+        elif action == 'delete_account':
+            # Verify password before deletion for security
+            password = request.form.get('password')
+            
+            if not password:
+                return jsonify({'error': 'Password required for account deletion'}), 400
+                
+            if not user.check_password(password):
+                return jsonify({'error': 'Password is incorrect'}), 400
+            
+            try:
+                # Delete user's data
+                db.session.delete(user)
+                db.session.commit()
+                logout_user()
+                
+                return jsonify({
+                    'success': 'Account deleted successfully',
+                    'redirect': url_for('main.home')
+                }), 200
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+            
+        return jsonify({'error': 'Invalid action'}), 400
+    
+    # Handle DELETE method for account deletion (if needed for API clients)
+    elif request.method == 'DELETE':
+        # Get JSON data if available
+        data = request.get_json(silent=True) or {}
+        password = data.get('password')
+        
+        if not password:
+            return jsonify({'error': 'Password required for account deletion'}), 400
+            
+        if not user.check_password(password):
+            return jsonify({'error': 'Password is incorrect'}), 400
+        
+        try:
+            db.session.delete(user)
+            db.session.commit()
+            logout_user()
+            
+            return jsonify({
+                'success': 'Account deleted successfully',
+                'redirect': url_for('main.home')
+            }), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+    
+    # Invalid method
+    return jsonify({'error': 'Method not allowed'}), 405

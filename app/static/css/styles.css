@@ -1268,6 +1268,64 @@ main.container {
     color: #212529;
 }
 
+/* Profile Section Styles */
+.profile-section {
+    background-color: #f5f5dc;
+    min-height: calc(100vh - 76px);
+    padding: 40px 0;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border: 2px solid yellowgreen;
+}
+
+.profile-navigation .nav-link {
+    color: #495057;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.profile-navigation .nav-link:hover {
+    background-color: #f8f9fa;
+    color: yellowgreen;
+}
+
+.profile-navigation .nav-link.active {
+    background-color: #f1f1dd;
+    color: yellowgreen;
+    font-weight: 500;
+}
+
+.profile-navigation .nav-link i {
+    width: 20px;
+}
+
+.profile-navigation .nav-link.text-danger:hover {
+    background-color: #fff5f5;
+    color: #dc3545;
+}
+
+/* Tab content styling */
+.tab-content {
+    padding: 15px 0;
+}
+
+.tab-pane h4 {
+    color: #333;
+    border-bottom: 2px solid #f1f1dd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .intro-section {

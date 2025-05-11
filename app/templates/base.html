@@ -63,11 +63,20 @@
                         </div>
                     </nav>
                 </div>
+
                 <!-- Login/Register on the right -->
                 <div class="col-md-3 text-end">
                     {% if current_user.is_authenticated %}
-                        <span class="text-white me-2">Hi, {{ current_user.username }}</span>
-                        <a href="{{ url_for('auth.logout') }}" class="btn btn-fancy-login">Log Out</a>
+                        <div class="dropdown">
+                            <a href="#" class="text-white text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i> {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>
+                            </ul>
+                        </div>
                     {% else %}
                         <a href="{{ url_for('main.login') }}" class="btn btn-fancy-login me-2">
                             <i class="bi bi-person-circle me-1"></i>Login
@@ -107,8 +116,13 @@
                 <div class="col-md-4 mb-4">
                     <h5>Account</h5>
                     <ul>
-                        <li><a href="{{ url_for('main.login') }}">Login</a></li>
-                        <li><a href="{{ url_for('main.login') }}#register">Register</a></li>
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('auth.profile') }}">My Profile</a></li>
+                            <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('main.login') }}">Login</a></li>
+                            <li><a href="{{ url_for('main.login') }}#register">Register</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

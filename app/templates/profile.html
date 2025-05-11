@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+    <section class="profile-section">
+        <div class="container my-4">
+            <div class="row justify-content-center">
+                <!-- Flash messages -->
+                <div class="col-12 mb-3" id="flashMessages">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+                <!-- Profile sidebar -->
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header bg-dark text-white">
+                            <h4 class="mb-0">My Account</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <div class="profile-avatar mb-3">
+                                    <i class="bi bi-person-circle" style="font-size: 5rem; color: yellowgreen;"></i>
+                                </div>
+                                <h5>{{ user.username }}</h5>
+                                <p class="text-muted">{{ user.email }}</p>
+                            </div>
+                            <hr>
+                            <div class="profile-navigation">
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="#profile-info" data-bs-toggle="tab">
+                                            <i class="bi bi-person-fill me-2"></i> Profile Information
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#change-email" data-bs-toggle="tab">
+                                            <i class="bi bi-envelope-fill me-2"></i> Change Email
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#change-password" data-bs-toggle="tab">
+                                            <i class="bi bi-lock-fill me-2"></i> Change Password
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-danger" href="#delete-account" data-bs-toggle="tab">
+                                            <i class="bi bi-trash-fill me-2"></i> Delete Account
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile content -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <!-- Profile Info Tab -->
+                                <div class="tab-pane fade show active" id="profile-info">
+                                    <h4 class="mb-4">Profile Information</h4>
+                                    <form id="updateUsernameForm">
+                                        <input type="hidden" name="action" value="update_username">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="mb-3">
+                                            <label for="username" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+                                            <div class="form-text">Choose a unique username.</div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mb-3">Update Username</button>
+                                    </form>
+                                    <div class="mb-3">
+                                        <label for="email-display" class="form-label">Email Address</label>
+                                        <input type="email" class="form-control" id="email-display" value="{{ user.email }}" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="member-since" class="form-label">Member Since</label>
+                                        <input type="text" class="form-control" id="member-since" value="{{ user.id | string }}" readonly>
+                                    </div>
+                                </div>
+
+                                <!-- Change Email Tab -->
+                                <div class="tab-pane fade" id="change-email">
+                                    <h4 class="mb-4">Change Email Address</h4>
+                                    <form id="updateEmailForm">
+                                        <input type="hidden" name="action" value="update_email">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">New Email Address</label>
+                                            <input type="email" class="form-control" id="email" name="email" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Update Email</button>
+                                    </form>
+                                </div>
+
+                                <!-- Change Password Tab -->
+                                <div class="tab-pane fade" id="change-password">
+                                    <h4 class="mb-4">Change Password</h4>
+                                    <form id="updatePasswordForm">
+                                        <input type="hidden" name="action" value="update_password">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="mb-3">
+                                            <label for="current_password" class="form-label">Current Password</label>
+                                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="new_password" class="form-label">New Password</label>
+                                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                            <div class="invalid-feedback" id="password-match-feedback">
+                                                Passwords do not match.
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Update Password</button>
+                                    </form>
+                                </div>
+
+                                <!-- Delete Account Tab -->
+                                <div class="tab-pane fade" id="delete-account">
+                                    <h4 class="mb-4 text-danger">Delete Account</h4>
+                                    <div class="alert alert-danger">
+                                        <p><strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.</p>
+                                    </div>
+                                    <form id="deleteAccountForm">
+                                        <input type="hidden" name="action" value="delete_account">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="mb-3">
+                                            <label for="delete_confirm_password" class="form-label">Enter your password to confirm</label>
+                                            <input type="password" class="form-control" id="delete_confirm_password" name="password" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger">Delete My Account</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update username form
+    const updateUsernameForm = document.getElementById('updateUsernameForm');
+    if (updateUsernameForm) {
+        updateUsernameForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // AJAX request to update username
+            fetch('{{ url_for("auth.profile") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showAlert(data.success, 'success');
+                    // Update displayed username in profile
+                    document.querySelector('.profile-avatar + h5').textContent = formData.get('username');
+                    // Reset form
+                    updateUsernameForm.reset();
+                } else if (data.error) {
+                    showAlert(data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('An error occurred. Please try again.', 'danger');
+                console.error('Error:', error);
+            });
+        });
+    }
+
+    // Update email form
+    const updateEmailForm = document.getElementById('updateEmailForm');
+    if (updateEmailForm) {
+        updateEmailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // AJAX request to update email
+            fetch('{{ url_for("auth.profile") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showAlert(data.success, 'success');
+                    // Update displayed email in profile
+                    document.getElementById('email-display').value = formData.get('email');
+                    // Reset form
+                    updateEmailForm.reset();
+                } else if (data.error) {
+                    showAlert(data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('An error occurred. Please try again.', 'danger');
+                console.error('Error:', error);
+            });
+        });
+    }
+    
+    // Update password form
+    const updatePasswordForm = document.getElementById('updatePasswordForm');
+    if (updatePasswordForm) {
+        updatePasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            // Check if passwords match
+            if (newPassword !== confirmPassword) {
+                document.getElementById('confirm_password').classList.add('is-invalid');
+                document.getElementById('password-match-feedback').style.display = 'block';
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            // AJAX request to update password
+            fetch('{{ url_for("auth.profile") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showAlert(data.success, 'success');
+                    // Reset form
+                    updatePasswordForm.reset();
+                } else if (data.error) {
+                    showAlert(data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('An error occurred. Please try again.', 'danger');
+                console.error('Error:', error);
+            });
+        });
+        
+        // Add input validation for password match
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const newPassword = document.getElementById('new_password').value;
+            if (this.value !== newPassword) {
+                this.classList.add('is-invalid');
+                document.getElementById('password-match-feedback').style.display = 'block';
+            } else {
+                this.classList.remove('is-invalid');
+                document.getElementById('password-match-feedback').style.display = 'none';
+            }
+        });
+    }
+    
+    // Delete account form
+    const deleteAccountForm = document.getElementById('deleteAccountForm');
+    if (deleteAccountForm) {
+        deleteAccountForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show confirmation modal
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                const formData = new FormData(this);
+                
+                // AJAX request to delete account
+                fetch('{{ url_for("auth.profile") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        showAlert(data.success, 'success');
+                        // Redirect to home page after account deletion
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    } else if (data.error) {
+                        showAlert(data.error, 'danger');
+                    }
+                })
+                .catch(error => {
+                    showAlert('An error occurred. Please try again.', 'danger');
+                    console.error('Error:', error);
+                });
+            }
+        });
+    }
+    
+    // Helper function to display alerts
+    function showAlert(message, type) {
+        const alertHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        const flashMessagesElement = document.getElementById('flashMessages');
+        flashMessagesElement.innerHTML = alertHTML;
+        
+        // Auto-dismiss alert after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}
