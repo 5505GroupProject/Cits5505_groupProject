@@ -22,122 +22,125 @@ def allowed_file(filename):
 @upload_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def upload():
-    # Get recent uploads for display regardless of whether it's GET or POST
-    recent_uploads = UploadedText.query.filter_by(user_id=current_user.id).order_by(UploadedText.created_at.desc()).all()
+    # For GET requests, simply render the template with uploads
+    if request.method == 'GET':
+        recent_uploads = UploadedText.query.filter_by(user_id=current_user.id).order_by(UploadedText.created_at.desc()).all()
+        return render_template('upload.html', uploads=recent_uploads)
     
-    if request.method == 'POST':
-        try:
-            # Get title if provided
-            title = request.form.get('title', '').strip() or None
-            
-            # Handle file upload
-            if 'file' in request.files:
-                file = request.files['file']
-                if file and file.filename.strip() != '':
-                    if not file.filename.endswith('.txt'):
-                        flash('Only .txt files are supported!', 'danger')
-                        return redirect(url_for('upload.upload'))
-                    
-                    # Read and process the file content
-                    try:
-                        file_content = file.read().decode('utf-8')
-                    except UnicodeDecodeError:
-                        flash('File encoding not supported. Please use UTF-8 encoded text files.', 'danger')
-                        return redirect(url_for('upload.upload'))
-                    
-                    if len(file_content.strip()) == 0:
-                        flash('Uploaded file is empty!', 'danger')
-                        return redirect(url_for('upload.upload'))
-                    
-                    # Create the UploadedText entry
-                    new_upload = UploadedText(
-                        user_id=current_user.id,
-                        title=title or secure_filename(file.filename),
-                        content=file_content,
-                        filename=secure_filename(file.filename),
-                        file_type='file'
-                    )
-                    
-                    db.session.add(new_upload)
-                    db.session.commit()
-                    
-                    # Perform sentiment analysis
-                    sentiment_data = get_sentiment_summary(file_content)
-                    
-                    # Perform N-gram analysis
-                    ngram_data = get_multiple_ngrams(file_content)
-                    
-                    # Perform NER analysis
-                    ner_data = perform_ner_analysis(file_content)
-                    
-                    # Perform word frequency analysis
-                    word_freq_data = analyze_word_frequency(file_content)
-                    
-                    # Store data in session for visualization page
-                    session['sentiment_data'] = sentiment_data
-                    session['ngram_data'] = ngram_data
-                    session['ner_data'] = ner_data
-                    session['word_freq_data'] = word_freq_data
-                    session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
-                    session['upload_id'] = new_upload.id
-                    
-                    # Flash success message and redirect to visualization page
-                    flash('File uploaded and analyzed successfully!', 'success')
-                    return redirect(url_for('main.visualization'))
-                else:
-                    flash('No file selected!', 'warning')
+    # From here on, we're handling POST requests
+    try:
+        # Get title if provided
+        title = request.form.get('title', '').strip() or None
+        
+        # Handle file upload
+        if 'file' in request.files:
+            file = request.files['file']
+            if file and file.filename.strip() != '':
+                if not file.filename.endswith('.txt'):
+                    flash('Only .txt files are supported!', 'danger')
+                    return redirect(url_for('upload.upload'))
                 
-            # Handle text upload
-            elif 'content' in request.form:
-                text_content = request.form.get('content', '').strip()
-                if text_content:
-                    # Create new upload
-                    new_upload = UploadedText(
-                        user_id=current_user.id,
-                        title=title or 'Text Upload',
-                        content=text_content,
-                        filename='text_input.txt',
-                        file_type='text'
-                    )
-                    db.session.add(new_upload)
-                    db.session.commit()
-                    
-                    # Perform sentiment analysis
-                    sentiment_data = get_sentiment_summary(text_content)
-                    
-                    # Perform N-gram analysis
-                    ngram_data = get_multiple_ngrams(text_content)
-                    
-                    # Perform NER analysis
-                    ner_data = perform_ner_analysis(text_content)
-                    
-                    # Perform word frequency analysis
-                    word_freq_data = analyze_word_frequency(text_content)
-                    
-                    # Store data in session for visualization page
-                    session['sentiment_data'] = sentiment_data
-                    session['ngram_data'] = ngram_data
-                    session['ner_data'] = ner_data
-                    session['word_freq_data'] = word_freq_data
-                    session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
-                    session['upload_id'] = new_upload.id
-                    
-                    # Flash success message and redirect to visualization page
-                    flash('Text content uploaded and analyzed successfully!', 'success')
-                    return redirect(url_for('main.visualization'))
-                else:
-                    flash('No content provided!', 'danger')
-            
+                # Read and process the file content
+                try:
+                    file_content = file.read().decode('utf-8')
+                except UnicodeDecodeError:
+                    flash('File encoding not supported. Please use UTF-8 encoded text files.', 'danger')
+                    return redirect(url_for('upload.upload'))
+                
+                if len(file_content.strip()) == 0:
+                    flash('Uploaded file is empty!', 'danger')
+                    return redirect(url_for('upload.upload'))
+                
+                # Create the UploadedText entry
+                new_upload = UploadedText(
+                    user_id=current_user.id,
+                    title=title or secure_filename(file.filename),
+                    content=file_content,
+                    filename=secure_filename(file.filename),
+                    file_type='file'
+                )
+                
+                db.session.add(new_upload)
+                db.session.commit()
+                
+                # Perform sentiment analysis
+                sentiment_data = get_sentiment_summary(file_content)
+                
+                # Perform N-gram analysis
+                ngram_data = get_multiple_ngrams(file_content)
+                
+                # Perform NER analysis
+                ner_data = perform_ner_analysis(file_content)
+                
+                # Perform word frequency analysis
+                word_freq_data = analyze_word_frequency(file_content)
+                
+                # Store data in session for visualization page
+                session['sentiment_data'] = sentiment_data
+                session['ngram_data'] = ngram_data
+                session['ner_data'] = ner_data
+                session['word_freq_data'] = word_freq_data
+                session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
+                session['upload_id'] = new_upload.id
+                
+                # Flash success message and redirect to visualization page
+                flash('File uploaded and analyzed successfully!', 'success')
+                return redirect(url_for('main.visualization'))
             else:
-                flash('No data submitted!', 'danger')
+                flash('No file selected!', 'warning')
+            
+        # Handle text upload
+        elif 'content' in request.form:
+            text_content = request.form.get('content', '').strip()
+            if text_content:
+                # Create new upload
+                new_upload = UploadedText(
+                    user_id=current_user.id,
+                    title=title or 'Text Upload',
+                    content=text_content,
+                    filename='text_input.txt',
+                    file_type='text'
+                )
+                db.session.add(new_upload)
+                db.session.commit()
                 
-        except Exception as e:
-            db.session.rollback()
-            current_app.logger.error(f"Upload error: {str(e)}")
-            flash(f'Error: {str(e)}', 'danger')
-
-    # Render template with uploads for both GET and unsuccessful POST
-    return render_template('upload.html', uploads=recent_uploads)
+                # Perform sentiment analysis
+                sentiment_data = get_sentiment_summary(text_content)
+                
+                # Perform N-gram analysis
+                ngram_data = get_multiple_ngrams(text_content)
+                
+                # Perform NER analysis
+                ner_data = perform_ner_analysis(text_content)
+                
+                # Perform word frequency analysis
+                word_freq_data = analyze_word_frequency(text_content)
+                
+                # Store data in session for visualization page
+                session['sentiment_data'] = sentiment_data
+                session['ngram_data'] = ngram_data
+                session['ner_data'] = ner_data
+                session['word_freq_data'] = word_freq_data
+                session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
+                session['upload_id'] = new_upload.id
+                
+                # Flash success message and redirect to visualization page
+                flash('Text content uploaded and analyzed successfully!', 'success')
+                return redirect(url_for('main.visualization'))
+            else:
+                flash('No content provided!', 'danger')
+        
+        else:
+            flash('No data submitted!', 'danger')
+            
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Upload error: {str(e)}")
+        flash(f'Error: {str(e)}', 'danger')
+    
+    # If we get here, it means there was an error or invalid submission
+    # Redirect back to the upload page (this prevents form resubmission on refresh)
+    return redirect(url_for('upload.upload'))
 
 # Added new route to display sentiment analysis and N-gram analysis results
 @upload_bp.route('/test-page', methods=['GET'])
