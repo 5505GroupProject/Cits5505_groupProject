@@ -55,14 +55,13 @@
                         
                         <div class="mb-4">
                             <label for="file" class="form-label">Upload a Text File</label>
-                            <input type="file" class="form-control" id="file" name="file" accept=".txt" style="display: none;">
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary" id="fileSelectBtn">Select File</button>
+                            <input type="file" class="form-control" id="file" name="file" accept=".txt">
+                            <div class="d-grid gap-2 mt-2">
                                 <small class="form-text" id="selectedFileName">No file selected</small>
                             </div>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-success">Analyze File</button>
+                            <button type="submit" class="btn btn-success" id="analyzeFileBtn">Analyze File</button>
                         </div>
                     </form>
                 </div>
@@ -115,51 +114,4 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
-<script>
-    // Keeping the existing inline JavaScript for backward compatibility
-    document.addEventListener('DOMContentLoaded', function() {
-        // Word counter
-        const textArea = document.getElementById('newsContent');
-        const wordCount = document.getElementById('wordCount');
-        
-        if (textArea && wordCount) {
-            textArea.addEventListener('input', function() {
-                const text = this.value;
-                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-                const chars = text.length;
-                wordCount.textContent = `${words} words, ${chars} characters`;
-            });
-        }
-        
-        // Clear button
-        const clearBtn = document.getElementById('clearBtn');
-        if (clearBtn && textArea) {
-            clearBtn.addEventListener('click', function() {
-                textArea.value = '';
-                const titleInput = document.getElementById('newsTitle');
-                if (titleInput) titleInput.value = '';
-                wordCount.textContent = '0 words, 0 characters';
-            });
-        }
-        
-        // File upload button functionality
-        const fileInput = document.getElementById('file');
-        const fileSelectBtn = document.getElementById('fileSelectBtn');
-        const selectedFileName = document.getElementById('selectedFileName');
-        
-        if (fileSelectBtn && fileInput && selectedFileName) {
-            fileSelectBtn.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    selectedFileName.textContent = this.files[0].name;
-                } else {
-                    selectedFileName.textContent = 'No file selected';
-                }
-            });
-        }
-    });
-</script>
 {% endblock %}

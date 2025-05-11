@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get elements
     const uploadForm = document.getElementById('uploadForm');
     const fileUploadForm = document.getElementById('fileUploadForm');
-    const uploadStatus = document.getElementById('uploadStatus');
-    const statusMessage = document.getElementById('statusMessage');
-    const uploadHistory = document.getElementById('uploadHistory');
+    const fileInput = document.getElementById('file');
+    const selectedFileName = document.getElementById('selectedFileName');
+    const analyzeFileBtn = document.getElementById('analyzeFileBtn');
     
     // Initialize word counter
     const textArea = document.getElementById('newsContent');
@@ -30,16 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // File upload button functionality
-    const fileInput = document.getElementById('file');
-    const fileSelectBtn = document.getElementById('fileSelectBtn');
-    const selectedFileName = document.getElementById('selectedFileName');
-    
-    if (fileSelectBtn && fileInput && selectedFileName) {
-        fileSelectBtn.addEventListener('click', function() {
-            fileInput.click();
-        });
-        
+    // File input change handler
+    if (fileInput && selectedFileName) {
         fileInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 selectedFileName.textContent = this.files[0].name;
@@ -49,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Handle text upload form submission via AJAX (if using API endpoint directly)
+    // Handle text upload form submission
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
             // Disable the submit button to prevent double submission
@@ -69,35 +61,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Handle file upload form submission
-    if (fileUploadForm) {
+    if (fileUploadForm && analyzeFileBtn) {
         fileUploadForm.addEventListener('submit', function(e) {
             // Check if file is selected
-            const fileInput = this.querySelector('input[type="file"]');
             if (!fileInput.files || !fileInput.files[0]) {
-                if (uploadStatus) {
-                    uploadStatus.className = 'alert alert-danger mt-3';
-                    statusMessage.textContent = 'Please select a file to upload.';
-                    uploadStatus.style.display = 'block';
-                }
-                e.preventDefault(); // Prevent form submission only if no file selected
-                return;
+                e.preventDefault(); // Prevent form submission
+                alert('Please select a file to upload.');
+                return false;
             }
             
             console.log('File selected:', fileInput.files[0].name);
             
-            // Disable the submit button
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                const originalBtnText = submitBtn.textContent;
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Uploading & Analyzing...';
-                
-                // Enable the button after a short delay (form will reload page)
-                setTimeout(function() {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalBtnText;
-                }, 1500);
-            }
+            // Show submission is in progress
+            const originalBtnText = analyzeFileBtn.textContent;
+            analyzeFileBtn.disabled = true;
+            analyzeFileBtn.textContent = 'Uploading & Analyzing...';
+            
+            // Enable the button after a short delay (form will reload page)
+            setTimeout(function() {
+                analyzeFileBtn.disabled = false;
+                analyzeFileBtn.textContent = originalBtnText;
+            }, 1500);
         });
     }
 
