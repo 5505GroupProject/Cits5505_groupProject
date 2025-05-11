@@ -86,7 +86,7 @@
                                         <input type="email" class="form-control" id="email-display" value="{{ user.email }}" readonly>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="member-since" class="form-label">Member Since</label>
+                                        <label for="member-since" class="form-label">Member Since (Days)</label>
                                         <input type="text" class="form-control" id="member-since" value="{{ user.id | string }}" readonly>
                                     </div>
                                 </div>
@@ -181,6 +181,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     showAlert(data.success, 'success');
                     // Update displayed username in profile
                     document.querySelector('.profile-avatar + h5').textContent = formData.get('username');
+                    // Update username in header dropdown
+                    const headerUsername = document.querySelector('#userDropdown');
+                    if (headerUsername) {
+                        // Keep the icon and just update the text
+                        const icon = headerUsername.querySelector('i');
+                        headerUsername.innerHTML = '';
+                        if (icon) {
+                            headerUsername.appendChild(icon);
+                        }
+                        headerUsername.innerHTML += ' ' + formData.get('username');
+                    }
                     // Reset form
                     updateUsernameForm.reset();
                 } else if (data.error) {
