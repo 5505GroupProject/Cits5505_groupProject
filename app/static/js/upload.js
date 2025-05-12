@@ -323,13 +323,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectArticle(article) {
         if (!selectedArticlePreview || !previewArticleTitle || !previewArticleContent) return;
         
-        // Extract content from the article - use full content
+        // Extract content from the article - ensure we get full content
         let articleContent = article.content || article.description || 'No content available';
         
         // Remove the "[+XXXX chars]" that NewsAPI adds if present
         articleContent = articleContent.replace(/\[\+\d+ chars\]$/, '');
         
-        // Console log to debug content length
+        // Debug log to check content length
         console.log("Article content length:", articleContent.length, "Article title:", article.title);
         
         // Show the article preview with full content
@@ -338,14 +338,22 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedArticlePreview.classList.remove('d-none');
         
         // Set the values for the upload form with full content
-        uploadArticleTitle.value = article.title;
-        uploadArticleContent.value = articleContent;
+        if (uploadArticleTitle) uploadArticleTitle.value = article.title;
+        if (uploadArticleContent) uploadArticleContent.value = articleContent;
         
         // Update word count if we have a word count element
         if (wordCount) {
             const words = articleContent.trim() === '' ? 0 : articleContent.trim().split(/\s+/).length;
             const chars = articleContent.length;
             wordCount.textContent = `${words} words, ${chars} characters`;
+        }
+        
+        // Update the textArea if it exists (to sync with the news content)
+        if (textArea) {
+            textArea.value = articleContent;
+            // Trigger the input event to update word count if needed
+            const inputEvent = new Event('input', { bubbles: true });
+            textArea.dispatchEvent(inputEvent);
         }
         
         // Scroll to preview section

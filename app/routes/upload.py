@@ -453,27 +453,73 @@ def search_news():
                 url = article.get('url')
                 if url and (not content or len(content) < 500 or '[+' in content):
                     try:
-                        full_article = requests.get(url, timeout=3)
+                        full_article = requests.get(url, timeout=5)  # Increased timeout for better reliability
                         if full_article.status_code == 200:
-                            # Extract article content - this is simplified and may need adjustment
+                            # Extract article content - improved approach for better content extraction
                             from bs4 import BeautifulSoup
                             soup = BeautifulSoup(full_article.text, 'html.parser')
                             
-                            # Try to find article content - this varies by site
-                            article_content = soup.find('article') or soup.find(class_='article-content') or soup.find(class_='story-body')
+                            # Try multiple approaches to find article content
+                            article_content = None
+                            
+                            # Check for common article containers
+                            selectors = [
+                                'article', '.article-content', '.story-body', '.entry-content',
+                                '.article-body', '.story-content', '.post-content', '.news-content',
+                                '[itemprop="articleBody"]', '[property="content:encoded"]',
+                                '.main-content', '.blog-post-content', '.node-content'
+                            ]
+                            
+                            for selector in selectors:
+                                if selector.startswith('.'):
+                                    article_content = soup.find(class_=selector[1:])
+                                elif selector.startswith('['):
+                                    # Extract attribute name and value
+                                    attr = selector[1:-1].split('=')
+                                    if len(attr) == 2:
+                                        attr_name = attr[0]
+                                        attr_value = attr[1].strip('"\'')
+                                        article_content = soup.find(attrs={attr_name: attr_value})
+                                else:
+                                    article_content = soup.find(selector)
+                                    
+                                if article_content:
+                                    break
+                            
+                            # If no specific content container found, use the main content area
+                            if not article_content:
+                                article_content = soup.find('main') or soup.find(id='main') or soup.find('body')
                             
                             if article_content:
-                                # Get paragraphs from article
+                                # Get all paragraphs and combine
                                 paragraphs = article_content.find_all('p')
-                                full_content = '\n\n'.join([p.text for p in paragraphs if len(p.text) > 20])
-                                if full_content and len(full_content) > len(content):
+                                full_content = '\n\n'.join([p.text.strip() for p in paragraphs if len(p.text.strip()) > 20])
+                                
+                                if full_content and len(full_content) > 100:
                                     content = full_content
+                                    current_app.logger.info(f"Successfully extracted full content: {len(content)} chars")
                     except Exception as e:
                         current_app.logger.error(f"Error fetching full article: {str(e)}")
                 
-                # Ensure we have content
-                if not content or len(content.strip()) < 100:
-                    content = article.get('description', '') * 3  # Repeat description as fallback
+                # Ensure we have substantial content
+                if not content or len(content.strip()) < 200:
+                    # Try to get a better fallback by combining title, description, and any content we have
+                    title = article.get('title', '')
+                    description = article.get('description', '')
+                    
+                    # Combine all available text
+                    combined_text = []
+                    if title:
+                        combined_text.append(title)
+                    if description:
+                        combined_text.append(description)
+                    if content:
+                        combined_text.append(content)
+                        
+                    # If we still don't have enough, repeat what we have
+                    content = '\n\n'.join(combined_text)
+                    if len(content.strip()) < 200:
+                        content = content * 3  # Triple the content as fallback
                 
                 # Remove "[+XXXX chars]" that NewsAPI adds
                 content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
@@ -571,27 +617,73 @@ def latest_news():
                 url = article.get('url')
                 if url and (not content or len(content) < 500 or '[+' in content):
                     try:
-                        full_article = requests.get(url, timeout=3)
+                        full_article = requests.get(url, timeout=5)  # Increased timeout for better reliability
                         if full_article.status_code == 200:
-                            # Extract article content - this is simplified and may need adjustment
+                            # Extract article content - improved approach for better content extraction
                             from bs4 import BeautifulSoup
                             soup = BeautifulSoup(full_article.text, 'html.parser')
                             
-                            # Try to find article content - this varies by site
-                            article_content = soup.find('article') or soup.find(class_='article-content') or soup.find(class_='story-body') or soup.find(class_='entry-content')
+                            # Try multiple approaches to find article content
+                            article_content = None
+                            
+                            # Check for common article containers
+                            selectors = [
+                                'article', '.article-content', '.story-body', '.entry-content',
+                                '.article-body', '.story-content', '.post-content', '.news-content',
+                                '[itemprop="articleBody"]', '[property="content:encoded"]',
+                                '.main-content', '.blog-post-content', '.node-content'
+                            ]
+                            
+                            for selector in selectors:
+                                if selector.startswith('.'):
+                                    article_content = soup.find(class_=selector[1:])
+                                elif selector.startswith('['):
+                                    # Extract attribute name and value
+                                    attr = selector[1:-1].split('=')
+                                    if len(attr) == 2:
+                                        attr_name = attr[0]
+                                        attr_value = attr[1].strip('"\'')
+                                        article_content = soup.find(attrs={attr_name: attr_value})
+                                else:
+                                    article_content = soup.find(selector)
+                                    
+                                if article_content:
+                                    break
+                            
+                            # If no specific content container found, use the main content area
+                            if not article_content:
+                                article_content = soup.find('main') or soup.find(id='main') or soup.find('body')
                             
                             if article_content:
-                                # Get paragraphs from article
+                                # Get all paragraphs and combine
                                 paragraphs = article_content.find_all('p')
-                                full_content = '\n\n'.join([p.text for p in paragraphs if len(p.text) > 20])
-                                if full_content and len(full_content) > len(content):
+                                full_content = '\n\n'.join([p.text.strip() for p in paragraphs if len(p.text.strip()) > 20])
+                                
+                                if full_content and len(full_content) > 100:
                                     content = full_content
+                                    current_app.logger.info(f"Successfully extracted full content: {len(content)} chars")
                     except Exception as e:
                         current_app.logger.error(f"Error fetching full article: {str(e)}")
                 
-                # Ensure we have content
-                if not content or len(content.strip()) < 100:
-                    content = article.get('description', '') * 3  # Repeat description as fallback
+                # Ensure we have substantial content
+                if not content or len(content.strip()) < 200:
+                    # Try to get a better fallback by combining title, description, and any content we have
+                    title = article.get('title', '')
+                    description = article.get('description', '')
+                    
+                    # Combine all available text
+                    combined_text = []
+                    if title:
+                        combined_text.append(title)
+                    if description:
+                        combined_text.append(description)
+                    if content:
+                        combined_text.append(content)
+                        
+                    # If we still don't have enough, repeat what we have
+                    content = '\n\n'.join(combined_text)
+                    if len(content.strip()) < 200:
+                        content = content * 3  # Triple the content as fallback
                 
                 # Remove "[+XXXX chars]" that NewsAPI adds
                 content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
