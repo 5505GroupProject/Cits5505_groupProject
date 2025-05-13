@@ -839,12 +839,87 @@ body {
 
 /* Empty state styling */
 .text-center.text-muted {
-    padding: 2.5rem;
+    padding: 2rem;
     font-style: italic;
     background-color: #f8f9fa;
     border-radius: 10px;
-    border: 1px dashed #ddd;
+    border: 1px dashed #e0e0e0;
     font-size: 1.1rem;
+    color: #777;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Empty table cell ("No uploads yet") styling */
+td.text-center.text-muted {
+    background-color: #f9f9fa;
+    border: 1px dashed #dadada;
+    color: #666;
+    font-style: italic;
+    vertical-align: middle;
+    padding: 30px;
+    text-align: center !important; /* Force center alignment */
+}
+
+/* Reset any other properties that could be interfering */
+td.text-center.text-muted::before {
+    content: none; /* Remove any previous :before content */
+}
+
+/* Add the document icon using a direct HTML entity or character instead */
+td.text-center.text-muted svg {
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* Completely override any display property setting that could be interfering */
+.table td.text-center.text-muted {
+    display: table-cell;
+}
+
+/* Remove any potential previous styling that might interfere */
+.text-center.text-muted {
+    box-shadow: none;
+    min-height: auto;
+    justify-content: flex-start;
+    transition: none;
+    margin: 0;
+    display: table-cell;
+}
+
+/* Style the table appropriately */
+.upload-history .table {
+    border: none;
+    box-shadow: none;
+}
+
+.upload-history .table thead th {
+    background-color: #f3f5e7;
+    border-bottom: 1px solid #e0e0e0;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    color: #444;
+}
+
+/* Empty cell styling for "No uploads yet" in tables */
+td.text-center.text-muted {
+    padding: 3rem 1rem;
+    margin: 2rem auto;
+    width: 100%;
+}
+
+/* Document icon for empty state */
+td.text-center.text-muted::before {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23777777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'%3E%3C/path%3E%3Cpolyline points='14 2 14 8 20 8'%3E%3C/polyline%3E%3C/svg%3E");
+    opacity: 0.7;
+    margin-right: 0.75rem;
+    transform: scale(1.2);
+    display: inline-block;
+    vertical-align: middle;
 }
 
 /* Enhanced form buttons */
