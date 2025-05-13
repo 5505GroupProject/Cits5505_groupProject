@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, request, redirect, url_for
 from flask_login import login_required
 from ..utils.ngram_utils import get_multiple_ngrams
+from ..utils.word_frequency_utils import analyze_word_frequency
 
 
 main_bp = Blueprint('main', __name__)
@@ -33,10 +34,8 @@ def visualization():
     if text_content and text_content != 'No text analyzed yet.':
         ngram_data = get_multiple_ngrams(text_content)
 
-        # cleaning is done before storing the session to prevent contamination
-        word_freq_data = {
-            'top_words': [{'word': item['ngram'], 'count': item['count']} for item in ngram_data['unigrams']['ngrams']]
-        }
+        # Use the proper word frequency analysis function
+        word_freq_data = analyze_word_frequency(text_content)
 
         session['word_freq_data'] = word_freq_data
     else:
@@ -50,8 +49,6 @@ def visualization():
         word_freq_data=word_freq_data,
         analyzed_text=text_content
     )
-
-
 
 @main_bp.route('/protected-route')
 @login_required
