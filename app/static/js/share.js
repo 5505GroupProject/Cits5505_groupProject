@@ -7,6 +7,131 @@ document.addEventListener('DOMContentLoaded', function() {
     const connectedUsersList = document.getElementById('connectedUsersList');
     const noConnectionsMsg = document.getElementById('noConnectionsMsg');
     
+    // Setup user connection selector dropdown with any existing connections
+    function setupUserSelectDropdown() {
+        const userSelect = document.getElementById('user_select');
+        if (!userSelect || !connectedUsersList) return;
+        
+        // Clear the dropdown first
+        userSelect.innerHTML = '';
+        
+        // Get all users from the connectedUsersList and add them to the dropdown
+        const userItems = connectedUsersList.querySelectorAll('li[data-user-id]');
+        userItems.forEach(item => {
+            const userId = item.dataset.userId;
+            const username = item.querySelector('span').textContent;
+            
+            const option = document.createElement('option');
+            option.value = userId;
+            option.textContent = username;
+            userSelect.appendChild(option);
+        });
+    }
+    
+    // Add user connection function - direct DOM manipulation
+    function addUserConnection(userId) {
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+        
+        fetch('/share/add-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ user_id: userId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => { throw new Error(data.error || 'Error adding user') });
+            }
+            return response.json();
+        })
+        .then(data => {
+            showAlert(data.message, 'success');
+            
+            // Remove from search results
+            const searchItem = userSearchResults.querySelector(`li[data-user-id="${userId}"]`);
+            if (searchItem) searchItem.remove();
+            
+            // Add to connected users list immediately (don't wait for server refresh)
+            if (connectedUsersList) {
+                // Hide no connections message if it exists
+                if (noConnectionsMsg) {
+                    noConnectionsMsg.style.display = 'none';
+                }
+                
+                // Create and add the new user item
+                const li = createConnectedUserItem(data.user);
+                connectedUsersList.appendChild(li);
+                
+                // Also add to the user_select dropdown
+                setupUserSelectDropdown();
+            }
+            
+            // If no more search results, hide the section
+            if (userSearchResults.children.length === 0) {
+                searchResults.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            showAlert(error.message, 'danger');
+        });
+    }
+    
+    // Remove user connection function - direct DOM manipulation
+    function removeUserConnection(userId) {
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+        
+        fetch(`/share/remove-user/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => { throw new Error(data.error || 'Error removing user') });
+            }
+            return response.json();
+        })
+        .then(data => {
+            showAlert(data.message, 'success');
+            
+            // Remove from connected users list immediately
+            const connectedItem = connectedUsersList.querySelector(`li[data-user-id="${userId}"]`);
+            if (connectedItem) connectedItem.remove();
+            
+            // If no more connected users, show the no connections message
+            if (connectedUsersList && connectedUsersList.children.length === 0) {
+                if (noConnectionsMsg) {
+                    noConnectionsMsg.style.display = 'block';
+                }
+            }
+            
+            // Update dropdown
+            setupUserSelectDropdown();
+        })
+        .catch(error => {
+            showAlert(error.message, 'danger');
+        });
+    }
+    
+    // Initialize dropdown on page load
+    setupUserSelectDropdown();
+    
+    // Setup event delegation for remove buttons
+    if (connectedUsersList) {
+        connectedUsersList.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-user')) {
+                const userId = e.target.closest('li').dataset.userId;
+                if (userId) {
+                    removeUserConnection(userId);
+                }
+            }
+        });
+    }
+    
     // Function to show alert messages
     function showAlert(message, type) {
         const alertDiv = document.createElement('div');
@@ -69,11 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
         li.appendChild(span);
         li.appendChild(removeBtn);
         
-        // Add event listener for the remove button
-        removeBtn.addEventListener('click', function() {
-            removeUserConnection(user.id);
-        });
-        
         return li;
     }
     
@@ -118,111 +238,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Function to add a user connection
-    function addUserConnection(userId) {
-        fetch('/share/add-user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-            },
-            body: JSON.stringify({ user_id: userId })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => { throw new Error(data.error || 'Error adding user') });
-            }
-            return response.json();
-        })
-        .then(data => {
-            showAlert(data.message, 'success');
-            
-            // Remove from search results
-            const searchItem = userSearchResults.querySelector(`li[data-user-id="${userId}"]`);
-            if (searchItem) searchItem.remove();
-            
-            // Add to connected users list
-            if (noConnectionsMsg && connectedUsersList) {
-                // If there's no connections message, hide it and create the list
-                if (noConnectionsMsg.style.display !== 'none') {
-                    noConnectionsMsg.style.display = 'none';
-                    
-                    if (!connectedUsersList) {
-                        const ul = document.createElement('ul');
-                        ul.id = 'connectedUsersList';
-                        ul.className = 'list-group';
-                        document.querySelector('.connected-users').appendChild(ul);
-                        connectedUsersList = ul;
-                    }
-                }
-            }
-            
-            // Add to the connected users list
-            if (connectedUsersList) {
-                const li = createConnectedUserItem(data.user);
-                connectedUsersList.appendChild(li);
-                
-                // Also add to the user_select dropdown
-                const userSelect = document.getElementById('user_select');
-                if (userSelect) {
-                    const option = document.createElement('option');
-                    option.value = data.user.id;
-                    option.textContent = data.user.username;
-                    userSelect.appendChild(option);
-                }
-            }
-            
-            // If no more search results, hide the section
-            if (userSearchResults.children.length === 0) {
-                searchResults.style.display = 'none';
-            }
-        })
-        .catch(error => {
-            showAlert(error.message, 'danger');
-        });
-    }
-    
-    // Function to remove a user connection
-    function removeUserConnection(userId) {
-        fetch(`/share/remove-user/${userId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => { throw new Error(data.error || 'Error removing user') });
-            }
-            return response.json();
-        })
-        .then(data => {
-            showAlert(data.message, 'success');
-            
-            // Remove from connected users list
-            const connectedItem = connectedUsersList.querySelector(`li[data-user-id="${userId}"]`);
-            if (connectedItem) connectedItem.remove();
-            
-            // If no more connected users, show the no connections message
-            if (connectedUsersList && connectedUsersList.children.length === 0) {
-                if (noConnectionsMsg) {
-                    noConnectionsMsg.style.display = 'block';
-                }
-            }
-            
-            // Also remove from the user_select dropdown
-            const userSelect = document.getElementById('user_select');
-            if (userSelect) {
-                const option = userSelect.querySelector(`option[value="${userId}"]`);
-                if (option) option.remove();
-            }
-        })
-        .catch(error => {
-            showAlert(error.message, 'danger');
-        });
-    }
-    
     // Set up event listeners for search
     if (searchUserBtn) {
         searchUserBtn.addEventListener('click', function() {
@@ -246,16 +261,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showAlert('Please enter a username to search', 'warning');
                 }
             }
-        });
-    }
-    
-    // Set up event listeners for remove buttons
-    if (connectedUsersList) {
-        document.querySelectorAll('.remove-user').forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = this.parentElement.dataset.userId;
-                removeUserConnection(userId);
-            });
         });
     }
     

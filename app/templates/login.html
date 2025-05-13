@@ -27,7 +27,11 @@
                     <div id="loginContainer">
                         <h2 class="mb-4">Welcome Back</h2>
                         <form id="loginForm" action="{{ url_for('auth.login') }}" method="post" class="needs-validation" novalidate>
-                            {{ form.csrf_token if form else '<input type="hidden" name="csrf_token" value="' ~ csrf_token() ~ '">' | safe }}
+                            {% if form %}
+                                {{ form.csrf_token }}
+                            {% else %}
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% endif %}
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
@@ -66,7 +70,11 @@
                     <div id="registerContainer" style="display: none;">
                         <h2 class="mb-4">Create Account</h2>
                         <form id="registerForm" action="{{ url_for('auth.register') }}" method="post" class="needs-validation" novalidate>
-                            {{ form.csrf_token if form else '<input type="hidden" name="csrf_token" value="' ~ csrf_token() ~ '">' | safe }}
+                            {% if form %}
+                                {{ form.csrf_token }}
+                            {% else %}
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% endif %}
                             <div class="mb-3">
                                 <label for="reg_username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="reg_username" name="username" required minlength="3" maxlength="64">
@@ -116,7 +124,11 @@
                     <div id="forgotPasswordContainer" style="display: none;">
                         <h2 class="mb-4">Reset Password</h2>
                         <form id="forgotPasswordForm" action="{{ url_for('auth.reset_password') }}" method="post" class="needs-validation" novalidate>
-                            {{ form.csrf_token if form else '<input type="hidden" name="csrf_token" value="' ~ csrf_token() ~ '">' | safe }}
+                            {% if form %}
+                                {{ form.csrf_token }}
+                            {% else %}
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% endif %}
                             <div class="mb-3">
                                 <label for="fp_email" class="form-label">Enter your email address</label>
                                 <input type="email" class="form-control" id="fp_email" name="email" required>
