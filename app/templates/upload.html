@@ -3,99 +3,109 @@
 {% block title %}Upload News{% endblock %}
 
 {% block content %}
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="text-center mb-4">
-                <h2>Upload News Content</h2>
-                <p class="lead">Upload your news article or content for sentiment analysis.</p>
-            </div>
-            
-            <!-- Display flash messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            
-            <div class="upload-container">
-                <!-- Text upload form -->
-                <form id="uploadForm" action="{{ url_for('upload.upload') }}" method="post">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    
-                    <!-- Add title field -->
-                    <div class="mb-3">
-                        <label for="newsTitle" class="form-label">Title (Optional)</label>
-                        <input type="text" class="form-control" id="newsTitle" name="title" placeholder="Enter a title for your content">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="newsContent" class="form-label">News Content</label>
-                        <div class="word-count" id="wordCount">0 words, 0 characters</div>
-                        <textarea class="form-control" id="newsContent" name="content" rows="10" placeholder="Paste or type your news content here..."></textarea>
-                    </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="button" class="btn btn-secondary" id="clearBtn">Clear Text</button>
-                        <button type="submit" class="btn btn-primary">Upload & Analyze</button>
-                    </div>
-                </form>
+<main class="upload-page page-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="section-header upload-page-header">
+                    <h2>Upload News Content</h2>
+                    <p class="lead">Upload your news article or content for sentiment analysis.</p>
+                </div>
                 
-                <!-- File upload form -->
-                <form id="fileUploadForm" action="{{ url_for('upload.upload') }}" method="post" enctype="multipart/form-data" class="mt-4">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <!-- Display flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <div class="upload-container content-card">
+                    <!-- Text upload form -->
+                    <form id="uploadForm" action="{{ url_for('upload.upload') }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <!-- Add title field -->
+                        <div class="mb-4">
+                            <label for="newsTitle" class="form-label">Title (Optional)</label>
+                            <input type="text" class="form-control" id="newsTitle" name="title" placeholder="Enter a title for your content">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="newsContent" class="form-label">News Content</label>
+                            <div class="word-count" id="wordCount">0 words, 0 characters</div>
+                            <textarea class="form-control" id="newsContent" name="content" rows="10" placeholder="Paste or type your news content here..."></textarea>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-secondary" id="clearBtn">Clear Text</button>
+                            <button type="submit" class="btn btn-primary">Upload & Analyze</button>
+                        </div>
+                    </form>
                     
-                    <!-- Add title field for file uploads -->
-                    <div class="mb-3">
-                        <label for="fileTitle" class="form-label">Title (Optional)</label>
-                        <input type="text" class="form-control" id="fileTitle" name="title" placeholder="Enter a title for your file">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="file" class="form-label">Upload a Text File</label>
-                        <input type="file" class="form-control" id="file" name="file" accept=".txt" style="display: none;">
-                        <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-primary" id="fileSelectBtn">Upload File</button>
-                            <small class="form-text text-muted mt-2" id="selectedFileName">No file selected</small>
+                    <!-- File upload form -->
+                    <form id="fileUploadForm" action="{{ url_for('upload.upload') }}" method="post" enctype="multipart/form-data" class="mt-4">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <!-- Add title field for file uploads -->
+                        <div class="mb-4">
+                            <label for="fileTitle" class="form-label">Title (Optional)</label>
+                            <input type="text" class="form-control" id="fileTitle" name="title" placeholder="Enter a title for your file">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Upload a Text File</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".txt">
+                            <div class="d-grid gap-2 mt-2">
+                                <small class="form-text" id="selectedFileName">No file selected</small>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-success" id="analyzeFileBtn">Analyze File</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Upload History (modified to support JavaScript refresh) -->
+                <div class="upload-history content-card">
+                    <h3>Your Upload History</h3>
+                    <div id="historyLoadingSpinner" class="text-center my-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" class="btn btn-success">Analyze File</button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Upload History (directly from template) -->
-            <div class="mt-5">
-                <h3>Your Upload History</h3>
-                
-                {% if uploads %}
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Date</th>
-                                <th>Preview</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for upload in uploads %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>{{ upload.title or 'Untitled' }}</td>
-                                    <td>{{ upload.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td>{{ (upload.content[:100] + '...') if upload.content|length > 100 else upload.content }}</td>
-                                    <td>
-                                        <a href="{{ url_for('upload.view_upload', upload_id=upload.id) }}" class="btn btn-sm btn-primary">View</a>
-                                    </td>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Preview</th>
+                                    <th>Actions</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <p class="text-center text-muted">No uploads yet.</p>
-                {% endif %}
+                            </thead>
+                            <tbody>
+                                <!-- Initially empty, will be populated by JavaScript -->
+                                {% if uploads %}
+                                    {% for upload in uploads %}
+                                        <tr>
+                                            <td>{{ upload.title or 'Untitled' }}</td>
+                                            <td>{{ upload.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                            <td>{{ (upload.content[:100] + '...') if upload.content|length > 100 else upload.content }}</td>
+                                            <td>
+                                                <a href="{{ url_for('upload.view_upload', upload_id=upload.id) }}" class="btn btn-sm btn-primary">View</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No uploads yet.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -103,50 +113,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Word counter
-        const textArea = document.getElementById('newsContent');
-        const wordCount = document.getElementById('wordCount');
-        
-        if (textArea && wordCount) {
-            textArea.addEventListener('input', function() {
-                const text = this.value;
-                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-                const chars = text.length;
-                wordCount.textContent = `${words} words, ${chars} characters`;
-            });
-        }
-        
-        // Clear button
-        const clearBtn = document.getElementById('clearBtn');
-        if (clearBtn && textArea) {
-            clearBtn.addEventListener('click', function() {
-                textArea.value = '';
-                const titleInput = document.getElementById('newsTitle');
-                if (titleInput) titleInput.value = '';
-                wordCount.textContent = '0 words, 0 characters';
-            });
-        }
-        
-        // File upload button functionality
-        const fileInput = document.getElementById('file');
-        const fileSelectBtn = document.getElementById('fileSelectBtn');
-        const selectedFileName = document.getElementById('selectedFileName');
-        
-        if (fileSelectBtn && fileInput && selectedFileName) {
-            fileSelectBtn.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    selectedFileName.textContent = this.files[0].name;
-                } else {
-                    selectedFileName.textContent = 'No file selected';
-                }
-            });
-        }
-    });
-</script>
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

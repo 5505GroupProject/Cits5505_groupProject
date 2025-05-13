@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get elements
     const uploadForm = document.getElementById('uploadForm');
     const fileUploadForm = document.getElementById('fileUploadForm');
-    const uploadStatus = document.getElementById('uploadStatus');
-    const statusMessage = document.getElementById('statusMessage');
-    const uploadHistory = document.getElementById('uploadHistory');
+    const fileInput = document.getElementById('file');
+    const selectedFileName = document.getElementById('selectedFileName');
+    const analyzeFileBtn = document.getElementById('analyzeFileBtn');
     
     // Initialize word counter
     const textArea = document.getElementById('newsContent');
@@ -30,16 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // File upload button functionality
-    const fileInput = document.getElementById('file');
-    const fileSelectBtn = document.getElementById('fileSelectBtn');
-    const selectedFileName = document.getElementById('selectedFileName');
-    
-    if (fileSelectBtn && fileInput && selectedFileName) {
-        fileSelectBtn.addEventListener('click', function() {
-            fileInput.click();
-        });
-        
+    // File input change handler
+    if (fileInput && selectedFileName) {
         fileInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 selectedFileName.textContent = this.files[0].name;
@@ -49,13 +41,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Handle text upload form submission via AJAX (if using API endpoint directly)
+    // Handle text upload form submission
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
-            // If we want to handle via normal form submission (which will redirect to test_page after analysis)
-            // then we don't need to prevent default
-            // e.preventDefault();
-            
             // Disable the submit button to prevent double submission
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
@@ -73,134 +61,158 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Handle file upload form submission
-    if (fileUploadForm) {
+    if (fileUploadForm && analyzeFileBtn) {
         fileUploadForm.addEventListener('submit', function(e) {
-            // We're handling via normal form submission now for sentiment analysis
-            // e.preventDefault();
-            
             // Check if file is selected
-            const fileInput = this.querySelector('input[type="file"]');
             if (!fileInput.files || !fileInput.files[0]) {
-                if (uploadStatus) {
-                    uploadStatus.className = 'alert alert-danger mt-3';
-                    statusMessage.textContent = 'Please select a file to upload.';
-                    uploadStatus.style.display = 'block';
-                }
-                e.preventDefault(); // Prevent form submission only if no file selected
-                return;
+                e.preventDefault(); // Prevent form submission
+                alert('Please select a file to upload.');
+                return false;
             }
             
             console.log('File selected:', fileInput.files[0].name);
             
-            // Disable the submit button
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                const originalBtnText = submitBtn.textContent;
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Uploading & Analyzing...';
-                
-                // Enable the button after a short delay (form will reload page)
-                setTimeout(function() {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalBtnText;
-                }, 1500);
-            }
+            // Show submission is in progress
+            const originalBtnText = analyzeFileBtn.textContent;
+            analyzeFileBtn.disabled = true;
+            analyzeFileBtn.textContent = 'Uploading & Analyzing...';
+            
+            // Enable the button after a short delay (form will reload page)
+            setTimeout(function() {
+                analyzeFileBtn.disabled = false;
+                analyzeFileBtn.textContent = originalBtnText;
+            }, 1500);
         });
     }
-    
-    // Function to load upload history
-    function loadUploadHistory() {
-        if (!uploadHistory) {
-            console.error('Upload history element not found');
-            return;
-        }
-        
-        console.log('Loading upload history...');
-        uploadHistory.innerHTML = '<p class="text-center text-muted">Loading history...</p>';
-        
-        fetch('/upload/history')
-            .then(response => {
-                console.log('History API response status:', response.status);
-                
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        uploadHistory.innerHTML = '<p class="text-center text-warning">Please log in to view your upload history.</p>';
-                    } else {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return null;
-                }
-                
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return; // Skip processing if no data (from auth error)
-                
-                console.log('History data:', data);
-                
-                if (data.success && data.uploads) {
-                    if (data.uploads.length === 0) {
-                        uploadHistory.innerHTML = '<p class="text-center text-muted">No uploads yet.</p>';
-                        return;
-                    }
-                    
-                    uploadHistory.innerHTML = '';
-                    
-                    // Create a table for better display
-                    const table = document.createElement('table');
-                    table.className = 'table table-striped';
-                    
-                    // Add table header
-                    const thead = document.createElement('thead');
-                    thead.innerHTML = `
-                        <tr>
-                            <th>Title</th>
-                            <th>Date</th>
-                            <th>Preview</th>
-                            <th>Actions</th>
-                        </tr>
-                    `;
-                    table.appendChild(thead);
-                    
-                    // Add table body
-                    const tbody = document.createElement('tbody');
-                    
-                    data.uploads.forEach(upload => {
-                        const tr = document.createElement('tr');
-                        
-                        // Make sure values exist, provide fallbacks
-                        const title = upload.title || 'Untitled';
-                        const date = upload.created_at || 'Unknown date';
-                        const preview = upload.preview || 'No preview available';
-                        
-                        tr.innerHTML = `
-                            <td>${title}</td>
-                            <td>${date}</td>
-                            <td>${preview}</td>
-                            <td>
-                                <a href="/upload/view/${upload.id}" class="btn btn-sm btn-primary">View</a>
-                            </td>
-                        `;
-                        
-                        tbody.appendChild(tr);
-                    });
-                    
-                    table.appendChild(tbody);
-                    uploadHistory.appendChild(table);
-                    
-                } else {
-                    console.error('Error in history response:', data);
-                    uploadHistory.innerHTML = '<p class="text-center text-danger">Error loading history.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading history:', error);
-                uploadHistory.innerHTML = '<p class="text-center text-danger">Failed to load history.</p>';
-            });
-    }
-    
-    // Load upload history when page loads, but only if the element exists
-    if (document.getElementById('uploadHistory')) {
-        loadUploadHistory();
-    }
+
+    // Load upload history via AJAX to ensure fresh data after login
+    loadUploadHistory();
 });
+
+// Function to load upload history
+function loadUploadHistory() {
+    // Show loading spinner
+    const loadingSpinner = document.getElementById('historyLoadingSpinner');
+    if (loadingSpinner) {
+        loadingSpinner.style.display = 'block';
+    }
+
+    fetch('/upload/history')
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading spinner
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'none';
+            }
+
+            if (data.success && data.uploads) {
+                updateUploadHistoryTable(data.uploads);
+            } else {
+                console.error('Failed to load upload history:', data.error);
+            }
+        })
+        .catch(error => {
+            // Hide loading spinner on error too
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'none';
+            }
+            console.error('Error loading upload history:', error);
+        });
+}
+
+// Function to update the upload history table with data
+function updateUploadHistoryTable(uploads) {
+    const historyTableBody = document.querySelector('.upload-history table tbody');
+    
+    if (!historyTableBody) {
+        console.error('Upload history table not found!');
+        return;
+    }
+    
+    // Clear existing content
+    historyTableBody.innerHTML = '';
+    
+    if (uploads.length === 0) {
+        // If no uploads, show a message
+        const messageRow = document.createElement('tr');
+        messageRow.innerHTML = '<td colspan="4" class="text-center text-muted">No uploads yet.</td>';
+        historyTableBody.appendChild(messageRow);
+        return;
+    }
+    
+    // Add each upload to the table
+    uploads.forEach(upload => {
+        const row = document.createElement('tr');
+        row.dataset.uploadId = upload.id; // Store upload ID in the row for easy reference
+        row.innerHTML = `
+            <td>${upload.title || 'Untitled'}</td>
+            <td>${upload.created_at}</td>
+            <td>${upload.preview}</td>
+            <td>
+                <a href="/upload/view/${upload.id}" class="btn btn-sm btn-primary">View</a>
+                <button type="button" class="btn btn-sm btn-danger delete-upload-btn" data-upload-id="${upload.id}">Delete</button>
+            </td>
+        `;
+        historyTableBody.appendChild(row);
+    });
+    
+    // Add event listeners to the delete buttons
+    addDeleteButtonListeners();
+}
+
+// Function to add event listeners to delete buttons
+function addDeleteButtonListeners() {
+    const deleteButtons = document.querySelectorAll('.delete-upload-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const uploadId = this.getAttribute('data-upload-id');
+            confirmDeleteUpload(uploadId);
+        });
+    });
+}
+
+// Function to show confirmation dialog and handle delete
+function confirmDeleteUpload(uploadId) {
+    if (confirm('Are you sure you want to delete this upload? This action cannot be undone.')) {
+        deleteUpload(uploadId);
+    }
+}
+
+// Function to send delete request to server
+function deleteUpload(uploadId) {
+    // Get the CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch(`/upload/delete/${uploadId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Find and remove the row from the table
+            const rowToRemove = document.querySelector(`tr[data-upload-id="${uploadId}"]`);
+            if (rowToRemove) {
+                rowToRemove.remove();
+                
+                // If no more uploads, show "No uploads yet" message
+                const historyTableBody = document.querySelector('.upload-history table tbody');
+                if (historyTableBody && historyTableBody.children.length === 0) {
+                    const messageRow = document.createElement('tr');
+                    messageRow.innerHTML = '<td colspan="4" class="text-center text-muted">No uploads yet.</td>';
+                    historyTableBody.appendChild(messageRow);
+                }
+            }
+        } else {
+            // Show error message
+            alert('Error deleting upload: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting upload:', error);
+        alert('An error occurred while deleting the upload. Please try again.');
+    });
+}

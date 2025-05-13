@@ -6,7 +6,7 @@
          <!-- Intro Section -->
          <section class="intro-section">
              <div class="container">
-                 <h1>Welcome to SentiNews</h1>
+                 <h1>Welcome <span class="typed-username"></span> to SentiNews</h1>
                  <p>Discover, share, and analyze news with sentiment insights. Join our community to stay informed and engaged.</p>
                  <a href="{{ url_for('main.upload') }}" class="btn btn-fancy-login mt-3">Get Started</a>
              </div>
@@ -75,4 +75,32 @@
                  </div>
              </div>
          </section>
+     {% endblock %}
+
+     {% block scripts %}
+     <!-- Include Typed.js library -->
+     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+     <script>
+         document.addEventListener('DOMContentLoaded', function() {
+             // Get username from session if user is logged in
+             {% if current_user.is_authenticated %}
+                 var username = "{{ current_user.username }}";
+                 var typed = new Typed(".typed-username", {
+                     strings: [username + "", "Researcher", "Analyzer", "News Explorer"],
+                     typeSpeed: 100,
+                     backSpeed: 100,
+                     backDelay: 1000,
+                     loop: true
+                 });
+             {% else %}
+                 var typed = new Typed(".typed-username", {
+                     strings: ["Explorer,", "Researcher,", "Analyzer,", "News Explorer,"],
+                     typeSpeed: 100,
+                     backSpeed: 100,
+                     backDelay: 1000,
+                     loop: true
+                 });
+             {% endif %}
+         });
+     </script>
      {% endblock %}

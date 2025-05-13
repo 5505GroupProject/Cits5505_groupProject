@@ -64,3 +64,9 @@ def protected_route():
 def upload():
     return render_template('upload.html')
 
+@main_bp.route('/profile')
+@login_required
+def profile():
+    """Redirect to the auth profile page."""
+    return redirect(url_for('auth.profile'))
+
