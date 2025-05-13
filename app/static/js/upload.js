@@ -465,7 +465,7 @@ function updateUploadHistoryTable(uploads) {
             <td>${upload.created_at}</td>
             <td>${upload.preview}</td>
             <td>
-                <a href="/upload/view/${upload.id}" class="btn btn-sm btn-primary">View</a>
+                <a href="/analyze/${upload.id}" class="btn btn-sm btn-primary">Analyze</a>
                 <button type="button" class="btn btn-sm btn-danger delete-upload-btn" data-upload-id="${upload.id}">Delete</button>
             </td>
         `;

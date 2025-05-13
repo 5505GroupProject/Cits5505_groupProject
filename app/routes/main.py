@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, request, redirect, url_for
+from flask import Blueprint, render_template, session, request, redirect, url_for, flash
 from flask_login import login_required
 from ..utils.ngram_utils import get_multiple_ngrams
 from ..utils.word_frequency_utils import analyze_word_frequency
@@ -82,4 +82,52 @@ def upload():
 def profile():
     """Redirect to the auth profile page."""
     return redirect(url_for('auth.profile'))
+
+@main_bp.route('/analyze/<int:upload_id>')
+@login_required
+def analyze_upload(upload_id):
+    """Direct analysis of a previously uploaded text"""
+    from app.models import UploadedText
+    from flask_login import current_user
+    from ..utils.sentiment_utils import get_sentiment_summary
+    from ..utils.ngram_utils import get_multiple_ngrams
+    from ..utils.ner_utils import perform_ner_analysis
+    from ..utils.word_frequency_utils import analyze_word_frequency
+    
+    try:
+        # Get the uploaded text from the database
+        upload = UploadedText.query.get_or_404(upload_id)
+        
+        # Security check - ensure user can only see their own uploads
+        if upload.user_id != current_user.id:
+            flash("You don't have permission to view this upload", 'danger')
+            return redirect(url_for('main.upload'))
+            
+        # Get the content
+        text_content = upload.content
+        
+        if text_content:
+            # Perform all analysis again (or for the first time)
+            sentiment_data = get_sentiment_summary(text_content)
+            ngram_data = get_multiple_ngrams(text_content)
+            ner_data = perform_ner_analysis(text_content)
+            word_freq_data = analyze_word_frequency(text_content)
+            
+            # Store in session for the visualization page
+            session['sentiment_data'] = sentiment_data
+            session['ngram_data'] = ngram_data
+            session['ner_data'] = ner_data
+            session['word_freq_data'] = word_freq_data
+            session['upload_id'] = upload_id
+            session['text_content'] = text_content[:500] + "..." if len(text_content) > 500 else text_content
+            
+            # Redirect to visualization page
+            return redirect(url_for('main.visualization'))
+        else:
+            flash('No content available for analysis', 'warning')
+            return redirect(url_for('main.upload'))
+            
+    except Exception as e:
+        flash(f'Error retrieving upload: {str(e)}', 'danger')
+        return redirect(url_for('main.upload'))
 
