@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, current_app, flash, redirect, url_for, session
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from app.models import UploadedText
+from app.models import UploadedText, AnalysisResult
 from app import db
 from flask_wtf.csrf import validate_csrf, ValidationError
 from app.utils.sentiment_utils import get_sentiment_summary
@@ -83,6 +83,15 @@ def upload():
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(file_content)
                 
+                # Create an AnalysisResult entry
+                analysis_result = AnalysisResult(
+                    title=title or secure_filename(file.filename),
+                    content=file_content,
+                    owner_id=current_user.id
+                )
+                db.session.add(analysis_result)
+                db.session.commit()
+                
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
                 session['ngram_data'] = ngram_data
@@ -124,6 +133,15 @@ def upload():
                 
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(text_content)
+                
+                # Create an AnalysisResult entry
+                analysis_result = AnalysisResult(
+                    title=title or 'Text Upload',
+                    content=text_content,
+                    owner_id=current_user.id
+                )
+                db.session.add(analysis_result)
+                db.session.commit()
                 
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data

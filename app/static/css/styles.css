@@ -1238,157 +1238,76 @@ td.text-center.text-muted::before {
 
 /* Enhanced Share Page Styles */
 .share-section {
-    padding: 4rem 0;
-    background: linear-gradient(135deg, #f9f9f9 0%, #f5f5dc 100%);
-    min-height: calc(100vh - 180px);
-    position: relative;
+    padding: 2rem 0;
 }
 
-.share-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: linear-gradient(90deg, yellowgreen, #86c232, yellowgreen);
-}
-
-.share-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #fff;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    padding: 3rem;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.share-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.share-container h1 {
-    color: #333;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    font-size: 2.5rem;
-    position: relative;
-    padding-bottom: 1rem;
-}
-
-.share-container h1::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 4px;
-    background: linear-gradient(90deg, #9ACD32, #88b04b);
-    border-radius: 2px;
-}
-
-.form-group {
-    margin-bottom: 2.5rem;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: #444;
-    font-size: 1.1rem;
-}
-
-.form-group select {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    font-size: 1rem;
-    color: #444;
-    transition: all 0.3s ease;
-}
-
-.form-group select:focus {
-    border-color: #9ACD32;
-    box-shadow: 0 0 0 3px rgba(154, 205, 50, 0.2);
-    outline: none;
-}
-
-.form-group input[type="file"] {
-    width: 100%;
-    padding: 30px;
-    border: 2px dashed #e0e0e0;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-}
-
-.form-group input[type="file"]:hover {
-    border-color: #9ACD32;
-    background-color: #f2f7e8;
-}
-
-#shareImagePreview {
-    max-width: 100%;
-    height: auto;
-    margin-top: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.share-buttons {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.share-buttons button {
-    flex: 1;
-    min-width: 160px;
-    padding: 16px;
+.share-section .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
     border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1.05rem;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
-.share-buttons button:first-child {
-    background: linear-gradient(135deg, #4285F4 0%, #0F9D58 100%);
+.share-section .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 1rem;
 }
 
-.share-buttons button:nth-child(2) {
-    background: linear-gradient(135deg, #9ACD32 0%, #88b04b 100%);
+.share-section .form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
 }
 
-.share-buttons button:last-child {
-    background: linear-gradient(135deg, #DB4437 0%, #F4B400 100%);
+.share-section select[multiple] {
+    min-height: 120px;
 }
 
-.share-buttons button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+.share-section .btn-primary {
+    background-color: #28a745;
+    border-color: #28a745;
+    padding: 0.5rem 2rem;
 }
 
-.share-buttons button:active {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+.share-section .btn-primary:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.share-section .list-group-item {
+    transition: all 0.2s ease;
+}
+
+.share-section .list-group-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.share-section .text-muted {
+    color: #6c757d;
+}
+
+/* Form Group Spacing */
+.share-section .form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Alert Messages */
+.share-section .alert {
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.share-section .alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.share-section .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
 }
 
 /* Enhanced Visualization/Analysis Page Styles */

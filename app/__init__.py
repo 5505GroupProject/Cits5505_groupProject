@@ -39,10 +39,12 @@ def create_app():
     # Register blueprints
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
-    from app.routes.upload import upload_bp  # Import the upload blueprint
+    from app.routes.upload import upload_bp
+    from app.routes.share import share_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(upload_bp)  # Register the upload blueprint
+    app.register_blueprint(upload_bp)
+    app.register_blueprint(share_bp, url_prefix='/share')
     
     return app

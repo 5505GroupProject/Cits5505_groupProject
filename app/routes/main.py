@@ -14,11 +14,6 @@ def home():
 def login():
     return render_template('login.html')
 
-@main_bp.route('/share')
-@login_required
-def share():
-    return render_template('share.html')
-
 @main_bp.route('/visualization')
 @login_required
 def visualization():
