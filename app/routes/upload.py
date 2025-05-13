@@ -345,8 +345,36 @@ def view_upload(upload_id):
         # Security check - ensure user can only see their own uploads
         if upload.user_id != current_user.id:
             return render_template('error.html', message="You don't have permission to view this upload"), 403
-            
-        return render_template('view_upload.html', upload=upload)
+        
+        # Instead of rendering view_upload.html, set up session variables and redirect to visualization
+        # Retrieve content and set it in the session
+        content = upload.content
+        
+        # Perform sentiment analysis
+        sentiment_data = get_sentiment_summary(content)
+        
+        # Perform N-gram analysis
+        ngram_data = get_multiple_ngrams(content)
+        
+        # Perform NER analysis
+        ner_data = perform_ner_analysis(content)
+        
+        # Perform word frequency analysis
+        word_freq_data = analyze_word_frequency(content)
+        
+        # Store data in session for visualization page
+        session['sentiment_data'] = sentiment_data
+        session['ngram_data'] = ngram_data
+        session['ner_data'] = ner_data
+        session['word_freq_data'] = word_freq_data
+        session['upload_id'] = upload.id
+        session['text_content'] = content[:500] + "..." if len(content) > 500 else content
+        
+        # Flash a message to the user
+        flash('Content loaded for visualization', 'success')
+        
+        # Redirect to the visualization page
+        return redirect(url_for('main.visualization'))
         
     except Exception as e:
         current_app.logger.error(f"Error viewing upload: {str(e)}")
