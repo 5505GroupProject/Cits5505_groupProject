@@ -20,50 +20,169 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
+
+                <!-- News Search Tab System -->
+                <ul class="nav nav-tabs mb-4" id="uploadTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" 
+                                data-bs-target="#manual-upload" type="button" role="tab" 
+                                aria-controls="manual-upload" aria-selected="true">Manual Upload</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="file-tab" data-bs-toggle="tab" 
+                                data-bs-target="#file-upload" type="button" role="tab" 
+                                aria-controls="file-upload" aria-selected="false">File Upload</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="search-tab" data-bs-toggle="tab" 
+                                data-bs-target="#news-search" type="button" role="tab" 
+                                aria-controls="news-search" aria-selected="false">Search Online News</button>
+                    </li>
+                </ul>
                 
-                <div class="upload-container content-card">
-                    <!-- Text upload form -->
-                    <form id="uploadForm" action="{{ url_for('upload.upload') }}" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        
-                        <!-- Add title field -->
-                        <div class="mb-4">
-                            <label for="newsTitle" class="form-label">Title (Optional)</label>
-                            <input type="text" class="form-control" id="newsTitle" name="title" placeholder="Enter a title for your content">
+                <!-- Tab Content -->
+                <div class="tab-content" id="uploadTabContent">
+                    <!-- Manual Text Upload -->
+                    <div class="tab-pane fade show active" id="manual-upload" role="tabpanel" aria-labelledby="manual-tab">
+                        <div class="upload-container content-card">
+                            <!-- Text upload form -->
+                            <form id="uploadForm" action="{{ url_for('upload.upload') }}" method="post">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                
+                                <!-- Add title field -->
+                                <div class="mb-4">
+                                    <label for="newsTitle" class="form-label">Title (Optional)</label>
+                                    <input type="text" class="form-control" id="newsTitle" name="title" placeholder="Enter a title for your content">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="newsContent" class="form-label">News Content</label>
+                                    <div class="word-count" id="wordCount">0 words, 0 characters</div>
+                                    <textarea class="form-control" id="newsContent" name="content" rows="10" placeholder="Paste or type your news content here..."></textarea>
+                                </div>
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-secondary" id="clearBtn">Clear Text</button>
+                                    <button type="submit" class="btn btn-primary">Upload & Analyze</button>
+                                </div>
+                            </form>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label for="newsContent" class="form-label">News Content</label>
-                            <div class="word-count" id="wordCount">0 words, 0 characters</div>
-                            <textarea class="form-control" id="newsContent" name="content" rows="10" placeholder="Paste or type your news content here..."></textarea>
-                        </div>
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-secondary" id="clearBtn">Clear Text</button>
-                            <button type="submit" class="btn btn-primary">Upload & Analyze</button>
-                        </div>
-                    </form>
+                    </div>
                     
-                    <!-- File upload form -->
-                    <form id="fileUploadForm" action="{{ url_for('upload.upload') }}" method="post" enctype="multipart/form-data" class="mt-4">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        
-                        <!-- Add title field for file uploads -->
-                        <div class="mb-4">
-                            <label for="fileTitle" class="form-label">Title (Optional)</label>
-                            <input type="text" class="form-control" id="fileTitle" name="title" placeholder="Enter a title for your file">
+                    <!-- File Upload -->
+                    <div class="tab-pane fade" id="file-upload" role="tabpanel" aria-labelledby="file-tab">
+                        <div class="upload-container content-card">
+                            <!-- File upload form -->
+                            <form id="fileUploadForm" action="{{ url_for('upload.upload') }}" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                
+                                <!-- Add title field for file uploads -->
+                                <div class="mb-4">
+                                    <label for="fileTitle" class="form-label">Title (Optional)</label>
+                                    <input type="text" class="form-control" id="fileTitle" name="title" placeholder="Enter a title for your file">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="file" class="form-label">Upload a Text File</label>
+                                    <input type="file" class="form-control" id="file" name="file" accept=".txt">
+                                    <div class="d-grid gap-2 mt-2">
+                                        <small class="form-text" id="selectedFileName">No file selected</small>
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-success" id="analyzeFileBtn">Analyze File</button>
+                                </div>
+                            </form>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label for="file" class="form-label">Upload a Text File</label>
-                            <input type="file" class="form-control" id="file" name="file" accept=".txt">
-                            <div class="d-grid gap-2 mt-2">
-                                <small class="form-text" id="selectedFileName">No file selected</small>
+                    </div>
+                    
+                    <!-- Search Online News -->
+                    <div class="tab-pane fade" id="news-search" role="tabpanel" aria-labelledby="search-tab">
+                        <div class="upload-container content-card">
+                            <!-- Real-time News Feed -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="mb-0">Latest Headlines</h4>
+                                    <div class="btn-group" role="group" aria-label="News categories">
+                                        <button type="button" class="btn btn-sm btn-outline-primary news-category-btn active" data-category="general">General</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary news-category-btn" data-category="technology">Tech</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary news-category-btn" data-category="business">Business</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary news-category-btn" data-category="entertainment">Entertainment</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary news-category-btn" data-category="sports">Sports</button>
+                                    </div>
+                                </div>
+                                <div id="latestNewsFeed" class="row">
+                                    <!-- Loading spinner for real-time news -->
+                                    <div id="latestNewsSpinner" class="text-center my-3">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading latest news...</span>
+                                        </div>
+                                        <p class="mt-2">Loading latest headlines...</p>
+                                    </div>
+                                    <!-- News cards will be inserted here -->
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            
+                            <!-- Search Section -->
+                            <div class="mb-4">
+                                <label for="newsSearchQuery" class="form-label">Search for News Articles</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="newsSearchQuery" 
+                                           placeholder="Enter keywords to search for news...">
+                                    <button class="btn btn-primary" type="button" id="searchNewsBtn">
+                                        <i class="bi bi-search"></i> Search
+                                    </button>
+                                </div>
+                                <div class="form-text">Search for recent news articles to analyze.</div>
+                            </div>
+                            
+                            <!-- Search Results -->
+                            <div id="newsSearchResults" class="mt-4">
+                                <div class="search-results-placeholder text-center text-muted d-flex flex-column align-items-center justify-content-center py-5">
+                                    <i class="bi bi-newspaper fs-1 mb-3"></i>
+                                    <p>Search for news articles to analyze</p>
+                                </div>
+                                
+                                <!-- Loading spinner (hidden by default) -->
+                                <div id="newsSearchSpinner" class="text-center my-5 d-none">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Searching for articles...</p>
+                                </div>
+                                
+                                <!-- Results list (populated by JavaScript) -->
+                                <div class="list-group" id="newsResultsList">
+                                    <!-- Search results will be inserted here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Article Preview (hidden by default) -->
+                            <div id="selectedArticlePreview" class="mt-4 d-none">
+                                <h4 class="mb-3">Selected Article</h4>
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0" id="previewArticleTitle"></h5>
+                                        <button type="button" class="btn-close" aria-label="Close" id="closePreviewBtn"></button>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text" id="previewArticleContent"></p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <form id="articleUploadForm" action="{{ url_for('upload.upload') }}" method="post">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" id="uploadArticleTitle" name="title" value="">
+                                            <input type="hidden" id="uploadArticleContent" name="content" value="">
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                <button type="submit" class="btn btn-primary">Upload & Analyze</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-success" id="analyzeFileBtn">Analyze File</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
                 
                 <!-- Upload History (modified to support JavaScript refresh) -->

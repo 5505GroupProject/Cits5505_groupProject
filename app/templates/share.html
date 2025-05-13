@@ -10,7 +10,7 @@
                 <div class="share-container">
                     <h1>Share Analyzed News Sentiment Data</h1>
                     
-                    <!-- Display flash messages -->
+                    <!-- Flash messages go here - need to style these better later -->
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
@@ -47,6 +47,6 @@
     </div>
 </section>
 
-<!-- Custom JavaScript -->
+<!-- JS for share functionality - TODO: add confirmation modals -->
 <script src="{{ url_for('static', filename='js/share.js') }}"></script>
 {% endblock %}
