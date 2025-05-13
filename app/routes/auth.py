@@ -4,6 +4,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app.models import User
 from app import db
+from app.forms import (
+    LoginForm, RegistrationForm, ResetPasswordRequestForm, 
+    ResetPasswordForm, UpdateProfileForm, ChangePasswordForm, DeleteAccountForm
+)
 import secrets
 import string
 import os
@@ -23,22 +27,20 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        remember = bool(request.form.get('remember_me'))
-
-        user = User.query.filter_by(username=username).first()
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
         
-        # Use the check_password method from the User model
-        if user is None or not user.check_password(password):
+        # Check if user exists and password is correct
+        if user is None or not user.check_password(form.password.data):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({'error': 'Invalid username or password'}), 401
             else:
                 flash('Invalid username or password', 'danger')
                 return redirect(url_for('auth.login'))
 
-        login_user(user, remember=remember)
+        login_user(user, remember=form.remember_me.data)
         
         # Handle AJAX vs regular form submission for success case
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -49,7 +51,11 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page or url_for('main.home'))
 
-    return render_template('login.html')
+    # For AJAX form validation errors
+    if form.errors and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'error': form.errors}), 400
+        
+    return render_template('login.html', form=form)
 
 @auth_bp.route('/logout')
 @login_required
@@ -71,6 +77,18 @@ def reset_password():
         
         # Send verification code
         if action == 'send_code':
+            form = ResetPasswordRequestForm(formdata=None)
+            form.email.data = email
+            
+            if not form.validate_on_submit():
+                error_messages = {field: errors[0] for field, errors in form.errors.items()}
+                if is_ajax:
+                    return jsonify({'error': error_messages}), 400
+                else:
+                    for field, error in error_messages.items():
+                        flash(f"{field.title()}: {error}", 'danger')
+                    return redirect(url_for('auth.reset_password'))
+            
             user = User.query.filter_by(email=email).first()
             if not user:
                 if is_ajax:
@@ -130,29 +148,23 @@ def reset_password():
                     flash(error_msg, 'danger')
                     return redirect(url_for('auth.reset_password'))
                 
-            new_password = request.form.get('new_password')
-            confirm_password = request.form.get('confirm_password')
+            form = ResetPasswordForm()
+            form.password.data = request.form.get('new_password')
+            form.confirm_password.data = request.form.get('confirm_password')
             
-            if not new_password or not confirm_password:
-                error_msg = 'Please enter a new password.'
+            if not form.validate_on_submit():
+                error_messages = {field: errors[0] for field, errors in form.errors.items()}
                 if is_ajax:
-                    return jsonify({'error': error_msg}), 400
+                    return jsonify({'error': error_messages}), 400
                 else:
-                    flash(error_msg, 'danger')
-                    return redirect(url_for('auth.set_new_password'))
-                
-            if new_password != confirm_password:
-                error_msg = 'Passwords do not match.'
-                if is_ajax:
-                    return jsonify({'error': error_msg}), 400
-                else:
-                    flash(error_msg, 'danger')
+                    for field, error in error_messages.items():
+                        flash(f"{field.title()}: {error}", 'danger')
                     return redirect(url_for('auth.set_new_password'))
                 
             # Update the user's password
             user = User.query.filter_by(email=session.get('reset_email')).first()
             if user:
-                user.set_password(new_password)
+                user.set_password(form.password.data)
                 db.session.commit()
                 
                 # Clear all reset-related session data
@@ -179,106 +191,63 @@ def set_new_password():
     if not session.get('password_reset_verified') or not session.get('reset_email'):
         flash('Please verify your email first.', 'danger')
         return redirect(url_for('auth.reset_password'))
-        
-    return render_template('reset_password.html', email=session.get('reset_email'))
+    
+    form = ResetPasswordForm()
+    return render_template('reset_password.html', email=session.get('reset_email'), form=form)
 
-@auth_bp.route('/debug-login/<username>/<password>')
-def debug_login(username, password):
-    """Debug route to check login credentials"""
-    user = User.query.filter_by(username=username).first()
-    
-    if not user:
-        return jsonify({
-            'user_exists': False,
-            'message': f'No user found with username: {username}'
-        })
-    
-    # Use the check_password method instead of direct comparison
-    password_match = user.check_password(password)
-    
-    return jsonify({
-        'user_exists': True,
-        'username': user.username,
-        'email': user.email,
-        'password_field_exists': hasattr(user, 'password'),
-        'password_stored': user.password[:20] + '...' if hasattr(user, 'password') else 'No password field',
-        'password_match': password_match,
-        'password_check_method': 'user.check_password method'
-    })
-
-@auth_bp.route('/debug-user-model')
-def debug_user_model():
-    """Debug route to check user model fields"""
-    # Get table info from SQLAlchemy
-    table = User.__table__
-    columns = [column.name for column in table.columns]
-    
-    # Get a sample user if available
-    sample_user = User.query.first()
-    sample_data = None
-    if sample_user:
-        sample_data = {col: getattr(sample_user, col) for col in columns}
-        # Don't return password hash in response
-        if 'password_hash' in sample_data:
-            sample_data['password_hash'] = '[REDACTED]'
-    
-    return jsonify({
-        'model_name': User.__name__,
-        'table_name': table.name,
-        'columns': columns,
-        'sample_data': sample_data
-    })
-
-@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """Handle user registration."""
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-        
+    
+    form = RegistrationForm()
+    
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        
-        # Validate input
-        if not username or not email or not password or not confirm_password:
-            return jsonify({'error': 'All fields are required'}), 400
+        # Manual validation for AJAX requests
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            form = RegistrationForm(formdata=None)
+            form.username.data = request.form.get('username')
+            form.email.data = request.form.get('email')
+            form.password.data = request.form.get('password')
+            form.confirm_password.data = request.form.get('confirm_password')
             
-        if password != confirm_password:
-            return jsonify({'error': 'Passwords do not match'}), 400
-        
-        # Check if username or email already exists
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            return jsonify({'error': 'Username already exists'}), 400
+            if not form.validate():
+                error_messages = {field: errors[0] for field, errors in form.errors.items()}
+                return jsonify({'error': error_messages}), 400
             
-        existing_email = User.query.filter_by(email=email).first()
-        if existing_email:
-            return jsonify({'error': 'Email already registered'}), 400
+            try:
+                # Create new user using form data
+                new_user = User(username=form.username.data, email=form.email.data)
+                new_user.set_password(form.password.data)
+                
+                # Add to database
+                db.session.add(new_user)
+                db.session.commit()
+                
+                # Log the user in
+                login_user(new_user)
+                
+                return jsonify({
+                    'success': 'Registration successful!', 
+                    'redirect': url_for('main.home')
+                }), 200
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'error': f'An error occurred: {str(e)}'}), 500
         
-        try:
-            # Create new user
-            new_user = User(username=username, email=email)
-            new_user.set_password(password)
-            
-            # Add to database
+        # Regular form submission (non-AJAX)
+        elif form.validate_on_submit():
+            new_user = User(username=form.username.data, email=form.email.data)
+            new_user.set_password(form.password.data)
             db.session.add(new_user)
             db.session.commit()
-            
-            # Log the user in
             login_user(new_user)
-            
-            return jsonify({
-                'success': 'Registration successful!', 
-                'redirect': url_for('main.home')
-            }), 200
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+            flash('Your account has been created!', 'success')
+            return redirect(url_for('main.home'))
     
-    # If not a POST request (which shouldn't happen with this route)
-    return redirect(url_for('auth.login'))
+    # If GET request or validation fails for non-AJAX request
+    return render_template('login.html', form=form)
 
 @auth_bp.route('/profile', methods=['GET', 'POST', 'DELETE'])
 @login_required
@@ -286,8 +255,17 @@ def profile():
     """Handle user profile management."""
     user = User.query.get(current_user.id)
     
+    # Initialize forms
+    update_form = UpdateProfileForm(user.username, user.email)
+    password_form = ChangePasswordForm()
+    delete_form = DeleteAccountForm()
+    
     if request.method == 'GET':
-        return render_template('profile.html', user=user)
+        # Pre-populate form fields
+        update_form.username.data = user.username
+        update_form.email.data = user.email
+        return render_template('profile.html', user=user, update_form=update_form, 
+                               password_form=password_form, delete_form=delete_form)
     
     elif request.method == 'POST':
         action = request.form.get('action')
@@ -336,65 +314,51 @@ def profile():
             else:
                 return jsonify({'error': 'File type not allowed. Please upload a JPG, PNG, or GIF image.'}), 400
         
-        # Update username
-        elif action == 'update_username':
-            new_username = request.form.get('username')
-            if not new_username:
-                return jsonify({'error': 'Username is required'}), 400
-                
-            # Check if username is already in use by another account
-            existing_username = User.query.filter(User.username == new_username, User.id != current_user.id).first()
-            if existing_username:
-                return jsonify({'error': 'Username already in use'}), 400
+        # Update username and email
+        elif action == 'update_profile':
+            # Handle update_form validation
+            update_form = UpdateProfileForm(user.username, user.email)
+            update_form.username.data = request.form.get('username')
+            update_form.email.data = request.form.get('email')
             
-            user.username = new_username
-            db.session.commit()
-            return jsonify({'success': 'Username updated successfully!'}), 200
-        
-        # Update email
-        elif action == 'update_email':
-            new_email = request.form.get('email')
-            if not new_email:
-                return jsonify({'error': 'Email is required'}), 400
-                
-            # Check if email is already in use by another account
-            existing_email = User.query.filter(User.email == new_email, User.id != current_user.id).first()
-            if existing_email:
-                return jsonify({'error': 'Email already in use'}), 400
+            if not update_form.validate_on_submit():
+                return jsonify({'error': update_form.errors}), 400
             
-            user.email = new_email
+            user.username = update_form.username.data
+            user.email = update_form.email.data
             db.session.commit()
-            return jsonify({'success': 'Email updated successfully!'}), 200
+            return jsonify({'success': 'Profile updated successfully!'}), 200
         
         # Update password
         elif action == 'update_password':
-            current_password = request.form.get('current_password')
-            new_password = request.form.get('new_password')
-            confirm_password = request.form.get('confirm_password')
+            # Handle password_form validation
+            password_form = ChangePasswordForm()
+            password_form.current_password.data = request.form.get('current_password')
+            password_form.new_password.data = request.form.get('new_password')
+            password_form.confirm_password.data = request.form.get('confirm_password')
             
-            if not current_password or not new_password or not confirm_password:
-                return jsonify({'error': 'All fields are required'}), 400
+            if not password_form.validate_on_submit():
+                return jsonify({'error': password_form.errors}), 400
+            
+            if not user.check_password(password_form.current_password.data):
+                return jsonify({'error': {'current_password': 'Current password is incorrect'}}), 400
                 
-            if not user.check_password(current_password):
-                return jsonify({'error': 'Current password is incorrect'}), 400
-                
-            if new_password != confirm_password:
-                return jsonify({'error': 'Passwords do not match'}), 400
-                
-            user.set_password(new_password)
+            user.set_password(password_form.new_password.data)
             db.session.commit()
             return jsonify({'success': 'Password updated successfully!'}), 200
         
         # Handle account deletion via POST
         elif action == 'delete_account':
-            # Verify password before deletion for security
-            password = request.form.get('password')
+            # Handle delete_form validation
+            delete_form = DeleteAccountForm()
+            delete_form.password.data = request.form.get('password')
+            delete_form.confirm.data = request.form.get('confirm') == 'on'
             
-            if not password:
-                return jsonify({'error': 'Password required for account deletion'}), 400
+            if not delete_form.validate_on_submit():
+                return jsonify({'error': delete_form.errors}), 400
                 
-            if not user.check_password(password):
-                return jsonify({'error': 'Password is incorrect'}), 400
+            if not user.check_password(delete_form.password.data):
+                return jsonify({'error': {'password': 'Password is incorrect'}}), 400
             
             try:
                 # Delete user's data
@@ -416,13 +380,15 @@ def profile():
     elif request.method == 'DELETE':
         # Get JSON data if available
         data = request.get_json(silent=True) or {}
-        password = data.get('password')
+        delete_form = DeleteAccountForm()
+        delete_form.password.data = data.get('password')
+        delete_form.confirm.data = data.get('confirm', False)
         
-        if not password:
-            return jsonify({'error': 'Password required for account deletion'}), 400
+        if not delete_form.validate():
+            return jsonify({'error': delete_form.errors}), 400
             
-        if not user.check_password(password):
-            return jsonify({'error': 'Password is incorrect'}), 400
+        if not user.check_password(delete_form.password.data):
+            return jsonify({'error': {'password': 'Password is incorrect'}}), 400
         
         try:
             db.session.delete(user)
@@ -439,3 +405,51 @@ def profile():
     
     # Invalid method
     return jsonify({'error': 'Method not allowed'}), 405
+
+# Debug routes can be kept for development but should be disabled in production
+@auth_bp.route('/debug-login/<username>/<password>')
+def debug_login(username, password):
+    """Debug route to check login credentials"""
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({
+            'user_exists': False,
+            'message': f'No user found with username: {username}'
+        })
+    
+    # Use the check_password method instead of direct comparison
+    password_match = user.check_password(password)
+    
+    return jsonify({
+        'user_exists': True,
+        'username': user.username,
+        'email': user.email,
+        'password_field_exists': hasattr(user, 'password'),
+        'password_stored': user.password[:20] + '...' if hasattr(user, 'password') else 'No password field',
+        'password_match': password_match,
+        'password_check_method': 'user.check_password method'
+    })
+
+@auth_bp.route('/debug-user-model')
+def debug_user_model():
+    """Debug route to check user model fields"""
+    # Get table info from SQLAlchemy
+    table = User.__table__
+    columns = [column.name for column in table.columns]
+    
+    # Get a sample user if available
+    sample_user = User.query.first()
+    sample_data = None
+    if sample_user:
+        sample_data = {col: getattr(sample_user, col) for col in columns}
+        # Don't return password hash in response
+        if 'password_hash' in sample_data:
+            sample_data['password_hash'] = '[REDACTED]'
+    
+    return jsonify({
+        'model_name': User.__name__,
+        'table_name': table.name,
+        'columns': columns,
+        'sample_data': sample_data
+    })

@@ -72,18 +72,24 @@ def visualization():
         # Get the uploaded text
         uploaded_text = UploadedText.query.get(upload_id)
         if uploaded_text and uploaded_text.user_id == current_user.id:
-            # Check if we already have a result for this specific upload
-            existing_result = AnalysisResult.query.filter_by(
-                title=f"Analysis of {uploaded_text.title or 'Untitled Text'}",
+            # Check if we already have a result for this specific upload_id
+            existing_results = AnalysisResult.query.filter_by(
+                upload_id=upload_id,
                 owner_id=current_user.id
             ).all()
             
-            # Instead of creating a duplicate, delete any existing analysis for this text
-            for result in existing_result:
-                db.session.delete(result)
-            
-            # Create new analysis result (fresh copy - no duplicates)
-            title = f"Analysis of {uploaded_text.title or 'Untitled Text'}"
+            # If there's at least one existing result, update it instead of creating a new one
+            if existing_results:
+                # Use the first existing result and update it
+                result_to_update = existing_results[0]
+                
+                # If there are multiple results (duplicates), remove the extras
+                if len(existing_results) > 1:
+                    for result in existing_results[1:]:
+                        db.session.delete(result)
+                
+                # Create consistent title format
+                title = f"Analysis Result: {uploaded_text.title or 'Untitled Text'}"
             
             # Capture the important parts of the analysis as HTML
             sentiment_section = render_template_string("""
@@ -123,16 +129,14 @@ def visualization():
                 </div>
             """
             
-            # Create the analysis result record
-            result = AnalysisResult(
+            # Use our utility function to save or update the analysis result
+            from app.utils.analysis_utils import save_or_update_analysis_result
+            save_or_update_analysis_result(
                 title=title,
                 content=content,
-                owner_id=current_user.id
+                owner_id=current_user.id,
+                upload_id=upload_id
             )
-            
-            # Save to database
-            db.session.add(result)
-            db.session.commit()
     
     # Return the rendered template
     return rendered_template
@@ -158,12 +162,13 @@ def profile():
 @login_required
 def analyze_upload(upload_id):
     """Direct analysis of a previously uploaded text"""
-    from app.models import UploadedText
+    from app.models import UploadedText, AnalysisResult
     from flask_login import current_user
     from ..utils.sentiment_utils import get_sentiment_summary
     from ..utils.ngram_utils import get_multiple_ngrams
     from ..utils.ner_utils import perform_ner_analysis
     from ..utils.word_frequency_utils import analyze_word_frequency
+    from app import db
     
     try:
         # Get the uploaded text from the database
@@ -177,12 +182,29 @@ def analyze_upload(upload_id):
         # Get the content
         text_content = upload.content
         
+        # Instead of deleting and re-creating, we'll use our save_or_update utility
+        # which will properly handle existing results and ensure consistent title formatting
+        from app.utils.analysis_utils import save_or_update_analysis_result
+        
+        # This will ensure any existing results are properly updated 
+        # or new ones created with proper title formatting
+        analysis_title = f"Analysis Result: {upload.title or 'Untitled Text'}"
+        
         if text_content:
             # Perform all analysis again (or for the first time)
             sentiment_data = get_sentiment_summary(text_content)
             ngram_data = get_multiple_ngrams(text_content)
             ner_data = perform_ner_analysis(text_content)
             word_freq_data = analyze_word_frequency(text_content)
+            
+            # Use our utility function to create or update the analysis result with proper formatting
+            # This will avoid creating duplicate entries or entries with incorrect title formats
+            save_or_update_analysis_result(
+                title=analysis_title,
+                content=text_content,
+                owner_id=current_user.id,
+                upload_id=upload_id
+            )
             
             # Store in session for the visualization page
             session['sentiment_data'] = sentiment_data
@@ -201,4 +223,36 @@ def analyze_upload(upload_id):
     except Exception as e:
         flash(f'Error retrieving upload: {str(e)}', 'danger')
         return redirect(url_for('main.upload'))
+
+@main_bp.route('/cleanup-orphaned-results')
+@login_required
+def cleanup_orphaned_results():
+    """Utility route to clean up orphaned analysis results"""
+    from app.models import AnalysisResult
+    from app import db
+    from flask_login import current_user
+    
+    try:
+        # Get all analysis results for the current user
+        results = AnalysisResult.query.filter_by(owner_id=current_user.id).all()
+        
+        # Counter for deleted items
+        deleted_count = 0
+        
+        # Delete the results that have no associated upload
+        for result in results:
+            if result.upload_id is None:
+                db.session.delete(result)
+                deleted_count += 1
+        
+        # Commit the changes
+        db.session.commit()
+        
+        flash(f'Successfully cleaned up {deleted_count} orphaned analysis results', 'success')
+        return redirect(url_for('share.shared_page'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error cleaning up orphaned results: {str(e)}', 'danger')
+        return redirect(url_for('main.home'))
 

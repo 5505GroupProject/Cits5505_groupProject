@@ -36,3 +36,22 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+
+# New model to track user connections for sharing
+class UserConnection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    connected_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Define relationships for easy lookup in both directions
+    user = db.relationship('User', foreign_keys=[user_id], backref='connections')
+    connected_user = db.relationship('User', foreign_keys=[connected_user_id], backref='connected_to')
+    
+    def __repr__(self):
+        return f'<UserConnection {self.user_id} -> {self.connected_user_id}>'
+    
+    # Ensure uniqueness of connections
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'connected_user_id', name='unique_user_connection'),
+    )

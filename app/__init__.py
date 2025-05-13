@@ -26,6 +26,18 @@ def create_app():
     login_manager.init_app(app)
     csrf.init_app(app)  # Initialize CSRF for this app
     
+    # Enable SQLite foreign key constraints
+    with app.app_context():
+        if db.engine.name == 'sqlite':
+            from sqlalchemy import event
+            from sqlalchemy.engine import Engine
+            
+            @event.listens_for(Engine, "connect")
+            def set_sqlite_pragma(dbapi_connection, connection_record):
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA foreign_keys=ON")
+                cursor.close()
+    
     # Configure login manager
     login_manager.login_view = 'auth.login'
     login_manager.login_message = "Please log in to access this page."
