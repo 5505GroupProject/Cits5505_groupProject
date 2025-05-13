@@ -19,6 +19,11 @@ def login():
 def visualization():
     from app.models import UploadedText
     from flask_login import current_user
+    from app.models import AnalysisResult
+    from app import db
+    import json
+    from flask import render_template_string
+    from datetime import datetime
     
     # Get four types of analysis results from session
     sentiment_data = session.get('sentiment_data', None)
@@ -52,7 +57,8 @@ def visualization():
     else:
         ngram_data = None
 
-    return render_template(
+    # Render the visualization template with the analysis data
+    rendered_template = render_template(
         'visualization.html', 
         sentiment_data=sentiment_data,
         ngram_data=ngram_data, 
@@ -60,6 +66,76 @@ def visualization():
         word_freq_data=word_freq_data,
         analyzed_text=text_content
     )
+    
+    # Save the analysis result to the database if it doesn't already exist
+    if upload_id and sentiment_data and ngram_data and ner_data and word_freq_data:
+        # Get the uploaded text
+        uploaded_text = UploadedText.query.get(upload_id)
+        if uploaded_text and uploaded_text.user_id == current_user.id:
+            # Check if we already have a result for this specific upload
+            existing_result = AnalysisResult.query.filter_by(
+                title=f"Analysis of {uploaded_text.title or 'Untitled Text'}",
+                owner_id=current_user.id
+            ).all()
+            
+            # Instead of creating a duplicate, delete any existing analysis for this text
+            for result in existing_result:
+                db.session.delete(result)
+            
+            # Create new analysis result (fresh copy - no duplicates)
+            title = f"Analysis of {uploaded_text.title or 'Untitled Text'}"
+            
+            # Capture the important parts of the analysis as HTML
+            sentiment_section = render_template_string("""
+                <h3>Sentiment Analysis</h3>
+                <p>Overall Sentiment: <strong>{{ sentiment.sentiment }}</strong></p>
+                <p>Compound Score: <strong>{{ sentiment.compound_score|round(2) }}</strong></p>
+                <p>Positive: {{ (sentiment.positive_score*100)|round(1) }}%, 
+                   Neutral: {{ (sentiment.neutral_score*100)|round(1) }}%, 
+                   Negative: {{ (sentiment.negative_score*100)|round(1) }}%</p>
+            """, sentiment=sentiment_data)
+            
+            word_freq_section = render_template_string("""
+                <h3>Word Frequency Analysis</h3>
+                <p>Total Words: {{ freq.total_words }}</p>
+                <p>Unique Words: {{ freq.unique_words }}</p>
+                <p>Top 5 Words:</p>
+                <ul>
+                {% for word in freq.top_words[:5] %}
+                    <li>{{ word.word }}: {{ word.count }}</li>
+                {% endfor %}
+                </ul>
+            """, freq=word_freq_data)
+            
+            # Combine the sections
+            content = f"""
+                <div class="analysis-result">
+                    <h2>Analysis Results for: {uploaded_text.title or 'Untitled'}</h2>
+                    <div class="analysis-text">
+                        <h3>Analyzed Text Preview</h3>
+                        <p>{text_content[:300]}...</p>
+                    </div>
+                    <div class="analysis-sections">
+                        {sentiment_section}
+                        {word_freq_section}
+                    </div>
+                    <p><em>Analysis generated on {datetime.now().strftime('%Y-%m-%d %H:%M')}</em></p>
+                </div>
+            """
+            
+            # Create the analysis result record
+            result = AnalysisResult(
+                title=title,
+                content=content,
+                owner_id=current_user.id
+            )
+            
+            # Save to database
+            db.session.add(result)
+            db.session.commit()
+    
+    # Return the rendered template
+    return rendered_template
 
 @main_bp.route('/protected-route')
 @login_required

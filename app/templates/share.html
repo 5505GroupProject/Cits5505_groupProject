@@ -28,7 +28,7 @@
                                 <label for="analysis_select">Select Analysis Results to Share:</label>
                                 <select multiple class="form-control" id="analysis_select" name="analysis_ids" required>
                                     {% for result in my_results %}
-                                    <option value="{{ result.id }}">{{ result.title }}</option>
+                                    <option value="{{ result.id }}">{{ result.title.split(" (upload_id:")[0] }}</option>
                                     {% endfor %}
                                 </select>
                                 <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple items</small>
@@ -75,7 +75,7 @@
                             {% for result in shared_results %}
                                 <a href="{{ url_for('share.view_result', result_id=result.id) }}" 
                                    class="list-group-item list-group-item-action">
-                                    <h5 class="mb-1">{{ result.title }}</h5>
+                                    <h5 class="mb-1">{{ result.title.split(" (upload_id:")[0] }}</h5>
                                     <small class="text-muted">Shared by: {{ result.owner.username }}</small>
                                 </a>
                             {% endfor %}
