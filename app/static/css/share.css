@@ -442,3 +442,58 @@
 .share-section option:hover {
     background-color: #f0f0f0;
 }
+
+/* Network error styling */
+.network-error {
+    border-radius: 12px;
+    background-color: #fff5f5;
+    border: 1px solid #fed7d7;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.network-error .icon {
+    color: #c53030;
+    font-size: 1.5rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.network-error .content {
+    flex-grow: 1;
+}
+
+.network-error h5 {
+    color: #c53030;
+    margin-bottom: 5px;
+}
+
+.network-error p {
+    color: #718096;
+    margin-bottom: 0;
+}
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: calc(50% - 8px);
+    left: calc(50% - 8px);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

@@ -28,9 +28,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Add user connection function - direct DOM manipulation with animations
+    // Add user connection function - direct DOM manipulation with enhanced error handling and animations
     function addUserConnection(userId) {
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+        
+        // Reference to the button for visual feedback
+        const addBtn = document.querySelector(`li[data-user-id="${userId}"] .add-user`);
+        const originalBtnText = addBtn ? addBtn.textContent : 'Add';
+        
+        // Show loading state
+        if (addBtn) {
+            addBtn.textContent = 'Adding...';
+            addBtn.disabled = true;
+            addBtn.classList.add('btn-loading');
+        }
         
         fetch('/share/add-user', {
             method: 'POST',
@@ -42,7 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                return response.json().then(data => { throw new Error(data.error || 'Error adding user') });
+                if (response.headers.get('content-type')?.includes('application/json')) {
+                    return response.json().then(data => { throw new Error(data.error || 'Error adding user') });
+                } else {
+                    throw new Error('Failed to add user');
+                }
             }
             return response.json();
         })
@@ -83,20 +98,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 void li.offsetWidth;
                 
                 // Apply fade-in animation
-                li.classList.add('fade-in');
+                li.style.opacity = '1';
+                li.style.transition = 'opacity 0.5s ease';
                 
                 // Also add to the user_select dropdown
                 setupUserSelectDropdown();
             }
         })
         .catch(error => {
-            showAlert(error.message, 'danger');
+            // Restore button state if exists
+            if (addBtn) {
+                addBtn.textContent = originalBtnText;
+                addBtn.disabled = false;
+                addBtn.classList.remove('btn-loading');
+            }
+            
+            console.error('Error adding user connection:', error);
+            showAlert('Failed to add user connection. Please try again.', 'danger');
         });
     }
     
-    // Remove user connection function - direct DOM manipulation with animation
+    // Remove user connection function - direct DOM manipulation with enhanced error handling
     function removeUserConnection(userId) {
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+        
+        // Reference to the button for visual feedback
+        const button = document.querySelector(`li[data-user-id="${userId}"] .remove-user`);
+        const originalText = button ? button.textContent : 'Remove';
+        
+        // Show loading state
+        if (button) {
+            button.textContent = 'Removing...';
+            button.disabled = true;
+            button.classList.add('btn-loading');
+        }
         
         fetch(`/share/remove-user/${userId}`, {
             method: 'POST',
@@ -107,7 +142,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                return response.json().then(data => { throw new Error(data.error || 'Error removing user') });
+                if (response.headers.get('content-type')?.includes('application/json')) {
+                    return response.json().then(data => { throw new Error(data.error || 'Error removing user') });
+                } else {
+                    throw new Error('Failed to remove user');
+                }
             }
             return response.json();
         })
@@ -138,7 +177,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            showAlert(error.message, 'danger');
+            // Restore button state
+            if (button) {
+                button.textContent = originalText;
+                button.disabled = false;
+                button.classList.remove('btn-loading');
+            }
+            
+            console.error('Error removing user connection:', error);
+            showAlert('Failed to remove user connection. Please try again.', 'danger');
         });
     }
     
@@ -157,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Function to show alert messages with enhanced animation
+    // Function to show alert messages with enhanced styling and animations
     function showAlert(message, type) {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade`;
@@ -172,6 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Insert alert before the form or any other element
         const container = document.querySelector('.card-body');
         if (container) {
+            // Insert at the beginning and set initial state for animation
             container.insertBefore(alertDiv, container.firstChild);
             
             // Trigger reflow for animation
@@ -247,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return li;
     }
     
-    // Function to search for users with enhanced animations
+    // Function to search for users
     function searchUsers(username) {
         // Show loading state
         const searchBtn = document.getElementById('searchUserBtn');
@@ -258,6 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // If search results are already visible, fade them out first
         if (searchResults.style.display === 'block') {
             searchResults.style.opacity = '0';
+            searchResults.style.transition = 'opacity 0.3s ease';
             setTimeout(() => {
                 performSearch();
             }, 300);
@@ -276,7 +325,11 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(data => { throw new Error(data.error || 'Error searching for users') });
+                    if (response.headers.get('content-type')?.includes('application/json')) {
+                        return response.json().then(data => { throw new Error(data.error || 'Error searching for users') });
+                    } else {
+                        throw new Error('Failed to search for users');
+                    }
                 }
                 return response.json();
             })
@@ -323,7 +376,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 searchBtn.disabled = false;
             })
             .catch(error => {
-                showAlert(error.message, 'danger');
+                console.error('Error searching for users:', error);
+                
+                // Create a more informative error message in the search results
+                userSearchResults.innerHTML = '';
+                const errorItem = document.createElement('li');
+                errorItem.className = 'list-group-item text-center text-danger';
+                
+                // If it's a fetch error (app not running), provide helpful context
+                if (error.message === 'Failed to fetch') {
+                    errorItem.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Connection error: Make sure the application is running
+                        <br>
+                        <small class="text-muted">Server might be offline or restarting</small>
+                    `;
+                } else {
+                    errorItem.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        ${error.message}
+                    `;
+                }
+                
+                userSearchResults.appendChild(errorItem);
+                searchResults.style.display = 'block';
+                searchResults.style.opacity = '1';
                 
                 // Restore button state
                 searchBtn.innerHTML = originalBtnText;
@@ -396,14 +473,14 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sharing...';
             submitBtn.disabled = true;
             
-            // Add overlay to form
+            // Add overlay to form for visual feedback
             const overlay = document.createElement('div');
             overlay.style.position = 'absolute';
             overlay.style.top = '0';
             overlay.style.left = '0';
             overlay.style.width = '100%';
             overlay.style.height = '100%';
-            overlay.style.backgroundColor = 'rgba(255,255,255,0.6)';
+            overlay.style.backgroundColor = 'rgba(255,255,255,0.7)';
             overlay.style.display = 'flex';
             overlay.style.justifyContent = 'center';
             overlay.style.alignItems = 'center';
@@ -435,10 +512,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.text();
             })
             .then(result => {
-                showAlert(result, 'success');
+                // Show success animation in overlay
+                overlay.innerHTML = `
+                    <div class="text-center">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3 mb-2">Shared Successfully!</h4>
+                        <p class="mb-0">Redirecting...</p>
+                    </div>
+                `;
                 
-                // Show success animation
-                overlay.innerHTML = '<div class="text-center"><i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i><h4 class="mt-3">Shared Successfully!</h4><p>Redirecting...</p></div>';
+                // Show success alert
+                showAlert(result, 'success');
                 
                 // Reset form with visual feedback
                 shareForm.reset();
@@ -456,6 +540,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1800);
             })
             .catch(error => {
+                console.error('Form submission error:', error);
+                
+                // If it's a server connection error (app not running)
+                if (error.message === 'Failed to fetch') {
+                    showAlert('Connection error: Make sure the application is running', 'danger');
+                } else {
+                    showAlert(error.message, 'danger');
+                }
+                
                 // Remove overlay
                 if (overlay) {
                     overlay.style.opacity = '0';
@@ -465,9 +558,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Restore button
                 submitBtn.innerHTML = originalBtnText;
                 submitBtn.disabled = false;
-                
-                // Show error
-                showAlert(error.message, 'danger');
             });
         });
 
