@@ -19,6 +19,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visualization.css') }}">
+    {% block head %}{% endblock %}
 </head>
 <body>
     {% if login_required_message %}

@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Add user connection function - direct DOM manipulation
+    // Add user connection function - direct DOM manipulation with animations
     function addUserConnection(userId) {
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         
@@ -49,11 +49,25 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             showAlert(data.message, 'success');
             
-            // Remove from search results
+            // Remove from search results with animation
             const searchItem = userSearchResults.querySelector(`li[data-user-id="${userId}"]`);
-            if (searchItem) searchItem.remove();
+            if (searchItem) {
+                searchItem.classList.add('fade-out');
+                setTimeout(() => {
+                    searchItem.remove();
+                    
+                    // If no more search results, hide the section with animation
+                    if (userSearchResults.children.length === 0) {
+                        searchResults.style.opacity = '0';
+                        setTimeout(() => {
+                            searchResults.style.display = 'none';
+                            searchResults.style.opacity = '1';
+                        }, 300);
+                    }
+                }, 500);
+            }
             
-            // Add to connected users list immediately (don't wait for server refresh)
+            // Add to connected users list with animation
             if (connectedUsersList) {
                 // Hide no connections message if it exists
                 if (noConnectionsMsg) {
@@ -62,15 +76,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Create and add the new user item
                 const li = createConnectedUserItem(data.user);
+                li.style.opacity = '0';
                 connectedUsersList.appendChild(li);
+                
+                // Trigger reflow for animation
+                void li.offsetWidth;
+                
+                // Apply fade-in animation
+                li.classList.add('fade-in');
                 
                 // Also add to the user_select dropdown
                 setupUserSelectDropdown();
-            }
-            
-            // If no more search results, hide the section
-            if (userSearchResults.children.length === 0) {
-                searchResults.style.display = 'none';
             }
         })
         .catch(error => {
@@ -78,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Remove user connection function - direct DOM manipulation
+    // Remove user connection function - direct DOM manipulation with animation
     function removeUserConnection(userId) {
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         
@@ -98,19 +114,28 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             showAlert(data.message, 'success');
             
-            // Remove from connected users list immediately
+            // Remove from connected users list with animation
             const connectedItem = connectedUsersList.querySelector(`li[data-user-id="${userId}"]`);
-            if (connectedItem) connectedItem.remove();
-            
-            // If no more connected users, show the no connections message
-            if (connectedUsersList && connectedUsersList.children.length === 0) {
-                if (noConnectionsMsg) {
-                    noConnectionsMsg.style.display = 'block';
-                }
+            if (connectedItem) {
+                // Add fade-out animation class
+                connectedItem.classList.add('fade-out');
+                
+                // Remove element after animation completes
+                setTimeout(() => {
+                    connectedItem.remove();
+                    
+                    // If no more connected users, show the no connections message with animation
+                    if (connectedUsersList && connectedUsersList.children.length === 0) {
+                        if (noConnectionsMsg) {
+                            noConnectionsMsg.style.display = 'block';
+                            noConnectionsMsg.classList.add('fade-in');
+                        }
+                    }
+                    
+                    // Update dropdown
+                    setupUserSelectDropdown();
+                }, 500); // Match this timing with the CSS animation duration
             }
-            
-            // Update dropdown
-            setupUserSelectDropdown();
         })
         .catch(error => {
             showAlert(error.message, 'danger');
@@ -132,12 +157,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Function to show alert messages
+    // Function to show alert messages with enhanced animation
     function showAlert(message, type) {
         const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.className = `alert alert-${type} alert-dismissible fade`;
         alertDiv.innerHTML = `
-            ${message}
+            <div class="d-flex align-items-center">
+                <i class="bi ${getAlertIcon(type)} me-2"></i>
+                <span>${message}</span>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
         
@@ -146,11 +174,33 @@ document.addEventListener('DOMContentLoaded', function() {
         if (container) {
             container.insertBefore(alertDiv, container.firstChild);
             
+            // Trigger reflow for animation
+            void alertDiv.offsetWidth;
+            
+            // Show the alert with animation
+            alertDiv.classList.add('show');
+            
             // Auto dismiss after 5 seconds
             setTimeout(() => {
                 alertDiv.classList.remove('show');
-                setTimeout(() => alertDiv.remove(), 150);
+                setTimeout(() => alertDiv.remove(), 300);
             }, 5000);
+        }
+    }
+    
+    // Helper function to get appropriate icon for alert type
+    function getAlertIcon(type) {
+        switch(type) {
+            case 'success':
+                return 'bi-check-circle-fill';
+            case 'danger':
+                return 'bi-exclamation-triangle-fill';
+            case 'warning':
+                return 'bi-exclamation-circle-fill';
+            case 'info':
+                return 'bi-info-circle-fill';
+            default:
+                return 'bi-bell-fill';
         }
     }
     
@@ -197,45 +247,89 @@ document.addEventListener('DOMContentLoaded', function() {
         return li;
     }
     
-    // Function to search for users
+    // Function to search for users with enhanced animations
     function searchUsers(username) {
-        fetch('/share/search-user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-            },
-            body: JSON.stringify({ username })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => { throw new Error(data.error || 'Error searching for users') });
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Clear previous results
-            userSearchResults.innerHTML = '';
-            
-            if (data.users && data.users.length > 0) {
-                // Show results
-                data.users.forEach(user => {
-                    const li = createSearchResultItem(user);
+        // Show loading state
+        const searchBtn = document.getElementById('searchUserBtn');
+        const originalBtnText = searchBtn.innerHTML;
+        searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...';
+        searchBtn.disabled = true;
+        
+        // If search results are already visible, fade them out first
+        if (searchResults.style.display === 'block') {
+            searchResults.style.opacity = '0';
+            setTimeout(() => {
+                performSearch();
+            }, 300);
+        } else {
+            performSearch();
+        }
+        
+        function performSearch() {
+            fetch('/share/search-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                },
+                body: JSON.stringify({ username })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.error || 'Error searching for users') });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Clear previous results
+                userSearchResults.innerHTML = '';
+                
+                // Hide search results initially for animation
+                searchResults.style.opacity = '0';
+                searchResults.style.display = 'block';
+                
+                if (data.users && data.users.length > 0) {
+                    // Create results with slight delay between each for staggered animation
+                    data.users.forEach((user, index) => {
+                        setTimeout(() => {
+                            const li = createSearchResultItem(user);
+                            li.style.opacity = '0';
+                            userSearchResults.appendChild(li);
+                            
+                            // Trigger reflow for animation
+                            void li.offsetWidth;
+                            
+                            // Apply fade-in animation
+                            li.style.opacity = '1';
+                            li.style.transition = 'opacity 0.3s ease';
+                        }, index * 100);
+                    });
+                } else {
+                    // No results found
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item text-center';
+                    li.innerHTML = '<i class="bi bi-search me-2"></i>No users found matching "' + username + '"';
                     userSearchResults.appendChild(li);
-                });
-                searchResults.style.display = 'block';
-            } else {
-                // No results found
-                const li = document.createElement('li');
-                li.className = 'list-group-item';
-                li.textContent = 'No users found';
-                userSearchResults.appendChild(li);
-                searchResults.style.display = 'block';
-            }
-        })
-        .catch(error => {
-            showAlert(error.message, 'danger');
-        });
+                }
+                
+                // Fade in the search results container
+                setTimeout(() => {
+                    searchResults.style.opacity = '1';
+                    searchResults.style.transition = 'opacity 0.3s ease';
+                }, 100);
+                
+                // Restore button state
+                searchBtn.innerHTML = originalBtnText;
+                searchBtn.disabled = false;
+            })
+            .catch(error => {
+                showAlert(error.message, 'danger');
+                
+                // Restore button state
+                searchBtn.innerHTML = originalBtnText;
+                searchBtn.disabled = false;
+            });
+        }
     }
     
     // Set up event listeners for search
@@ -296,6 +390,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 csrf_token: formData.get('csrf_token')
             };
 
+            // Show loading state on submit button
+            const submitBtn = shareForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sharing...';
+            submitBtn.disabled = true;
+            
+            // Add overlay to form
+            const overlay = document.createElement('div');
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(255,255,255,0.6)';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.zIndex = '100';
+            overlay.style.borderRadius = '15px';
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s ease';
+            
+            const formCard = shareForm.closest('.card-body');
+            if (formCard) {
+                formCard.style.position = 'relative';
+                formCard.appendChild(overlay);
+                setTimeout(() => { overlay.style.opacity = '1'; }, 0);
+            }
+            
             // Send share request
             fetch(shareForm.action, {
                 method: 'POST',
@@ -313,12 +436,37 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(result => {
                 showAlert(result, 'success');
+                
+                // Show success animation
+                overlay.innerHTML = '<div class="text-center"><i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i><h4 class="mt-3">Shared Successfully!</h4><p>Redirecting...</p></div>';
+                
+                // Reset form with visual feedback
                 shareForm.reset();
+                
+                // Reset select labels if they had (x selected) text
+                const labels = shareForm.querySelectorAll('label[for="analysis_select"], label[for="user_select"]');
+                labels.forEach(label => {
+                    const originalLabel = label.textContent.split(' (')[0];
+                    label.textContent = originalLabel;
+                });
+                
+                // Redirect after a delay
                 setTimeout(() => {
                     window.location.reload();
-                }, 1500);
+                }, 1800);
             })
             .catch(error => {
+                // Remove overlay
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => { overlay.remove(); }, 300);
+                }
+                
+                // Restore button
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+                
+                // Show error
                 showAlert(error.message, 'danger');
             });
         });
