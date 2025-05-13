@@ -22,13 +22,29 @@ def share():
 @main_bp.route('/visualization')
 @login_required
 def visualization():
+    from app.models import UploadedText
+    from flask_login import current_user
+    
     # Get four types of analysis results from session
     sentiment_data = session.get('sentiment_data', None)
     ner_data = session.get('ner_data', None) 
     word_freq_data = session.get('word_freq_data', None)
     
-    # Get original text content
-    text_content = session.get('text_content', 'No text analyzed yet.')
+    # Get the upload_id from the session
+    upload_id = session.get('upload_id', None)
+    
+    # Try to get the full text content from the database if possible
+    if upload_id:
+        uploaded_text = UploadedText.query.get(upload_id)
+        if uploaded_text and uploaded_text.user_id == current_user.id:
+            # Get the full text directly from the database
+            text_content = uploaded_text.content
+        else:
+            # Fallback to session data
+            text_content = session.get('text_content', 'No text analyzed yet.')
+    else:
+        # Fallback to session data
+        text_content = session.get('text_content', 'No text analyzed yet.')
     
     # Regenerate the N-gram data
     if text_content and text_content != 'No text analyzed yet.':

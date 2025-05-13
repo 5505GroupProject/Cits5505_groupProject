@@ -148,15 +148,31 @@ canvas {
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
-    /* Removing max-height to allow full text to display */
-    /* max-height: 200px; */
-    /* overflow-y: auto; */
+    max-height: 300px;  /* Adjusted height for better visibility */
+    overflow-y: scroll; /* Always show scroll to indicate scrollability */
+    height: auto;
+    width: 100%;
+    position: relative;
 }
 
 .text-content-box h3 {
     font-size: 1.2rem;
     margin-bottom: 10px;
     color: #2c3e50;
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    padding: 5px 0;
+    z-index: 1;
+}
+
+/* Analyzed text wrapper for better text display */
+.analyzed-text-wrapper {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+    line-height: 1.6;
+    padding-right: 5px; /* Add spacing for scrollbar */
 }
 
 /* Ngram specific styles */

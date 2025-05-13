@@ -83,13 +83,14 @@ def upload():
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(file_content)
                 
-                # Store data in session for visualization page
+                # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
                 session['ngram_data'] = ngram_data
                 session['ner_data'] = ner_data
                 session['word_freq_data'] = word_freq_data
-                session['text_content'] = file_content[:1000] + '...' if len(file_content) > 1000 else file_content
                 session['upload_id'] = new_upload.id
+                # Store text preview in session but keep it minimal - we'll get full text from database
+                session['text_content'] = file_content[:500] + "..." if len(file_content) > 500 else file_content
                 
                 # Flash success message and redirect to visualization page
                 flash('File uploaded and analyzed successfully!', 'success')
@@ -124,13 +125,14 @@ def upload():
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(text_content)
                 
-                # Store data in session for visualization page
+                # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
                 session['ngram_data'] = ngram_data
                 session['ner_data'] = ner_data
                 session['word_freq_data'] = word_freq_data
-                session['text_content'] = text_content[:1000] + '...' if len(text_content) > 1000 else text_content
                 session['upload_id'] = new_upload.id
+                # Store text preview in session but keep it minimal - we'll get full text from database
+                session['text_content'] = text_content[:500] + "..." if len(text_content) > 500 else text_content
                 
                 # Flash success message and redirect to visualization page
                 flash('Text content uploaded and analyzed successfully!', 'success')
@@ -257,7 +259,7 @@ def upload_file():
             'ngram_data': ngram_data,
             'ner_data': ner_data,
             'word_freq_data': word_freq_data,
-            'content': file_content[:1000] + '...' if len(file_content) > 1000 else file_content
+            'content': file_content  # Storing full content without truncation
         }), 200
         
     except Exception as e:
