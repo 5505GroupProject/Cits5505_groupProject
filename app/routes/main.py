@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, request, redirect, url_for, flash
+from flask import Blueprint, render_template, session, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from ..utils.ngram_utils import get_multiple_ngrams
 from ..utils.word_frequency_utils import analyze_word_frequency
@@ -239,6 +239,11 @@ def protected_route():
 @main_bp.route('/upload')
 @login_required
 def upload():
+    # Check if there's a pending flash message
+    if 'pending_flash' in session:
+        flash_data = session.pop('pending_flash')
+        flash(flash_data['message'], flash_data['category'])
+    
     return render_template('upload.html')
 
 @main_bp.route('/profile')
@@ -246,6 +251,32 @@ def upload():
 def profile():
     """Redirect to the auth profile page."""
     return redirect(url_for('auth.profile'))
+
+@main_bp.route('/api/latest_analysis')
+@login_required
+def get_latest_analysis():
+    """
+    API endpoint to retrieve the latest analysis result ID for the current user
+    Returns the latest result ID or indicates no results exist
+    """
+    try:
+        # Find the most recent analysis result for the current user
+        latest_result = AnalysisResult.query.filter_by(owner_id=current_user.id) \
+                                    .order_by(AnalysisResult.created_at.desc()) \
+                                    .first()
+        
+        if latest_result:
+            return jsonify({"success": True, "url_path": latest_result.url_path})
+        else:
+            # Set flash message in session without displaying it yet
+            session['pending_flash'] = {
+                'message': 'You have no analysis results yet. Please upload content first.',
+                'category': 'info'
+            }
+            return jsonify({"success": False, "message": "No analysis results found"})
+    
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Error retrieving analysis results: {str(e)}"}), 500
 
 @main_bp.route('/cleanup-orphaned-results')
 @login_required
