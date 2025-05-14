@@ -1,0 +1,499 @@
+/* 
+ * Enhanced Share Page Styling - SentiNews Project
+ * This CSS builds upon the existing styles.css but provides enhanced visuals for the share page
+ */
+
+/* General Share Page Styling */
+.share-section {
+    background: linear-gradient(135deg, #f5f5dc 0%, #f0f8ff 100%);
+    padding: 3rem 0;
+    position: relative;
+    min-height: calc(100vh - 76px);
+}
+
+.share-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, yellowgreen, #88b04b, yellowgreen);
+    z-index: 1;
+}
+
+/* Card Enhancements */
+.share-section .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.share-section .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.share-section .card-header {
+    background: linear-gradient(90deg, #333333, #222222);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    border-bottom: none;
+    position: relative;
+}
+
+.share-section .card-header h2,
+.share-section .card-header h3 {
+    font-weight: 600;
+    margin: 0;
+    font-size: 1.4rem;
+    display: inline-block;
+    position: relative;
+}
+
+.share-section .card-header h2::after,
+.share-section .card-header h3::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: yellowgreen;
+    border-radius: 2px;
+}
+
+.share-section .card-body {
+    padding: 1.8rem;
+    background-color: white;
+}
+
+/* Form Element Enhancements */
+.share-section .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.share-section .form-control:focus {
+    border-color: yellowgreen;
+    box-shadow: 0 0 0 4px rgba(154, 205, 50, 0.15);
+    background-color: white;
+}
+
+.share-section select.form-control[multiple] {
+    height: auto;
+    min-height: 120px;
+}
+
+.share-section .form-label {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    display: block;
+}
+
+.share-section .form-text {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+/* User Connections Section */
+.connected-users h5,
+.user-search h5 {
+    font-weight: 600;
+    color: #333;
+    margin: 1rem 0;
+    position: relative;
+    display: inline-block;
+}
+
+.connected-users h5::after,
+.user-search h5::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background-color: yellowgreen;
+    border-radius: 2px;
+}
+
+/* User Search Input Group */
+.user-search .input-group {
+    margin-bottom: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.user-search .input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}
+
+.user-search .input-group .btn-primary {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+}
+
+/* List Group Enhancements */
+.share-section .list-group-item {
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1rem 1.2rem;
+    transition: all 0.2s ease;
+    background-color: transparent;
+}
+
+.share-section .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.share-section .list-group-item:hover {
+    background-color: #f9f9f9;
+}
+
+.share-section .list-group-item span {
+    font-weight: 500;
+    font-size: 1.05rem;
+}
+
+/* Button Enhancements */
+.share-section .btn {
+    border-radius: 30px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.share-section .btn-primary {
+    background: linear-gradient(135deg, yellowgreen 0%, #88b04b 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 10px rgba(154, 205, 50, 0.3);
+}
+
+.share-section .btn-primary:hover {
+    background: linear-gradient(135deg, #88b04b 0%, #6d9c2e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(154, 205, 50, 0.4);
+}
+
+.share-section .btn-danger {
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+}
+
+.share-section .btn-danger:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(231, 76, 60, 0.3);
+}
+
+.share-section .btn-sm {
+    padding: 0.3rem 1rem;
+    font-size: 0.85rem;
+}
+
+/* Add User Button */
+.share-section .add-user {
+    background-color: #2ecc71;
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.share-section .add-user:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(46, 204, 113, 0.3);
+}
+
+/* Search Results */
+#searchResults {
+    margin-top: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    background-color: white;
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+#searchResults h5 {
+    padding: 15px;
+    margin: 0;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Shared With Me Section */
+.share-section .list-group-item-action {
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.share-section .list-group-item-action:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+    z-index: 1;
+}
+
+.share-section .list-group-item-action h5 {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.share-section .list-group-item-action small {
+    color: #6c757d;
+}
+
+/* Helper classes for empty states */
+.text-muted {
+    color: #6c757d;
+    font-style: italic;
+    padding: 15px;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Alert Styling */
+.share-section .alert {
+    border-radius: 12px;
+    border-left: 4px solid transparent;
+    padding: 1rem 1rem 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    animation: slideInDown 0.5s forwards;
+}
+
+.share-section .alert-success {
+    background-color: #f0fff4;
+    color: #276749;
+    border-left-color: #276749;
+}
+
+.share-section .alert-danger {
+    background-color: #fff5f5;
+    color: #c53030;
+    border-left-color: #c53030;
+}
+
+.share-section .alert-warning {
+    background-color: #fffaf0;
+    color: #c05621;
+    border-left-color: #c05621;
+}
+
+/* Animation for alerts */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Enhanced styling for form submit button */
+.share-section form button[type="submit"] {
+    background: linear-gradient(135deg, yellowgreen 0%, #88b04b 100%);
+    color: white;
+    font-weight: 600;
+    padding: 12px 30px;
+    border-radius: 30px;
+    border: none;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(154, 205, 50, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.share-section form button[type="submit"]:hover {
+    background: linear-gradient(135deg, #88b04b 0%, #6d9c2e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(154, 205, 50, 0.4);
+}
+
+.share-section form button[type="submit"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+    );
+    transition: left 0.7s ease;
+}
+
+.share-section form button[type="submit"]:hover::before {
+    left: 100%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .share-section {
+        padding: 2rem 0;
+    }
+    
+    .share-section .card-header {
+        padding: 1rem;
+    }
+    
+    .share-section .card-body {
+        padding: 1.2rem;
+    }
+    
+    .share-section .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Enhanced animations for user interactions */
+.share-section .list-group-item.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+.share-section .list-group-item.fade-in {
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+        height: 0;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Custom scrollbar for multi-select dropdowns */
+.share-section select[multiple] {
+    scrollbar-width: thin;
+    scrollbar-color: #88b04b #f0f0f0;
+}
+
+.share-section select[multiple]::-webkit-scrollbar {
+    width: 8px;
+}
+
+.share-section select[multiple]::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+}
+
+.share-section select[multiple]::-webkit-scrollbar-thumb {
+    background-color: #88b04b;
+    border-radius: 10px;
+    border: 2px solid #f0f0f0;
+}
+
+/* Enhanced selection styling for multi-select options */
+.share-section option:checked {
+    background: linear-gradient(135deg, yellowgreen 0%, #88b04b 100%);
+    color: white;
+    font-weight: 600;
+}
+
+/* Styling for option on hover (works in some browsers) */
+.share-section option:hover {
+    background-color: #f0f0f0;
+}
+
+/* Network error styling */
+.network-error {
+    border-radius: 12px;
+    background-color: #fff5f5;
+    border: 1px solid #fed7d7;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.network-error .icon {
+    color: #c53030;
+    font-size: 1.5rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.network-error .content {
+    flex-grow: 1;
+}
+
+.network-error h5 {
+    color: #c53030;
+    margin-bottom: 5px;
+}
+
+.network-error p {
+    color: #718096;
+    margin-bottom: 0;
+}
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: calc(50% - 8px);
+    left: calc(50% - 8px);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

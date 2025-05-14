@@ -2,51 +2,139 @@
 
 {% block title %}Share Analysis{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/share.css') }}">
+{% endblock %}
+
 {% block content %}
 <section class="share-section page-section">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <div class="share-container">
-                    <h1>Share Analyzed News Sentiment Data</h1>
-                    
-                    <!-- Flash messages go here - need to style these better later -->
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ message }}</div>
+        <div class="row">
+            <!-- Share Analysis Form -->
+            <div class="col-md-8">
+                <!-- User Connection Management Card -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Manage User Connections</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="user-search mb-4">
+                            <div class="input-group">
+                                <input type="text" id="usernameSearch" class="form-control" placeholder="Search for username">
+                                <button class="btn btn-primary" id="searchUserBtn">Search</button>
+                            </div>
+                            <small class="form-text text-muted">
+                                Search for users to add to your connections list. Only connected users appear in the share dropdown.
+                            </small>
+                            
+                            <div id="searchResults" class="mt-3" style="display: none;">
+                                <h5>Search Results</h5>
+                                <ul class="list-group" id="userSearchResults">
+                                    <!-- Search results will appear here -->
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="connected-users">
+                            <h5>Your Connections</h5>
+                            <ul class="list-group" id="connectedUsersList">
+                                <!-- Connected users will be loaded dynamically -->
+                                {% for user in users %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center" data-user-id="{{ user.id }}">
+                                    <span>{{ user.username }}</span>
+                                    <button class="btn btn-sm btn-danger remove-user">Remove</button>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% if not users %}
+                            <p class="text-muted" id="noConnectionsMsg">No user connections yet. Use the search above to find and add users.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Share Analysis Form Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2>Share Analysis Results</h2>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form id="shareForm" method="POST" action="{{ url_for('share.share_results') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            <div class="form-group mb-3">
+                                <label for="analysis_select">Select Analysis Results to Share:</label>
+                                <select multiple class="form-control" id="analysis_select" name="analysis_ids" required>
+                                    {% for result in my_results %}
+                                    <option value="{{ result.id }}">{{ result.title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple items</small>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="user_select">Share with Users:</label>
+                                <select multiple class="form-control" id="user_select" name="user_ids" required>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple users</small>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="permission">Sharing Permission:</label>
+                                <select class="form-control" id="permission" name="permission">
+                                    <option value="view-only">View Only</option>
+                                    <option value="allow-reshare">Allow Resharing</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="message">Message (Optional):</label>
+                                <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Share</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shared with Me Section -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Shared with Me</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if shared_results %}
+                            <div class="list-group">
+                            {% for result in shared_results %}
+                                <a href="{{ url_for('share.view_result', result_id=result.id) }}" 
+                                   class="list-group-item list-group-item-action">
+                                    <h5 class="mb-1">{{ result.title }}</h5>
+                                    <small class="text-muted">Shared by: {{ result.owner.username }}</small>
+                                </a>
                             {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No analysis has been shared with you yet.</p>
                         {% endif %}
-                    {% endwith %}
-                    
-                    <form id="shareForm">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <div class="form-group">
-                            <label for="colleagueSelect">Choose Colleague:</label>
-                            <select id="colleagueSelect" name="colleague" required>
-                                <option value="">Select a Colleague</option>
-                                <option value="colleague1">Colleague 1</option>
-                                <option value="colleague2">Colleague 2</option>
-                                <option value="colleague3">Colleague 3</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="shareImageUpload">Upload Image:</label>
-                            <input type="file" id="shareImageUpload" name="image" accept="image/*" required>
-                            <img id="shareImagePreview" alt="Image Preview" style="display: none;">
-                        </div>
-                        <div class="form-group share-buttons">
-                            <button type="button" onclick="shareViaEmail()">Email</button>
-                            <button type="button" onclick="shareToGoogleDocs()">Google Docs</button>
-                            <button type="button" onclick="shareViaInstantMessage()">Instant Message</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- JS for share functionality - TODO: add confirmation modals -->
 <script src="{{ url_for('static', filename='js/share.js') }}"></script>
 {% endblock %}

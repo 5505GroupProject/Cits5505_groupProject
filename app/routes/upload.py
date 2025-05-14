@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, jsonify, current_app, flash, redirect, url_for, session
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from app.models import UploadedText
+from app.models import UploadedText, AnalysisResult
+from app.models.share import SharedAnalysis
 from app import db
 from flask_wtf.csrf import validate_csrf, ValidationError
 from app.utils.sentiment_utils import get_sentiment_summary
@@ -83,6 +84,24 @@ def upload():
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(file_content)
                 
+                # Check if an analysis result already exists for this upload_id
+                existing_result = AnalysisResult.query.filter_by(
+                    upload_id=new_upload.id,
+                    owner_id=current_user.id
+                ).first()
+                
+                # Create a distinct analysis title to avoid confusion with the upload title
+                analysis_title = f"Analysis Result: {title or secure_filename(file.filename)}"
+                
+                # Use our utility function to save or update the analysis result
+                from app.utils.analysis_utils import save_or_update_analysis_result
+                save_or_update_analysis_result(
+                    title=analysis_title,
+                    content=file_content,
+                    owner_id=current_user.id,
+                    upload_id=new_upload.id
+                )
+                
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
                 session['ngram_data'] = ngram_data
@@ -124,6 +143,24 @@ def upload():
                 
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(text_content)
+                
+                # Check if an analysis result already exists for this upload_id
+                existing_result = AnalysisResult.query.filter_by(
+                    upload_id=new_upload.id,
+                    owner_id=current_user.id
+                ).first()
+                
+                # Create a distinct analysis title to avoid confusion with the upload title
+                analysis_title = f"Analysis Result: {title or 'Text Upload'}"
+                
+                # Use our utility function to save or update the analysis result
+                from app.utils.analysis_utils import save_or_update_analysis_result
+                save_or_update_analysis_result(
+                    title=analysis_title,
+                    content=text_content,
+                    owner_id=current_user.id,
+                    upload_id=new_upload.id
+                )
                 
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
@@ -405,8 +442,28 @@ def delete_upload(upload_id):
                 'success': False,
                 'error': "You don't have permission to delete this upload"
             }), 403
+        
+        # Manually delete shared analysis entries first
+        try:
+            # Find analysis results for this upload
+            analysis_results = AnalysisResult.query.filter_by(upload_id=upload_id).all()
             
-        # Delete the upload
+            # For each analysis result, delete the shared entries
+            for result in analysis_results:
+                shared_entries = SharedAnalysis.query.filter_by(analysis_id=result.id).all()
+                for entry in shared_entries:
+                    db.session.delete(entry)
+            
+            # Now delete the analysis results themselves
+            for result in analysis_results:
+                db.session.delete(result)
+            
+            db.session.flush()  # Flush changes before deleting the upload
+        except Exception as e:
+            current_app.logger.error(f"Error deleting related records: {str(e)}")
+        
+        # Delete the upload itself - if foreign keys are properly enabled,
+        # this should cascade to analysis_results
         db.session.delete(upload)
         db.session.commit()
         

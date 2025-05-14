@@ -72,6 +72,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.innerHTML = 'Signing in...';
             }
             
+            // Clear previous messages
+            const flashMessages = document.getElementById('flashMessages');
+            flashMessages.innerHTML = '';
+            
             // AJAX time! Much better than full page reloads
             fetch(this.action, {
                 method: 'POST',
@@ -87,7 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show success message
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-success';
-                    alertDiv.innerHTML = data.success;
+                    // Use textContent instead of innerHTML for security
+                    alertDiv.textContent = data.success;
                     document.getElementById('flashMessages').appendChild(alertDiv);
                     
                     // Redirect after a short delay - gives time to see the message
@@ -98,7 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show error message
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-danger';
-                    alertDiv.innerHTML = data.error;
+                    // Use textContent instead of innerHTML for security
+                    alertDiv.textContent = data.error;
                     document.getElementById('flashMessages').appendChild(alertDiv);
                     
                     // Re-enable the button
@@ -110,6 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
+                
+                // Show general error message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger';
+                // Use textContent instead of innerHTML for security
+                alertDiv.textContent = 'An error occurred. Please try again.';
+                document.getElementById('flashMessages').appendChild(alertDiv);
                 
                 // Re-enable the button
                 if (submitButton) {
@@ -155,7 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show success message
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-success';
-                    alertDiv.innerHTML = data.success;
+                    // Use textContent instead of innerHTML for security
+                    alertDiv.textContent = data.success;
                     document.getElementById('flashMessages').appendChild(alertDiv);
                     
                     // Redirect after a short delay - gives time to see the message
@@ -166,7 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show error message
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-danger';
-                    alertDiv.innerHTML = data.error;
+                    // Use textContent instead of innerHTML for security
+                    alertDiv.textContent = data.error;
                     document.getElementById('flashMessages').appendChild(alertDiv);
                     
                     // Re-enable the button
@@ -182,7 +197,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show general error message
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-danger';
-                alertDiv.innerHTML = 'An error occurred. Please try again.';
+                // Use textContent instead of innerHTML for security
+                alertDiv.textContent = 'An error occurred. Please try again.';
                 document.getElementById('flashMessages').appendChild(alertDiv);
                 
                 // Re-enable the button
@@ -240,6 +256,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Lock it down
                 isSubmitting = true;
                 
+                // Clear previous messages
+                const flashMessages = document.getElementById('flashMessages');
+                flashMessages.innerHTML = '';
+                
                 // Show that something's happening - UX 101
                 const activeButton = document.activeElement;
                 const originalButtonText = activeButton.innerHTML;
@@ -292,7 +312,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Show success message
                         const alertDiv = document.createElement('div');
                         alertDiv.className = 'alert alert-success';
-                        alertDiv.innerHTML = data.success;                    
+                        // Use textContent instead of innerHTML for security
+                        alertDiv.textContent = data.success;                    
                         flashMessages.appendChild(alertDiv);
                         
                         // If we just sent the code, highlight the verification code field
@@ -302,16 +323,36 @@ document.addEventListener('DOMContentLoaded', function() {
                             const verificationCode = codeMatch ? codeMatch[0] : null;
                             
                             if (verificationCode) {
-                                // Display the verification code prominently
+                                // Display the verification code prominently using DOM manipulation
+                                // instead of innerHTML for better security
                                 const codeDisplayContainer = document.getElementById('codeDisplayContainer');
                                 if (codeDisplayContainer) {
-                                    codeDisplayContainer.innerHTML = `
-                                        <div class="code-box">
-                                            <h5>Your Verification Code:</h5>
-                                            <div class="code-value">${verificationCode}</div>
-                                            <p class="code-hint">(Enter this code below)</p>
-                                        </div>
-                                    `;
+                                    // Clear previous content
+                                    codeDisplayContainer.innerHTML = '';
+                                    
+                                    // Create container
+                                    const codeBox = document.createElement('div');
+                                    codeBox.className = 'code-box';
+                                    
+                                    // Create header
+                                    const codeHeader = document.createElement('h5');
+                                    codeHeader.textContent = 'Your Verification Code:';
+                                    codeBox.appendChild(codeHeader);
+                                    
+                                    // Create code value display
+                                    const codeValue = document.createElement('div');
+                                    codeValue.className = 'code-value';
+                                    codeValue.textContent = verificationCode;
+                                    codeBox.appendChild(codeValue);
+                                    
+                                    // Create hint text
+                                    const codeHint = document.createElement('p');
+                                    codeHint.className = 'code-hint';
+                                    codeHint.textContent = '(Enter this code below)';
+                                    codeBox.appendChild(codeHint);
+                                    
+                                    // Add to container and display
+                                    codeDisplayContainer.appendChild(codeBox);
                                     codeDisplayContainer.style.display = 'block';
                                 }
                             }
@@ -344,7 +385,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Show error message
                         const alertDiv = document.createElement('div');
                         alertDiv.className = 'alert alert-danger';
-                        alertDiv.innerHTML = data.error;
+                        // Use textContent instead of innerHTML for security
+                        alertDiv.textContent = data.error;
                         
                         // Clear any existing alerts
                         const flashMessages = document.getElementById('flashMessages');
@@ -365,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show general error message
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-danger';
-                    alertDiv.innerHTML = 'An error occurred. Please try again.';
+                    alertDiv.textContent = 'An error occurred. Please try again.';
                     
                     const flashMessages = document.getElementById('flashMessages');
                     flashMessages.innerHTML = '';

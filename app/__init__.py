@@ -26,6 +26,18 @@ def create_app():
     login_manager.init_app(app)
     csrf.init_app(app)  # Initialize CSRF for this app
     
+    # Enable SQLite foreign key constraints
+    with app.app_context():
+        if db.engine.name == 'sqlite':
+            from sqlalchemy import event
+            from sqlalchemy.engine import Engine
+            
+            @event.listens_for(Engine, "connect")
+            def set_sqlite_pragma(dbapi_connection, connection_record):
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA foreign_keys=ON")
+                cursor.close()
+    
     # Configure login manager
     login_manager.login_view = 'auth.login'
     login_manager.login_message = "Please log in to access this page."
@@ -39,10 +51,12 @@ def create_app():
     # Register blueprints
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
-    from app.routes.upload import upload_bp  # Import the upload blueprint
+    from app.routes.upload import upload_bp
+    from app.routes.share import share_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(upload_bp)  # Register the upload blueprint
+    app.register_blueprint(upload_bp)
+    app.register_blueprint(share_bp, url_prefix='/share')
     
     return app
