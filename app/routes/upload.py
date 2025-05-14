@@ -549,26 +549,14 @@ def search_news():
                         current_app.logger.error(f"Error fetching full article: {str(e)}")
                 
                 # Ensure we have substantial content
-                if not content or len(content.strip()) < 200:
-                    # Try to get a better fallback by combining title, description, and any content we have
-                    title = article.get('title', '')
-                    description = article.get('description', '')
+                if not content or len(content.strip()) < 225:
+                    # Instead of trying to create a fallback, report that content extraction failed
+                    current_app.logger.warning(f"Insufficient content for article: {article.get('title', 'Unknown')}")
+                    content = "Content extraction failed. The article may be behind a paywall or not accessible."
                     
-                    # Combine all available text
-                    combined_text = []
-                    if title:
-                        combined_text.append(title)
-                    if description:
-                        combined_text.append(description)
-                    if content:
-                        combined_text.append(content)
-                        
-                    # If we still don't have enough, repeat what we have
-                    content = '\n\n'.join(combined_text)
-                    if len(content.strip()) < 200:
-                        content = content * 3  # Triple the content as fallback
-                
-                # Remove "[+XXXX chars]" that NewsAPI adds
+                    # Add a flag to indicate content extraction failure
+                    article['contentInsufficient'] = True
+                  # Remove "[+XXXX chars]" that NewsAPI adds
                 content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
                 
                 articles.append({
@@ -578,7 +566,8 @@ def search_news():
                     'publishedAt': publish_date,
                     'description': article.get('description', ''),
                     'content': content,
-                    'urlToImage': article.get('urlToImage', '')
+                    'urlToImage': article.get('urlToImage', ''),
+                    'contentInsufficient': article.get('contentInsufficient', False)
                 })
                 
             return jsonify({
@@ -711,26 +700,13 @@ def latest_news():
                                     current_app.logger.info(f"Successfully extracted full content: {len(content)} chars")
                     except Exception as e:
                         current_app.logger.error(f"Error fetching full article: {str(e)}")
-                
-                # Ensure we have substantial content
-                if not content or len(content.strip()) < 200:
-                    # Try to get a better fallback by combining title, description, and any content we have
-                    title = article.get('title', '')
-                    description = article.get('description', '')
-                    
-                    # Combine all available text
-                    combined_text = []
-                    if title:
-                        combined_text.append(title)
-                    if description:
-                        combined_text.append(description)
-                    if content:
-                        combined_text.append(content)
-                        
-                    # If we still don't have enough, repeat what we have
-                    content = '\n\n'.join(combined_text)
-                    if len(content.strip()) < 200:
-                        content = content * 3  # Triple the content as fallback
+                  # Ensure we have substantial content
+                if not content or len(content.strip()) < 225:
+                    # Instead of trying to create a fallback, report that content extraction failed
+                    current_app.logger.warning(f"Insufficient content for article: {article.get('title', 'Unknown')}")
+                    content = "Content extraction failed. The article may be behind a paywall or not accessible."
+                      # Add a flag to indicate content extraction failure
+                    article['contentInsufficient'] = True
                 
                 # Remove "[+XXXX chars]" that NewsAPI adds
                 content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
@@ -742,7 +718,8 @@ def latest_news():
                     'publishedAt': publish_date,
                     'description': article.get('description', ''),
                     'content': content,
-                    'urlToImage': article.get('urlToImage', '')
+                    'urlToImage': article.get('urlToImage', ''),
+                    'contentInsufficient': article.get('contentInsufficient', False)
                 })
                 
             return jsonify({

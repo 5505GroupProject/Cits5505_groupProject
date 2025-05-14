@@ -317,20 +317,31 @@ document.addEventListener('DOMContentLoaded', function() {
             
             newsResultsList.appendChild(resultItem);
         });
-    }
-
-    // Function to select and preview an article
+    }    // Function to select and preview an article
     function selectArticle(article) {
         if (!selectedArticlePreview || !previewArticleTitle || !previewArticleContent) return;
         
+        // Check if the article has insufficient content flag
+        if (article.contentInsufficient === true) {
+            // Show alert for insufficient content
+            alert(`Article "${article.title}" has insufficient content. The article may be behind a paywall or not accessible.`);
+            return; // Stop processing this article
+        }
+          
         // Extract content from the article - ensure we get full content
-        let articleContent = article.content || article.description || 'No content available';
+        let articleContent = article.content || 'No content available';
         
         // Remove the "[+XXXX chars]" that NewsAPI adds if present
         articleContent = articleContent.replace(/\[\+\d+ chars\]$/, '');
         
+        // Remove excessive empty lines (replace 3 or more newlines with just 2)
+        articleContent = articleContent.replace(/\n{3,}/g, '\n\n');
+        
+        // Trim any leading or trailing whitespace
+        articleContent = articleContent.trim();
+        
         // Debug log to check content length
-        console.log("Article content length:", articleContent.length, "Article title:", article.title);
+        console.log("Article content length:", articleContent.length, "chars, Article title:", article.title);
         
         // Show the article preview with full content
         previewArticleTitle.textContent = article.title;
