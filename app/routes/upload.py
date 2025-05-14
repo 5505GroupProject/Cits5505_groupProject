@@ -59,8 +59,7 @@ def upload():
                 if len(file_content.strip()) == 0:
                     flash('Uploaded file is empty!', 'danger')
                     return redirect(url_for('upload.upload'))
-                
-                # Create the UploadedText entry
+                  # Create the UploadedText entry
                 new_upload = UploadedText(
                     user_id=current_user.id,
                     title=title or secure_filename(file.filename),
@@ -84,24 +83,6 @@ def upload():
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(file_content)
                 
-                # Check if an analysis result already exists for this upload_id
-                existing_result = AnalysisResult.query.filter_by(
-                    upload_id=new_upload.id,
-                    owner_id=current_user.id
-                ).first()
-                
-                # Create a distinct analysis title to avoid confusion with the upload title
-                analysis_title = f"Analysis Result: {title or secure_filename(file.filename)}"
-                
-                # Use our utility function to save or update the analysis result
-                from app.utils.analysis_utils import save_or_update_analysis_result
-                save_or_update_analysis_result(
-                    title=analysis_title,
-                    content=file_content,
-                    owner_id=current_user.id,
-                    upload_id=new_upload.id
-                )
-                
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
                 session['ngram_data'] = ngram_data
@@ -110,10 +91,9 @@ def upload():
                 session['upload_id'] = new_upload.id
                 # Store text preview in session but keep it minimal - we'll get full text from database
                 session['text_content'] = file_content[:500] + "..." if len(file_content) > 500 else file_content
-                
-                # Flash success message and redirect to visualization page
+                  # Flash success message and redirect to analyze page
                 flash('File uploaded and analyzed successfully!', 'success')
-                return redirect(url_for('main.visualization'))
+                return redirect(url_for('main.analyze'))
             else:
                 flash('No file selected!', 'warning')
             
@@ -140,27 +120,8 @@ def upload():
                 
                 # Perform NER analysis
                 ner_data = perform_ner_analysis(text_content)
-                
-                # Perform word frequency analysis
+                  # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(text_content)
-                
-                # Check if an analysis result already exists for this upload_id
-                existing_result = AnalysisResult.query.filter_by(
-                    upload_id=new_upload.id,
-                    owner_id=current_user.id
-                ).first()
-                
-                # Create a distinct analysis title to avoid confusion with the upload title
-                analysis_title = f"Analysis Result: {title or 'Text Upload'}"
-                
-                # Use our utility function to save or update the analysis result
-                from app.utils.analysis_utils import save_or_update_analysis_result
-                save_or_update_analysis_result(
-                    title=analysis_title,
-                    content=text_content,
-                    owner_id=current_user.id,
-                    upload_id=new_upload.id
-                )
                 
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
@@ -170,10 +131,9 @@ def upload():
                 session['upload_id'] = new_upload.id
                 # Store text preview in session but keep it minimal - we'll get full text from database
                 session['text_content'] = text_content[:500] + "..." if len(text_content) > 500 else text_content
-                
-                # Flash success message and redirect to visualization page
+                  # Flash success message and redirect to analyze page
                 flash('Text content uploaded and analyzed successfully!', 'success')
-                return redirect(url_for('main.visualization'))
+                return redirect(url_for('main.analyze'))
             else:
                 flash('No content provided!', 'danger')
         
@@ -406,12 +366,11 @@ def view_upload(upload_id):
         session['word_freq_data'] = word_freq_data
         session['upload_id'] = upload.id
         session['text_content'] = content[:500] + "..." if len(content) > 500 else content
+          # Flash a message to the user
+        flash('Content loaded for analysis', 'success')
         
-        # Flash a message to the user
-        flash('Content loaded for visualization', 'success')
-        
-        # Redirect to the visualization page
-        return redirect(url_for('main.visualization'))
+        # Redirect to the analysis page
+        return redirect(url_for('main.analyze'))
         
     except Exception as e:
         current_app.logger.error(f"Error viewing upload: {str(e)}")
@@ -435,35 +394,14 @@ def delete_upload(upload_id):
             }), 400
             
         upload = UploadedText.query.get_or_404(upload_id)
-        
-        # Security check - ensure user can only delete their own uploads
+          # Security check - ensure user can only delete their own uploads
         if upload.user_id != current_user.id:
             return jsonify({
                 'success': False,
                 'error': "You don't have permission to delete this upload"
             }), 403
         
-        # Manually delete shared analysis entries first
-        try:
-            # Find analysis results for this upload
-            analysis_results = AnalysisResult.query.filter_by(upload_id=upload_id).all()
-            
-            # For each analysis result, delete the shared entries
-            for result in analysis_results:
-                shared_entries = SharedAnalysis.query.filter_by(analysis_id=result.id).all()
-                for entry in shared_entries:
-                    db.session.delete(entry)
-            
-            # Now delete the analysis results themselves
-            for result in analysis_results:
-                db.session.delete(result)
-            
-            db.session.flush()  # Flush changes before deleting the upload
-        except Exception as e:
-            current_app.logger.error(f"Error deleting related records: {str(e)}")
-        
-        # Delete the upload itself - if foreign keys are properly enabled,
-        # this should cascade to analysis_results
+        # Delete the upload itself
         db.session.delete(upload)
         db.session.commit()
         

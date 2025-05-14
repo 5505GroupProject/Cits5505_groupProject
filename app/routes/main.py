@@ -14,16 +14,11 @@ def home():
 def login():
     return render_template('login.html')
 
-@main_bp.route('/visualization')
+@main_bp.route('/analyze')
 @login_required
-def visualization():
+def analyze():
     from app.models import UploadedText
     from flask_login import current_user
-    from app.models import AnalysisResult
-    from app import db
-    import json
-    from flask import render_template_string
-    from datetime import datetime
     
     # Get four types of analysis results from session
     sentiment_data = session.get('sentiment_data', None)
@@ -55,91 +50,15 @@ def visualization():
 
         session['word_freq_data'] = word_freq_data
     else:
-        ngram_data = None
-
-    # Render the visualization template with the analysis data
-    rendered_template = render_template(
-        'visualization.html', 
+        ngram_data = None    # Render the analysis template with the analysis data
+    return render_template(
+        'analyze.html', 
         sentiment_data=sentiment_data,
         ngram_data=ngram_data, 
         ner_data=ner_data,
         word_freq_data=word_freq_data,
         analyzed_text=text_content
     )
-    
-    # Save the analysis result to the database if it doesn't already exist
-    if upload_id and sentiment_data and ngram_data and ner_data and word_freq_data:
-        # Get the uploaded text
-        uploaded_text = UploadedText.query.get(upload_id)
-        if uploaded_text and uploaded_text.user_id == current_user.id:
-            # Check if we already have a result for this specific upload_id
-            existing_results = AnalysisResult.query.filter_by(
-                upload_id=upload_id,
-                owner_id=current_user.id
-            ).all()
-            
-            # If there's at least one existing result, update it instead of creating a new one
-            if existing_results:
-                # Use the first existing result and update it
-                result_to_update = existing_results[0]
-                
-                # If there are multiple results (duplicates), remove the extras
-                if len(existing_results) > 1:
-                    for result in existing_results[1:]:
-                        db.session.delete(result)
-                
-                # Create consistent title format
-                title = f"Analysis Result: {uploaded_text.title or 'Untitled Text'}"
-            
-            # Capture the important parts of the analysis as HTML
-            sentiment_section = render_template_string("""
-                <h3>Sentiment Analysis</h3>
-                <p>Overall Sentiment: <strong>{{ sentiment.sentiment }}</strong></p>
-                <p>Compound Score: <strong>{{ sentiment.compound_score|round(2) }}</strong></p>
-                <p>Positive: {{ (sentiment.positive_score*100)|round(1) }}%, 
-                   Neutral: {{ (sentiment.neutral_score*100)|round(1) }}%, 
-                   Negative: {{ (sentiment.negative_score*100)|round(1) }}%</p>
-            """, sentiment=sentiment_data)
-            
-            word_freq_section = render_template_string("""
-                <h3>Word Frequency Analysis</h3>
-                <p>Total Words: {{ freq.total_words }}</p>
-                <p>Unique Words: {{ freq.unique_words }}</p>
-                <p>Top 5 Words:</p>
-                <ul>
-                {% for word in freq.top_words[:5] %}
-                    <li>{{ word.word }}: {{ word.count }}</li>
-                {% endfor %}
-                </ul>
-            """, freq=word_freq_data)
-            
-            # Combine the sections
-            content = f"""
-                <div class="analysis-result">
-                    <h2>Analysis Results for: {uploaded_text.title or 'Untitled'}</h2>
-                    <div class="analysis-text">
-                        <h3>Analyzed Text Preview</h3>
-                        <p>{text_content[:300]}...</p>
-                    </div>
-                    <div class="analysis-sections">
-                        {sentiment_section}
-                        {word_freq_section}
-                    </div>
-                    <p><em>Analysis generated on {datetime.now().strftime('%Y-%m-%d %H:%M')}</em></p>
-                </div>
-            """
-            
-            # Use our utility function to save or update the analysis result
-            from app.utils.analysis_utils import save_or_update_analysis_result
-            save_or_update_analysis_result(
-                title=title,
-                content=content,
-                owner_id=current_user.id,
-                upload_id=upload_id
-            )
-    
-    # Return the rendered template
-    return rendered_template
 
 @main_bp.route('/protected-route')
 @login_required
@@ -157,72 +76,6 @@ def upload():
 def profile():
     """Redirect to the auth profile page."""
     return redirect(url_for('auth.profile'))
-
-@main_bp.route('/analyze/<int:upload_id>')
-@login_required
-def analyze_upload(upload_id):
-    """Direct analysis of a previously uploaded text"""
-    from app.models import UploadedText, AnalysisResult
-    from flask_login import current_user
-    from ..utils.sentiment_utils import get_sentiment_summary
-    from ..utils.ngram_utils import get_multiple_ngrams
-    from ..utils.ner_utils import perform_ner_analysis
-    from ..utils.word_frequency_utils import analyze_word_frequency
-    from app import db
-    
-    try:
-        # Get the uploaded text from the database
-        upload = UploadedText.query.get_or_404(upload_id)
-        
-        # Security check - ensure user can only see their own uploads
-        if upload.user_id != current_user.id:
-            flash("You don't have permission to view this upload", 'danger')
-            return redirect(url_for('main.upload'))
-            
-        # Get the content
-        text_content = upload.content
-        
-        # Instead of deleting and re-creating, we'll use our save_or_update utility
-        # which will properly handle existing results and ensure consistent title formatting
-        from app.utils.analysis_utils import save_or_update_analysis_result
-        
-        # This will ensure any existing results are properly updated 
-        # or new ones created with proper title formatting
-        analysis_title = f"Analysis Result: {upload.title or 'Untitled Text'}"
-        
-        if text_content:
-            # Perform all analysis again (or for the first time)
-            sentiment_data = get_sentiment_summary(text_content)
-            ngram_data = get_multiple_ngrams(text_content)
-            ner_data = perform_ner_analysis(text_content)
-            word_freq_data = analyze_word_frequency(text_content)
-            
-            # Use our utility function to create or update the analysis result with proper formatting
-            # This will avoid creating duplicate entries or entries with incorrect title formats
-            save_or_update_analysis_result(
-                title=analysis_title,
-                content=text_content,
-                owner_id=current_user.id,
-                upload_id=upload_id
-            )
-            
-            # Store in session for the visualization page
-            session['sentiment_data'] = sentiment_data
-            session['ngram_data'] = ngram_data
-            session['ner_data'] = ner_data
-            session['word_freq_data'] = word_freq_data
-            session['upload_id'] = upload_id
-            session['text_content'] = text_content[:500] + "..." if len(text_content) > 500 else text_content
-            
-            # Redirect to visualization page
-            return redirect(url_for('main.visualization'))
-        else:
-            flash('No content available for analysis', 'warning')
-            return redirect(url_for('main.upload'))
-            
-    except Exception as e:
-        flash(f'Error retrieving upload: {str(e)}', 'danger')
-        return redirect(url_for('main.upload'))
 
 @main_bp.route('/cleanup-orphaned-results')
 @login_required
