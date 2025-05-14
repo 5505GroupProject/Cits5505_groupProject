@@ -10,16 +10,16 @@
                 <div class="analysis-container">
                     <div class="analysis-header d-flex justify-content-between align-items-center">
                         <h2>{{ analysis.title }}</h2>
-                    </div>
-                    
-                    <!-- Information about who shared this analysis -->
+                    </div>                    <!-- Information about who shared this analysis -->
                     <div class="sharing-info mb-3">
-                        <small class="text-muted">
-                            Original owner: {{ original_owner.username if original_owner else "Unknown User" }}
-                            {% if sharer_info %}
-                             | Shared by: {{ sharer_info.username }}
-                            {% endif %}
-                        </small>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Original owner: {{ original_owner.username if original_owner else "Unknown User" }}
+                                {% if sharer_info %}
+                                | Shared by: {{ sharer_info.username }}
+                                {% endif %}
+                            </small>
+                        </div>
                     </div>
                     
                     <!-- Here's where the original analyzed text shows up - keeping it simple -->
@@ -228,10 +228,11 @@
                                         <p class="text-center text-muted">No word frequency data available for word cloud visualization</p>
                                     {% endif %}
                                 </div>
-                            </div>                        </div>
-                    </div>
-                    <div class="text-center mt-4 mb-2">
-                        <a href="{{ url_for('share.shared_page') }}" class="btn btn-primary">← Back to Share</a>
+                            </div>                        </div>                    </div>                    <div class="text-center mt-4 mb-2">
+                        <a href="{{ url_for('share.shared_page') }}" class="btn btn-primary me-2">← Back to Share</a>
+                        {% if analysis.permission == "allow-reshare" %}
+                        <a href="{{ url_for('share.save_shared_to_my_news', shared_id=analysis.id) }}" class="btn btn-primary" id="saveToMyNewsBtn">Save to My News</a>
+                        {% endif %}
                     </div>
                 </div>
                 

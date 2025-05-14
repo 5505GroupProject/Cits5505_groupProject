@@ -370,3 +370,56 @@ def view_shared_analysis(shared_id):
         sharer_info=sharer_info
     )
 
+@share_bp.route('/save-to-my-news/<int:shared_id>')
+@login_required
+def save_shared_to_my_news(shared_id):
+    """Save a shared analysis text to the user's own UploadedText collection"""
+    # Get the shared analysis record
+    shared = SharedAnalysis.query.get_or_404(shared_id)
+    
+    # Check if the current user has access
+    if shared.user_id != current_user.id:
+        flash('You do not have permission to save this analysis', 'danger')
+        return redirect(url_for('share.shared_page'))    # Check if the permission allows resharing
+    if shared.permission != "allow-reshare":
+        flash('This analysis is not allowed to be saved to your collection', 'danger')
+        return redirect(url_for('share.view_shared_analysis', shared_id=shared_id))
+    
+    try:
+        # Create a new UploadedText from the shared analysis
+        from app.models import UploadedText
+        
+        # Check if the user already has this content saved
+        existing_upload = UploadedText.query.filter_by(
+            user_id=current_user.id,
+            content=shared.content
+        ).first()
+        
+        if existing_upload:
+            flash('This content is already in your collection', 'info')
+            return redirect(url_for('upload.upload'))
+        
+        # Generate a title for the saved content
+        title = f"Saved: {shared.title}"
+        
+        # Create a new UploadedText entry
+        new_upload = UploadedText(
+            user_id=current_user.id,
+            title=title,
+            content=shared.content,
+            file_type='text'
+        )
+        
+        db.session.add(new_upload)
+        db.session.commit()
+        
+        flash('Analysis has been saved to your collection successfully', 'success')
+        
+        # Redirect to the upload page to see the saved text
+        return redirect(url_for('upload.upload'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error saving analysis: {str(e)}', 'danger')
+        return redirect(url_for('share.view_shared_analysis', shared_id=shared_id))
+
