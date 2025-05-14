@@ -363,7 +363,7 @@ def view_upload(upload_id):
         
         if existing_analysis and existing_analysis.url_path:
             # If analysis exists with URL path, redirect directly to it
-            return redirect(url_for('main.view_analysis_by_path', url_path=existing_analysis.url_path))
+            return redirect(url_for('main.analyze', url_path=existing_analysis.url_path))
         
         # Otherwise, set up session variables and go through the regular analyze flow
         # Retrieve content and set it in the session

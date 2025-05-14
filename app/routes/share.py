@@ -332,7 +332,7 @@ def view_analysis(analysis_id):
         
     # If the analysis has a URL path, redirect to the cleaner URL
     if hasattr(analysis, 'url_path') and analysis.url_path:
-        return redirect(url_for('main.view_analysis_by_path', url_path=analysis.url_path))
+        return redirect(url_for('main.analyze', url_path=analysis.url_path))
     
     # Parse the JSON data
     import json

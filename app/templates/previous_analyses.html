@@ -9,7 +9,7 @@
                 <small>{{ analysis.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
             </div>
             <p class="mb-1">{{ analysis.content[:100] }}{% if analysis.content|length > 100 %}...{% endif %}</p>            <div class="d-flex justify-content-end">
-                <a href="{{ url_for('main.view_analysis_by_path', url_path=analysis.url_path) if analysis.url_path else url_for('share.view_analysis', analysis_id=analysis.id) }}" class="btn btn-sm btn-info me-2">View</a>
+                <a href="{{ url_for('main.analyze', url_path=analysis.url_path) if analysis.url_path else url_for('share.view_analysis', analysis_id=analysis.id) }}" class="btn btn-sm btn-info me-2">View</a>
                 <a href="{{ url_for('share.shared_page', analysis_id=analysis.id) }}" class="btn btn-sm btn-primary">Share</a>
             </div>
         </div>
