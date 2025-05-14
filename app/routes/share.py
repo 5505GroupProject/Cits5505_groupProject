@@ -52,9 +52,7 @@ def share_results():
             if not result:
                 return f"Error: Analysis result {result_id} not found", 400
             if result.owner_id != current_user.id:
-                return f"Error: You don't own analysis result {result_id}", 403
-
-        # Create share entries
+                return f"Error: You don't own analysis result {result_id}", 403        # Create share entries
         for user_id in user_ids:
             for result_id in selected_ids:
                 # Check if already shared
@@ -63,17 +61,44 @@ def share_results():
                     analysis_id=result_id
                 ).first()
                 
+                # Get the full analysis result data
+                result = AnalysisResult.query.get(result_id)
+                
                 if existing:
                     # Update existing share
                     existing.permission = permission
                     existing.message = message
+                    existing.sharer_id = current_user.id  # Set current user as sharer
+                    # Update all the duplicated fields 
+                    existing.title = result.title
+                    existing.content = result.content
+                    existing.original_owner_id = result.owner_id
+                    existing.upload_id = result.upload_id
+                    existing.analysis_created_at = result.created_at
+                    existing.url_path = result.url_path
+                    existing.sentiment_data = result.sentiment_data
+                    existing.ngram_data = result.ngram_data
+                    existing.ner_data = result.ner_data
+                    existing.word_freq_data = result.word_freq_data
                 else:
-                    # Create new share
+                    # Create new share with all analysis data
                     entry = SharedAnalysis(
                         user_id=user_id,
                         analysis_id=result_id,
+                        sharer_id=current_user.id,  # Set current user as sharer
                         permission=permission,
-                        message=message
+                        message=message,
+                        # Add all the duplicated fields
+                        title=result.title,
+                        content=result.content,
+                        original_owner_id=result.owner_id,
+                        upload_id=result.upload_id,
+                        analysis_created_at=result.created_at,
+                        url_path=result.url_path,
+                        sentiment_data=result.sentiment_data,
+                        ngram_data=result.ngram_data,
+                        ner_data=result.ner_data,
+                        word_freq_data=result.word_freq_data
                     )
                     db.session.add(entry)
 
@@ -139,67 +164,47 @@ def shared_page():
                 regular_result.title = f"Analysis Result: {regular_result.title}"
                 db.session.commit()
                 my_results.append(regular_result)
-    
-    # Get results shared with current user - only the latest per upload
+      # Get results shared with current user directly from the SharedAnalysis table
+    # This now contains all the duplicated analysis data
     from sqlalchemy import func, desc
     
-    # Get all shared analysis IDs for the current user
-    shared_analysis_ids = db.session.query(SharedAnalysis.analysis_id).filter(
+    # Get all shared analyses for the current user
+    shared_analyses = SharedAnalysis.query.filter(
         SharedAnalysis.user_id == current_user.id
     ).all()
-    shared_analysis_ids = [id[0] for id in shared_analysis_ids]
     
-    # Get the results and organize by upload_id to find the newest for each,
-    # prioritizing those with "Analysis" in the title
+    # Organize by upload_id to find the newest for each
     shared_by_upload = {}
     
-    # First pass - only consider results with "Analysis" in the title
-    for analysis_id in shared_analysis_ids:
-        result = AnalysisResult.query.get(analysis_id)
-        if (result and result.upload_id is not None and 
-            (result.title.startswith("Analysis Result:") or result.title.startswith("Analysis of "))):
+    # Group by upload_id and keep only the newest
+    for shared_analysis in shared_analyses:
+        if shared_analysis.upload_id is not None:
             # Group by upload_id
-            if result.upload_id not in shared_by_upload or result.created_at > shared_by_upload[result.upload_id].created_at:
-                shared_by_upload[result.upload_id] = result
-    
-    # Second pass - for any upload_ids without an analysis result, use the regular one
-    for analysis_id in shared_analysis_ids:
-        result = AnalysisResult.query.get(analysis_id)
-        if result and result.upload_id is not None and result.upload_id not in shared_by_upload:
-            shared_by_upload[result.upload_id] = result
+            if shared_analysis.upload_id not in shared_by_upload or shared_analysis.analysis_created_at > shared_by_upload[shared_analysis.upload_id].analysis_created_at:
+                shared_by_upload[shared_analysis.upload_id] = shared_analysis
     
     # Convert to list and fix titles if needed
-    shared_results = []
-    for upload_id, result in shared_by_upload.items():
+    shared_results = list(shared_by_upload.values())
+    
+    # Standardize titles if needed
+    for result in shared_results:
         if not result.title.startswith("Analysis Result:"):
             if result.title.startswith("Analysis of "):
                 result.title = result.title.replace("Analysis of ", "Analysis Result: ")
             else:
                 result.title = f"Analysis Result: {result.title}"
             db.session.commit()
-        shared_results.append(result)
     
     # Filter out any results that do not start with 'Analysis Result:'
     my_results = [result for result in my_results if result.title.startswith('Analysis Result:')]
 
-    # Filter out any results that do not start with 'Analysis Result:'
+    # Also ensure all shared results have proper titles
     shared_results = [result for result in shared_results if result.title.startswith('Analysis Result:')]
 
     return render_template('share.html',
         users=connected_users,
         my_results=my_results,
         shared_results=shared_results)
-
-@share_bp.route('/view/<int:result_id>')
-@login_required
-def view_result(result_id):
-    result = AnalysisResult.query.get_or_404(result_id)
-    
-    shared_entry = SharedAnalysis.query.filter_by(user_id=current_user.id, analysis_id=result_id).first()
-    if shared_entry or result.owner_id == current_user.id:
-        return render_template("view.html", result=result)
-    
-    return "Access Denied", 403
 
 @share_bp.route('/search-user', methods=['POST'])
 @login_required
@@ -307,33 +312,18 @@ def remove_user(user_id):
         db.session.rollback()
         return jsonify({"error": f"Failed to remove user: {str(e)}"}), 500
 
-@share_bp.route('/view/<int:analysis_id>')
+@share_bp.route('/view-shared/<int:shared_id>')
 @login_required
-def view_analysis(analysis_id):
-    """View a specific analysis result"""
-    # Get the analysis result
-    analysis = AnalysisResult.query.get_or_404(analysis_id)
+def view_shared_analysis(shared_id):
+    """View a shared analysis using the data directly from SharedAnalysis"""
+    # Get the shared analysis record
+    shared = SharedAnalysis.query.get_or_404(shared_id)
     
-    # Check if the current user owns the analysis or has shared access
-    if analysis.owner_id == current_user.id:
-        # User owns the analysis
-        can_view = True
-    else:
-        # Check if the analysis is shared with the current user
-        shared = SharedAnalysis.query.filter_by(
-            user_id=current_user.id,
-            analysis_id=analysis_id
-        ).first()
-        can_view = shared is not None
-    
-    if not can_view:
+    # Check if the current user has access
+    if shared.user_id != current_user.id:
         flash('You do not have permission to view this analysis', 'danger')
         return redirect(url_for('share.shared_page'))
         
-    # If the analysis has a URL path, redirect to the cleaner URL
-    if hasattr(analysis, 'url_path') and analysis.url_path:
-        return redirect(url_for('main.analyze', url_path=analysis.url_path))
-    
     # Parse the JSON data
     import json
     
@@ -342,27 +332,41 @@ def view_analysis(analysis_id):
     ner_data = None
     word_freq_data = None
     
-    if analysis.sentiment_data:
-        sentiment_data = json.loads(analysis.sentiment_data)
+    if shared.sentiment_data:
+        sentiment_data = json.loads(shared.sentiment_data)
     
-    if analysis.ngram_data:
-        ngram_data = json.loads(analysis.ngram_data)
+    if shared.ngram_data:
+        ngram_data = json.loads(shared.ngram_data)
     
-    if analysis.ner_data:
-        ner_data = json.loads(analysis.ner_data)
+    if shared.ner_data:
+        ner_data = json.loads(shared.ner_data)
     
-    if analysis.word_freq_data:
-        word_freq_data = json.loads(analysis.word_freq_data)
+    if shared.word_freq_data:
+        word_freq_data = json.loads(shared.word_freq_data)    # Create a dict to represent the original owner
+    original_owner = User.query.get(shared.original_owner_id)
+    owner_info = {
+        "username": original_owner.username if original_owner else "Unknown User"
+    }
     
-    # Render the analysis template with the data
+    # Get sharer information
+    sharer_info = None
+    if shared.sharer_id:
+        sharer = User.query.get(shared.sharer_id)
+        sharer_info = {
+            "username": sharer.username if sharer else "Unknown User"
+        }
+      # Render the share view template with the data
     return render_template(
-        'analyze.html',
+        'view_share.html',
         sentiment_data=sentiment_data,
         ngram_data=ngram_data,
         ner_data=ner_data,
         word_freq_data=word_freq_data,
-        analyzed_text=analysis.content,
+        analyzed_text=shared.content,
         is_saved_analysis=True,
-        analysis=analysis
+        analysis=shared,
+        shared_analysis=True,
+        original_owner=owner_info,
+        sharer_info=sharer_info
     )
 

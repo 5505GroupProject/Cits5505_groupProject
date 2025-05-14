@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Text Analysis Results{% endblock %}
+{% block title %}Shared Analysis Results{% endblock %}
 
 {% block content %}
 <main class="analysis-section page-section">
@@ -8,8 +8,18 @@
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
                 <div class="analysis-container">
-                    <div class="analysis-header">
-                        <h2>Text Analysis Results</h2>
+                    <div class="analysis-header d-flex justify-content-between align-items-center">
+                        <h2>{{ analysis.title }}</h2>
+                    </div>
+                    
+                    <!-- Information about who shared this analysis -->
+                    <div class="sharing-info mb-3">
+                        <small class="text-muted">
+                            Original owner: {{ original_owner.username if original_owner else "Unknown User" }}
+                            {% if sharer_info %}
+                             | Shared by: {{ sharer_info.username }}
+                            {% endif %}
+                        </small>
                     </div>
                     
                     <!-- Here's where the original analyzed text shows up - keeping it simple -->
@@ -218,18 +228,15 @@
                                         <p class="text-center text-muted">No word frequency data available for word cloud visualization</p>
                                     {% endif %}
                                 </div>
-                            </div>
-                        </div>
+                            </div>                        </div>
+                    </div>
+                    <div class="text-center mt-4 mb-2">
+                        <a href="{{ url_for('share.shared_page') }}" class="btn btn-primary">← Back to Share</a>
                     </div>
                 </div>
-                  <!-- Button to upload new text -->
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                    <a href="{{ url_for('upload.upload') }}" class="btn btn-secondary">Upload New Text</a>
-                </div>
                 
-                <!-- Include the previous analyses section -->
-                {% include 'previous_analyses.html' %}
             </div>
+            
         </div>
     </div>
 </main>
