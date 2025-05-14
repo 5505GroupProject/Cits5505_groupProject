@@ -454,18 +454,22 @@ function updateUploadHistoryTable(uploads) {
         messageRow.innerHTML = '<td colspan="4" class="text-center text-muted">No uploads yet.</td>';
         historyTableBody.appendChild(messageRow);
         return;
-    }
-    
-    // Add each upload to the table
+    }    // Add each upload to the table
     uploads.forEach(upload => {
         const row = document.createElement('tr');
         row.dataset.uploadId = upload.id; // Store upload ID in the row for easy reference
+        
+        // Use the analysis URL path if available, otherwise use the regular view upload route
+        const analyzeUrl = upload.analysis_url_path 
+            ? `/analysis/${upload.analysis_url_path}` 
+            : `/upload/view/${upload.id}`;
+            
         row.innerHTML = `
             <td>${upload.title || 'Untitled'}</td>
             <td>${upload.created_at}</td>
             <td>${upload.preview}</td>
             <td>
-                <a href="/analyze/${upload.id}" class="btn btn-sm btn-primary">Analyze</a>
+                <a href="${analyzeUrl}" class="btn btn-sm btn-primary">Analyze</a>
                 <button type="button" class="btn btn-sm btn-danger delete-upload-btn" data-upload-id="${upload.id}">Delete</button>
             </td>
         `;

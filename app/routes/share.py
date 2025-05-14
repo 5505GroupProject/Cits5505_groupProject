@@ -307,3 +307,62 @@ def remove_user(user_id):
         db.session.rollback()
         return jsonify({"error": f"Failed to remove user: {str(e)}"}), 500
 
+@share_bp.route('/view/<int:analysis_id>')
+@login_required
+def view_analysis(analysis_id):
+    """View a specific analysis result"""
+    # Get the analysis result
+    analysis = AnalysisResult.query.get_or_404(analysis_id)
+    
+    # Check if the current user owns the analysis or has shared access
+    if analysis.owner_id == current_user.id:
+        # User owns the analysis
+        can_view = True
+    else:
+        # Check if the analysis is shared with the current user
+        shared = SharedAnalysis.query.filter_by(
+            user_id=current_user.id,
+            analysis_id=analysis_id
+        ).first()
+        can_view = shared is not None
+    
+    if not can_view:
+        flash('You do not have permission to view this analysis', 'danger')
+        return redirect(url_for('share.shared_page'))
+        
+    # If the analysis has a URL path, redirect to the cleaner URL
+    if hasattr(analysis, 'url_path') and analysis.url_path:
+        return redirect(url_for('main.view_analysis_by_path', url_path=analysis.url_path))
+    
+    # Parse the JSON data
+    import json
+    
+    sentiment_data = None
+    ngram_data = None
+    ner_data = None
+    word_freq_data = None
+    
+    if analysis.sentiment_data:
+        sentiment_data = json.loads(analysis.sentiment_data)
+    
+    if analysis.ngram_data:
+        ngram_data = json.loads(analysis.ngram_data)
+    
+    if analysis.ner_data:
+        ner_data = json.loads(analysis.ner_data)
+    
+    if analysis.word_freq_data:
+        word_freq_data = json.loads(analysis.word_freq_data)
+    
+    # Render the analysis template with the data
+    return render_template(
+        'analyze.html',
+        sentiment_data=sentiment_data,
+        ngram_data=ngram_data,
+        ner_data=ner_data,
+        word_freq_data=word_freq_data,
+        analyzed_text=analysis.content,
+        is_saved_analysis=True,
+        analysis=analysis
+    )
+

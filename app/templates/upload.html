@@ -208,8 +208,7 @@
                                     {% for upload in uploads %}
                                         <tr>
                                             <td>{{ upload.title or 'Untitled' }}</td>
-                                            <td>{{ upload.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                            <td>{{ (upload.content[:100] + '...') if upload.content|length > 100 else upload.content }}</td>                                            <td>
+                                            <td>{{ upload.created_at.strftime('%Y-%m-%d %H:%M') }}</td>                                            <td>{{ (upload.content[:100] + '...') if upload.content|length > 100 else upload.content }}</td>                                            <td>
                                                 <a href="{{ url_for('upload.view_upload', upload_id=upload.id) }}" class="btn btn-sm btn-primary">Analyze</a>
                                                 <button type="button" class="btn btn-sm btn-danger delete-upload-btn" data-upload-id="{{ upload.id }}">Delete</button>
                                             </td>

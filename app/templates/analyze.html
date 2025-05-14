@@ -228,6 +228,9 @@
                     <a href="{{ url_for('upload.upload') }}" class="btn btn-secondary">Upload New Text</a>
                     <a href="{{ url_for('share.shared_page') }}" class="btn btn-primary">Share Results</a>
                 </div>
+                
+                <!-- Include the previous analyses section -->
+                {% include 'previous_analyses.html' %}
             </div>
         </div>
     </div>
