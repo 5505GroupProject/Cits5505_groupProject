@@ -317,20 +317,31 @@ document.addEventListener('DOMContentLoaded', function() {
             
             newsResultsList.appendChild(resultItem);
         });
-    }
-
-    // Function to select and preview an article
+    }    // Function to select and preview an article
     function selectArticle(article) {
         if (!selectedArticlePreview || !previewArticleTitle || !previewArticleContent) return;
         
+        // Check if the article has insufficient content flag
+        if (article.contentInsufficient === true) {
+            // Show alert for insufficient content
+            alert(`Article "${article.title}" has insufficient content. The article may be behind a paywall or not accessible.`);
+            return; // Stop processing this article
+        }
+          
         // Extract content from the article - ensure we get full content
-        let articleContent = article.content || article.description || 'No content available';
+        let articleContent = article.content || 'No content available';
         
         // Remove the "[+XXXX chars]" that NewsAPI adds if present
         articleContent = articleContent.replace(/\[\+\d+ chars\]$/, '');
         
+        // Remove excessive empty lines (replace 3 or more newlines with just 2)
+        articleContent = articleContent.replace(/\n{3,}/g, '\n\n');
+        
+        // Trim any leading or trailing whitespace
+        articleContent = articleContent.trim();
+        
         // Debug log to check content length
-        console.log("Article content length:", articleContent.length, "Article title:", article.title);
+        console.log("Article content length:", articleContent.length, "chars, Article title:", article.title);
         
         // Show the article preview with full content
         previewArticleTitle.textContent = article.title;
@@ -454,18 +465,22 @@ function updateUploadHistoryTable(uploads) {
         messageRow.innerHTML = '<td colspan="4" class="text-center text-muted">No uploads yet.</td>';
         historyTableBody.appendChild(messageRow);
         return;
-    }
-    
-    // Add each upload to the table
+    }    // Add each upload to the table
     uploads.forEach(upload => {
         const row = document.createElement('tr');
         row.dataset.uploadId = upload.id; // Store upload ID in the row for easy reference
+        
+        // Use the analysis URL path if available, otherwise use the regular view upload route
+        const analyzeUrl = upload.analysis_url_path 
+            ? `/analysis/${upload.analysis_url_path}` 
+            : `/upload/view/${upload.id}`;
+            
         row.innerHTML = `
             <td>${upload.title || 'Untitled'}</td>
             <td>${upload.created_at}</td>
             <td>${upload.preview}</td>
             <td>
-                <a href="/analyze/${upload.id}" class="btn btn-sm btn-primary">Analyze</a>
+                <a href="${analyzeUrl}" class="btn btn-sm btn-primary">Analyze</a>
                 <button type="button" class="btn btn-sm btn-danger delete-upload-btn" data-upload-id="${upload.id}">Delete</button>
             </td>
         `;

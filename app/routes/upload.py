@@ -59,8 +59,7 @@ def upload():
                 if len(file_content.strip()) == 0:
                     flash('Uploaded file is empty!', 'danger')
                     return redirect(url_for('upload.upload'))
-                
-                # Create the UploadedText entry
+                  # Create the UploadedText entry
                 new_upload = UploadedText(
                     user_id=current_user.id,
                     title=title or secure_filename(file.filename),
@@ -84,24 +83,6 @@ def upload():
                 # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(file_content)
                 
-                # Check if an analysis result already exists for this upload_id
-                existing_result = AnalysisResult.query.filter_by(
-                    upload_id=new_upload.id,
-                    owner_id=current_user.id
-                ).first()
-                
-                # Create a distinct analysis title to avoid confusion with the upload title
-                analysis_title = f"Analysis Result: {title or secure_filename(file.filename)}"
-                
-                # Use our utility function to save or update the analysis result
-                from app.utils.analysis_utils import save_or_update_analysis_result
-                save_or_update_analysis_result(
-                    title=analysis_title,
-                    content=file_content,
-                    owner_id=current_user.id,
-                    upload_id=new_upload.id
-                )
-                
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
                 session['ngram_data'] = ngram_data
@@ -109,11 +90,10 @@ def upload():
                 session['word_freq_data'] = word_freq_data
                 session['upload_id'] = new_upload.id
                 # Store text preview in session but keep it minimal - we'll get full text from database
-                session['text_content'] = file_content[:500] + "..." if len(file_content) > 500 else file_content
-                
-                # Flash success message and redirect to visualization page
+                session['text_content'] = file_content[:500] + "..." if len(file_content) > 500 else file_content                # Flash success message and redirect to analyze page
                 flash('File uploaded and analyzed successfully!', 'success')
-                return redirect(url_for('main.visualization'))
+                # Redirecting to analyze will then redirect to a unique URL
+                return redirect(url_for('main.analyze'))
             else:
                 flash('No file selected!', 'warning')
             
@@ -140,27 +120,8 @@ def upload():
                 
                 # Perform NER analysis
                 ner_data = perform_ner_analysis(text_content)
-                
-                # Perform word frequency analysis
+                  # Perform word frequency analysis
                 word_freq_data = analyze_word_frequency(text_content)
-                
-                # Check if an analysis result already exists for this upload_id
-                existing_result = AnalysisResult.query.filter_by(
-                    upload_id=new_upload.id,
-                    owner_id=current_user.id
-                ).first()
-                
-                # Create a distinct analysis title to avoid confusion with the upload title
-                analysis_title = f"Analysis Result: {title or 'Text Upload'}"
-                
-                # Use our utility function to save or update the analysis result
-                from app.utils.analysis_utils import save_or_update_analysis_result
-                save_or_update_analysis_result(
-                    title=analysis_title,
-                    content=text_content,
-                    owner_id=current_user.id,
-                    upload_id=new_upload.id
-                )
                 
                 # Store data in session for visualization page - using a reference approach
                 session['sentiment_data'] = sentiment_data
@@ -170,10 +131,9 @@ def upload():
                 session['upload_id'] = new_upload.id
                 # Store text preview in session but keep it minimal - we'll get full text from database
                 session['text_content'] = text_content[:500] + "..." if len(text_content) > 500 else text_content
-                
-                # Flash success message and redirect to visualization page
+                  # Flash success message and redirect to analyze page
                 flash('Text content uploaded and analyzed successfully!', 'success')
-                return redirect(url_for('main.visualization'))
+                return redirect(url_for('main.analyze'))
             else:
                 flash('No content provided!', 'danger')
         
@@ -344,11 +304,20 @@ def get_upload_history():
             
         uploads = UploadedText.query.filter_by(user_id=current_user.id).order_by(UploadedText.created_at.desc()).all()
         
+        # Import AnalysisResult to check for existing analyses
+        from app.models import AnalysisResult
+        
         uploads_list = []
         for upload in uploads:
             # Handle possible None values in content
             content = upload.content or ""
             preview = content[:100] + '...' if len(content) > 100 else content
+            
+            # Check if an analysis result exists for this upload
+            analysis = AnalysisResult.query.filter_by(upload_id=upload.id, owner_id=current_user.id).first()
+            analysis_url_path = None
+            if analysis and analysis.url_path:
+                analysis_url_path = analysis.url_path
             
             uploads_list.append({
                 'id': upload.id,
@@ -356,7 +325,8 @@ def get_upload_history():
                 'filename': getattr(upload, 'filename', None) or 'text_input.txt',
                 'created_at': upload.created_at.strftime('%Y-%m-%d %H:%M:%S'),
                 'preview': preview,
-                'file_type': getattr(upload, 'file_type', 'text')
+                'file_type': getattr(upload, 'file_type', 'text'),
+                'analysis_url_path': analysis_url_path
             })
         
         return jsonify({
@@ -377,13 +347,25 @@ def get_upload_history():
 @login_required
 def view_upload(upload_id):
     try:
+        from app.models import AnalysisResult
+        
         upload = UploadedText.query.get_or_404(upload_id)
         
         # Security check - ensure user can only see their own uploads
         if upload.user_id != current_user.id:
             return render_template('error.html', message="You don't have permission to view this upload"), 403
         
-        # Instead of rendering view_upload.html, set up session variables and redirect to visualization
+        # Check if an analysis result already exists for this upload with a URL path
+        existing_analysis = AnalysisResult.query.filter_by(
+            upload_id=upload_id, 
+            owner_id=current_user.id
+        ).first()
+        
+        if existing_analysis and existing_analysis.url_path:
+            # If analysis exists with URL path, redirect directly to it
+            return redirect(url_for('main.analyze', url_path=existing_analysis.url_path))
+        
+        # Otherwise, set up session variables and go through the regular analyze flow
         # Retrieve content and set it in the session
         content = upload.content
         
@@ -406,12 +388,11 @@ def view_upload(upload_id):
         session['word_freq_data'] = word_freq_data
         session['upload_id'] = upload.id
         session['text_content'] = content[:500] + "..." if len(content) > 500 else content
+          # Flash a message to the user
+        flash('Content loaded for analysis', 'success')
         
-        # Flash a message to the user
-        flash('Content loaded for visualization', 'success')
-        
-        # Redirect to the visualization page
-        return redirect(url_for('main.visualization'))
+        # Redirect to the analysis page (which will create a URL and redirect again)
+        return redirect(url_for('main.analyze'))
         
     except Exception as e:
         current_app.logger.error(f"Error viewing upload: {str(e)}")
@@ -435,35 +416,14 @@ def delete_upload(upload_id):
             }), 400
             
         upload = UploadedText.query.get_or_404(upload_id)
-        
-        # Security check - ensure user can only delete their own uploads
+          # Security check - ensure user can only delete their own uploads
         if upload.user_id != current_user.id:
             return jsonify({
                 'success': False,
                 'error': "You don't have permission to delete this upload"
             }), 403
         
-        # Manually delete shared analysis entries first
-        try:
-            # Find analysis results for this upload
-            analysis_results = AnalysisResult.query.filter_by(upload_id=upload_id).all()
-            
-            # For each analysis result, delete the shared entries
-            for result in analysis_results:
-                shared_entries = SharedAnalysis.query.filter_by(analysis_id=result.id).all()
-                for entry in shared_entries:
-                    db.session.delete(entry)
-            
-            # Now delete the analysis results themselves
-            for result in analysis_results:
-                db.session.delete(result)
-            
-            db.session.flush()  # Flush changes before deleting the upload
-        except Exception as e:
-            current_app.logger.error(f"Error deleting related records: {str(e)}")
-        
-        # Delete the upload itself - if foreign keys are properly enabled,
-        # this should cascade to analysis_results
+        # Delete the upload itself
         db.session.delete(upload)
         db.session.commit()
         
@@ -589,26 +549,14 @@ def search_news():
                         current_app.logger.error(f"Error fetching full article: {str(e)}")
                 
                 # Ensure we have substantial content
-                if not content or len(content.strip()) < 200:
-                    # Try to get a better fallback by combining title, description, and any content we have
-                    title = article.get('title', '')
-                    description = article.get('description', '')
+                if not content or len(content.strip()) < 225:
+                    # Instead of trying to create a fallback, report that content extraction failed
+                    current_app.logger.warning(f"Insufficient content for article: {article.get('title', 'Unknown')}")
+                    content = "Content extraction failed. The article may be behind a paywall or not accessible."
                     
-                    # Combine all available text
-                    combined_text = []
-                    if title:
-                        combined_text.append(title)
-                    if description:
-                        combined_text.append(description)
-                    if content:
-                        combined_text.append(content)
-                        
-                    # If we still don't have enough, repeat what we have
-                    content = '\n\n'.join(combined_text)
-                    if len(content.strip()) < 200:
-                        content = content * 3  # Triple the content as fallback
-                
-                # Remove "[+XXXX chars]" that NewsAPI adds
+                    # Add a flag to indicate content extraction failure
+                    article['contentInsufficient'] = True
+                  # Remove "[+XXXX chars]" that NewsAPI adds
                 content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
                 
                 articles.append({
@@ -618,7 +566,8 @@ def search_news():
                     'publishedAt': publish_date,
                     'description': article.get('description', ''),
                     'content': content,
-                    'urlToImage': article.get('urlToImage', '')
+                    'urlToImage': article.get('urlToImage', ''),
+                    'contentInsufficient': article.get('contentInsufficient', False)
                 })
                 
             return jsonify({
@@ -751,26 +700,13 @@ def latest_news():
                                     current_app.logger.info(f"Successfully extracted full content: {len(content)} chars")
                     except Exception as e:
                         current_app.logger.error(f"Error fetching full article: {str(e)}")
-                
-                # Ensure we have substantial content
-                if not content or len(content.strip()) < 200:
-                    # Try to get a better fallback by combining title, description, and any content we have
-                    title = article.get('title', '')
-                    description = article.get('description', '')
-                    
-                    # Combine all available text
-                    combined_text = []
-                    if title:
-                        combined_text.append(title)
-                    if description:
-                        combined_text.append(description)
-                    if content:
-                        combined_text.append(content)
-                        
-                    # If we still don't have enough, repeat what we have
-                    content = '\n\n'.join(combined_text)
-                    if len(content.strip()) < 200:
-                        content = content * 3  # Triple the content as fallback
+                  # Ensure we have substantial content
+                if not content or len(content.strip()) < 225:
+                    # Instead of trying to create a fallback, report that content extraction failed
+                    current_app.logger.warning(f"Insufficient content for article: {article.get('title', 'Unknown')}")
+                    content = "Content extraction failed. The article may be behind a paywall or not accessible."
+                      # Add a flag to indicate content extraction failure
+                    article['contentInsufficient'] = True
                 
                 # Remove "[+XXXX chars]" that NewsAPI adds
                 content = re.sub(r'\[\+\d+ chars\]$', '', content).strip()
@@ -782,7 +718,8 @@ def latest_news():
                     'publishedAt': publish_date,
                     'description': article.get('description', ''),
                     'content': content,
-                    'urlToImage': article.get('urlToImage', '')
+                    'urlToImage': article.get('urlToImage', ''),
+                    'contentInsufficient': article.get('contentInsufficient', False)
                 })
                 
             return jsonify({

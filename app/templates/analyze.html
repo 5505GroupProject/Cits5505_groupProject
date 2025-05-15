@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+
+{% block title %}Text Analysis Results{% endblock %}
+
+{% block content %}
+<main class="analysis-section page-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="analysis-container">
+                    <div class="analysis-header">
+                        <h2>Text Analysis Results</h2>
+                    </div>
+                    
+                    <!-- Here's where the original analyzed text shows up - keeping it simple -->
+                    <div class="text-content-box mb-4">
+                        <h3>Analyzed Text Content</h3>
+                        <div class="analyzed-text-wrapper">{{ analyzed_text }}</div>
+                    </div>
+                    
+                    <!-- Bootstrap accordion for all the analysis sections -->
+                    <div class="accordion" id="analysisAccordion">
+                        <!-- First panel - sentiment stuff -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                    Sentiment Analysis Results
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1">
+                                <div class="accordion-body">
+                                    {% if sentiment_data %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h4>Sentiment Analysis Results:</h4>
+                                                <ul class="list-unstyled">
+                                                    <li>Overall Sentiment: <span class="fw-bold">{{ sentiment_data.sentiment }}</span></li>
+                                                    <li>Compound Score: <span class="fw-bold">{{ sentiment_data.compound_score|round(2) }}</span></li>
+                                                    <li>Positive Sentiment: <span class="fw-bold">{{ (sentiment_data.positive_score*100)|round(1) }}%</span></li>
+                                                    <li>Neutral Sentiment: <span class="fw-bold">{{ (sentiment_data.neutral_score*100)|round(1) }}%</span></li>
+                                                    <li>Negative Sentiment: <span class="fw-bold">{{ (sentiment_data.negative_score*100)|round(1) }}%</span></li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div style="width: 300px; height: 300px; margin: 0 auto;">
+                                                    <canvas id="sentimentChart"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-center text-muted">No sentiment analysis data available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Second panel - ngrams (word patterns) -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    N-gram Analysis Results
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2">
+                                <div class="accordion-body">
+                                    {% if ngram_data %}
+                                        <!-- Simple table format for unigrams -->
+                                        <h4>Word Frequency:</h4>
+                                        <div style="margin: 20px 0; width: 100%;">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Word</th>
+                                                        <th>Frequency</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for gram in ngram_data.unigrams.ngrams[:10] %}
+                                                    <tr>
+                                                        <td>{{ gram.ngram }}</td>
+                                                        <td>{{ gram.count }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                            <div id="chart1Container" style="width:100%; height:300px; overflow:hidden; margin:15px 0; background:#fff;">
+                                                <div id="chart1Placeholder" style="height:300px; border:1px solid #ddd; border-radius:5px;">
+                                                    <canvas id="ngramChart1"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Simple table format for bigrams -->
+                                        <h4>Two-Word Combination Frequency:</h4>
+                                        <div style="margin: 20px 0; width: 100%;">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Word Pair</th>
+                                                        <th>Frequency</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for gram in ngram_data.bigrams.ngrams[:10] %}
+                                                    <tr>
+                                                        <td>{{ gram.ngram }}</td>
+                                                        <td>{{ gram.count }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                            <div id="chart2Container" style="width:100%; height:300px; overflow:hidden; margin:15px 0; background:#fff;">
+                                                <div id="chart2Placeholder" style="height:300px; border:1px solid #ddd; border-radius:5px;">
+                                                    <canvas id="ngramChart2"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Simple table format for trigrams -->
+                                        <h4>Three-Word Combination Frequency:</h4>
+                                        <div style="margin: 20px 0; width: 100%;">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Word Triplet</th>
+                                                        <th>Frequency</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for gram in ngram_data.trigrams.ngrams[:10] %}
+                                                    <tr>
+                                                        <td>{{ gram.ngram }}</td>
+                                                        <td>{{ gram.count }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                            <div id="chart3Container" style="width:100%; height:300px; overflow:hidden; margin:15px 0; background:#fff;">
+                                                <div id="chart3Placeholder" style="height:300px; border:1px solid #ddd; border-radius:5px;">
+                                                    <canvas id="ngramChart3"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-center text-muted">No N-gram analysis data available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Third panel - named entities (people, orgs, places, etc) -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    Named Entity Recognition Results
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3">
+                                <div class="accordion-body">
+                                    {% if ner_data and ner_data.entity_types %}
+                                        {% for entity_type, entities in ner_data.entity_types.items() %}
+                                            <h4>{{ entity_type }}:</h4>
+                                            <ul>
+                                                {% for entity in entities %}
+                                                    <li>{{ entity }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-center text-muted">No named entity recognition data available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fourth panel - word frequency stats -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                    Word Frequency Analysis Results
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4">
+                                <div class="accordion-body">
+                                    {% if word_freq_data %}
+                                        <h4>Word Frequency Statistics:</h4>
+                                        <ul>
+                                            <li>Total Words: <span class="fw-bold">{{ word_freq_data.total_words }}</span></li>
+                                            <li>Unique Words: <span class="fw-bold">{{ word_freq_data.unique_words }}</span></li>
+                                            <li>Vocabulary Diversity: <span class="fw-bold">{{ (word_freq_data.unique_words / word_freq_data.total_words * 100)|round(2) }}%</span></li>
+                                        </ul>
+
+                                        <h4>High-Frequency Words:</h4>
+                                        <ul>
+                                            {% for word in word_freq_data.top_words %}
+                                                <li><span class="fw-bold">{{ word.word }}</span>: {{ word.count }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="text-center text-muted">No word frequency analysis data available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fifth panel - word cloud visualization -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                                    Word Cloud Visualization
+                                </button>
+                            </h2>
+                            <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5">
+                                <div class="accordion-body">
+                                    {% if word_freq_data and word_freq_data.top_words %}
+                                        <div id="wordCloudContainer" style="width: 100%; height: 500px; border: 1px solid #ddd; background-color: white; margin: 20px auto; display: block; border-radius: 8px;"></div>
+                                    {% else %}
+                                        <p class="text-center text-muted">No word frequency data available for word cloud visualization</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                  <!-- Button to upload new text -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a href="{{ url_for('upload.upload') }}" class="btn btn-secondary">Upload New Text</a>
+                </div>
+                
+                <!-- Include the previous analyses section -->
+                {% include 'previous_analyses.html' %}
+            </div>
+        </div>
+    </div>
+</main>
+
+{% if sentiment_data %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sentiment Chart
+    var ctx = document.getElementById('sentimentChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                data: [{{ (sentiment_data.positive_score*100)|round(1) }}, 
+                      {{ (sentiment_data.neutral_score*100)|round(1) }}, 
+                      {{ (sentiment_data.negative_score*100)|round(1) }}],
+                backgroundColor: ['#4CAF50', '#FFC107', '#F44336']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+});
+</script>
+{% endif %}
+
+{% if ngram_data %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize chart variables to prevent multiple rendering
+    let chart1 = null;
+    let chart2 = null;
+    let chart3 = null;
+
+    // Function to render chart 1 (unigrams)
+    function renderChart1() {
+        if (chart1) return; // Don't render if already exists
+        
+        console.log('Rendering unigram chart...');
+        var canvas = document.getElementById('ngramChart1');
+        var ctx = canvas.getContext('2d');
+        
+        chart1 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for gram in ngram_data.unigrams.ngrams[:10] %}'{{ gram.ngram }}', {% endfor %}],
+                datasets: [{
+                    label: 'Word Frequency',
+                    data: [{% for gram in ngram_data.unigrams.ngrams[:10] %}{{ gram.count }}, {% endfor %}],
+                    backgroundColor: '#2196F3'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+    }
+
+    // Function to render chart 2 (bigrams)
+    function renderChart2() {
+        if (chart2) return; // Don't render if already exists
+        
+        console.log('Rendering bigram chart...');
+        var canvas = document.getElementById('ngramChart2');
+        var ctx = canvas.getContext('2d');
+        
+        chart2 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for gram in ngram_data.bigrams.ngrams[:10] %}'{{ gram.ngram }}', {% endfor %}],
+                datasets: [{
+                    label: 'Two-Word Combination Frequency',
+                    data: [{% for gram in ngram_data.bigrams.ngrams[:10] %}{{ gram.count }}, {% endfor %}],
+                    backgroundColor: '#4CAF50'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+    }
+
+    // Function to render chart 3 (trigrams)
+    function renderChart3() {
+        if (chart3) return; // Don't render if already exists
+        
+        console.log('Rendering trigram chart...');
+        var canvas = document.getElementById('ngramChart3');
+        var ctx = canvas.getContext('2d');
+        
+        chart3 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for gram in ngram_data.trigrams.ngrams[:10] %}'{{ gram.ngram }}', {% endfor %}],
+                datasets: [{
+                    label: 'Three-Word Combination Frequency',
+                    data: [{% for gram in ngram_data.trigrams.ngrams[:10] %}{{ gram.count }}, {% endfor %}],
+                    backgroundColor: '#FF9800'
+                }]
+            },
+            options: {
+                responsive: true, 
+                maintainAspectRatio: true
+            }
+        });
+    }
+
+    // Add event listener for the ngram accordion section
+    var ngramSection = document.getElementById('collapse2');
+    if (ngramSection) {
+        // Listen for when the accordion is shown
+        ngramSection.addEventListener('shown.bs.collapse', function() {
+            console.log('N-gram section opened');
+            // Render all charts with a slight delay
+            setTimeout(function() {
+                renderChart1();
+                renderChart2();
+                renderChart3();
+            }, 100);
+        });
+    }
+
+    // If the ngram section is already open on page load, render the charts
+    if (document.getElementById('collapse2').classList.contains('show')) {
+        console.log('N-gram section is already open on load');
+        setTimeout(function() {
+            renderChart1();
+            renderChart2();
+            renderChart3();
+        }, 500);
+    }
+});
+</script>
+{% endif %}
+
+{% if word_freq_data and word_freq_data.top_words %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Word Cloud
+    var container = document.getElementById('wordCloudContainer');
+    
+    if (container) {
+        // Prepare the word list
+        var wordList = [
+            {% for word in word_freq_data.top_words %}
+                {% if word.word|length > 0 and word.word is string %}
+                    ['{{ word.word }}', {{ word.count }}],
+                {% endif %}
+            {% endfor %}
+        ];
+        
+        // Function to render word cloud
+        function renderWordCloud() {
+            container.innerHTML = '<p class="text-center">Generating word cloud...</p>';
+            
+            setTimeout(function() {
+                try {
+                    WordCloud(container, {
+                        list: wordList,
+                        gridSize: 5,
+                        weightFactor: function (size) {
+                            return size * 10;
+                        },
+                        fontFamily: 'Arial',
+                        color: function() {
+                            return 'hsl(' + Math.random() * 360 + ', 70%, 50%)';
+                        },
+                        backgroundColor: '#ffffff',
+                        rotateRatio: 0.5
+                    });
+                } catch (e) {
+                    container.innerHTML = '<p class="text-center text-danger">Failed to generate word cloud: ' + e.message + '</p>';
+                    console.error('Word cloud error:', e);
+                }
+            }, 500);
+        }
+        
+        // Listen for accordion expand
+        document.getElementById('heading5').addEventListener('click', function() {
+            setTimeout(renderWordCloud, 300);
+        });
+        
+        // Check if this section is already open
+        if (document.getElementById('collapse5').classList.contains('show')) {
+            renderWordCloud();
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

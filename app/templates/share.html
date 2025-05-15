@@ -115,14 +115,12 @@
                     <div class="card-header">
                         <h3>Shared with Me</h3>
                     </div>
-                    <div class="card-body">
-                        {% if shared_results %}
+                    <div class="card-body">                        {% if shared_results %}
                             <div class="list-group">
-                            {% for result in shared_results %}
-                                <a href="{{ url_for('share.view_result', result_id=result.id) }}" 
+                            {% for result in shared_results %}                                <a href="{{ url_for('share.view_shared_analysis', shared_id=result.id) }}" 
                                    class="list-group-item list-group-item-action">
                                     <h5 class="mb-1">{{ result.title }}</h5>
-                                    <small class="text-muted">Shared by: {{ result.owner.username }}</small>
+                                    <small class="text-muted">Shared by: {{ result.sharer.username if result.sharer else "Unknown" }}</small>
                                 </a>
                             {% endfor %}
                             </div>

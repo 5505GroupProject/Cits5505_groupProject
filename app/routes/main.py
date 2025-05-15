@@ -1,10 +1,73 @@
-from flask import Blueprint, render_template, session, request, redirect, url_for, flash
-from flask_login import login_required
+from flask import Blueprint, render_template, session, request, redirect, url_for, flash, jsonify
+from flask_login import login_required, current_user
 from ..utils.ngram_utils import get_multiple_ngrams
 from ..utils.word_frequency_utils import analyze_word_frequency
+from app.models import UploadedText, AnalysisResult, SharedAnalysis
+from app import db
+import json
+import uuid
+import hashlib
 
 
 main_bp = Blueprint('main', __name__)
+
+# Helper function to generate a URL path
+def _generate_url_path():
+    """Generate a unique URL path for an analysis result"""
+    unique_id = str(uuid.uuid4())
+    hash_id = hashlib.md5(f"{unique_id}-{current_user.id}".encode()).hexdigest()[:10]
+    return f"{current_user.id}-{hash_id}"
+
+# Helper function to process text content and generate analysis data
+def _process_text_content(text_content):
+    """Process text content and generate analysis data"""
+    result = {
+        'ngram_data': None,
+        'word_freq_data': None
+    }
+    
+    if text_content and text_content != 'No text analyzed yet.':
+        # Generate N-gram data
+        result['ngram_data'] = get_multiple_ngrams(text_content)
+        
+        # Generate word frequency data
+        result['word_freq_data'] = analyze_word_frequency(text_content)
+        
+        # Store word frequency data in session
+        session['word_freq_data'] = result['word_freq_data']
+    
+    return result
+
+# Helper function to load analysis data from an analysis object
+def _load_analysis_data(analysis):
+    """Load and parse analysis data from an analysis object"""
+    result = {
+        'sentiment_data': None,
+        'ngram_data': None,
+        'ner_data': None,
+        'word_freq_data': None
+    }
+    
+    if analysis:
+        if analysis.sentiment_data:
+            result['sentiment_data'] = json.loads(analysis.sentiment_data)
+        
+        if analysis.ngram_data:
+            result['ngram_data'] = json.loads(analysis.ngram_data)
+        
+        if analysis.ner_data:
+            result['ner_data'] = json.loads(analysis.ner_data)
+        
+        if analysis.word_freq_data:
+            result['word_freq_data'] = json.loads(analysis.word_freq_data)
+    
+    return result
+
+# Helper function to get previous analyses
+def _get_previous_analyses():
+    """Get previous analysis results for the current user"""
+    return AnalysisResult.query.filter_by(owner_id=current_user.id) \
+        .order_by(AnalysisResult.created_at.desc()).limit(5).all()
 
 @main_bp.route('/')
 def home():
@@ -14,132 +77,158 @@ def home():
 def login():
     return render_template('login.html')
 
-@main_bp.route('/visualization')
+@main_bp.route('/analyze')
+@main_bp.route('/analysis/<string:url_path>')
 @login_required
-def visualization():
-    from app.models import UploadedText
-    from flask_login import current_user
-    from app.models import AnalysisResult
-    from app import db
-    import json
-    from flask import render_template_string
-    from datetime import datetime
+def analyze(url_path=None):
+    """
+    Unified route to handle both new analysis and viewing existing analysis
+    If url_path is provided, it loads an existing analysis
+    If no url_path, it creates a new analysis based on upload_id or session data
+    """
+    # Check if we're viewing an existing analysis
+    if url_path:
+        # Get the analysis result
+        analysis = AnalysisResult.query.filter_by(url_path=url_path).first_or_404()
+        
+        # Check if the current user owns the analysis or has shared access
+        if analysis.owner_id != current_user.id:
+            # Check if the analysis is shared with the current user
+            shared = SharedAnalysis.query.filter_by(
+                user_id=current_user.id,
+                analysis_id=analysis.id
+            ).first()
+            if not shared:
+                flash('You do not have permission to view this analysis', 'danger')
+                return redirect(url_for('main.home'))
+        
+        # Load analysis data from the analysis object
+        analysis_data = _load_analysis_data(analysis)
+        
+        # Get previous analysis results for the current user
+        previous_analyses = _get_previous_analyses()
+        
+        # Render the analysis template with the data
+        return render_template(
+            'analyze.html',
+            sentiment_data=analysis_data['sentiment_data'],
+            ngram_data=analysis_data['ngram_data'],
+            ner_data=analysis_data['ner_data'],
+            word_freq_data=analysis_data['word_freq_data'],
+            analyzed_text=analysis.content,
+            is_saved_analysis=True,
+            analysis=analysis,
+            previous_analyses=previous_analyses
+        )
     
-    # Get four types of analysis results from session
+    # Creating a new analysis based on upload_id or session data
+    # Get analysis results from session
     sentiment_data = session.get('sentiment_data', None)
     ner_data = session.get('ner_data', None) 
     word_freq_data = session.get('word_freq_data', None)
     
     # Get the upload_id from the session
     upload_id = session.get('upload_id', None)
+    text_content = 'No text analyzed yet.'
+    ngram_data = None
     
-    # Try to get the full text content from the database if possible
+    # Try to get the text content from database if possible
     if upload_id:
         uploaded_text = UploadedText.query.get(upload_id)
         if uploaded_text and uploaded_text.user_id == current_user.id:
             # Get the full text directly from the database
             text_content = uploaded_text.content
+            
+            # Store the analysis results in the database
+            try:
+                # Process the text content to get analysis data
+                analysis_results = _process_text_content(text_content)
+                ngram_data = analysis_results['ngram_data']
+                word_freq_data = analysis_results['word_freq_data']
+                
+                # Convert data to JSON for storage
+                sentiment_json = json.dumps(sentiment_data) if sentiment_data else None
+                ner_json = json.dumps(ner_data) if ner_data else None
+                ngram_json = json.dumps(ngram_data) if ngram_data else None
+                word_freq_json = json.dumps(word_freq_data) if word_freq_data else None
+                
+                # Create a title for the analysis result
+                title = f"Analysis of {uploaded_text.title}"
+                
+                # Check if an analysis result already exists
+                existing_analysis = AnalysisResult.query.filter_by(
+                    upload_id=upload_id, 
+                    owner_id=current_user.id
+                ).first()
+                
+                if existing_analysis:
+                    # Update the existing analysis result
+                    existing_analysis.content = text_content
+                    existing_analysis.sentiment_data = sentiment_json
+                    existing_analysis.ngram_data = ngram_json
+                    existing_analysis.ner_data = ner_json
+                    existing_analysis.word_freq_data = word_freq_json
+                    
+                    # If URL path doesn't exist, create one
+                    if not existing_analysis.url_path:
+                        existing_analysis.url_path = _generate_url_path()
+                    
+                    url_path = existing_analysis.url_path
+                else:
+                    # Create a unique URL path
+                    url_path = _generate_url_path()
+                      # Create a new analysis result
+                    new_analysis = AnalysisResult(
+                        title=title,
+                        content=text_content,
+                        sentiment_data=sentiment_json,
+                        ngram_data=ngram_json,
+                        ner_data=ner_json,
+                        word_freq_data=word_freq_json,
+                        owner_id=current_user.id,
+                        upload_id=upload_id,
+                        url_path=url_path
+                    )
+                    db.session.add(new_analysis)
+                
+                db.session.commit()
+                flash('Analysis results saved to database', 'success')
+                
+                # Redirect to the unique URL path
+                return redirect(url_for('main.analyze', url_path=url_path))
+            except Exception as e:
+                flash(f'Error saving analysis results: {str(e)}', 'danger')
+                db.session.rollback()
         else:
             # Fallback to session data
             text_content = session.get('text_content', 'No text analyzed yet.')
+            
+            # Process the text content
+            analysis_results = _process_text_content(text_content)
+            ngram_data = analysis_results['ngram_data']
+            word_freq_data = analysis_results['word_freq_data']
     else:
         # Fallback to session data
         text_content = session.get('text_content', 'No text analyzed yet.')
+        
+        # Process the text content
+        analysis_results = _process_text_content(text_content)
+        ngram_data = analysis_results['ngram_data']
+        word_freq_data = analysis_results['word_freq_data']
     
-    # Regenerate the N-gram data
-    if text_content and text_content != 'No text analyzed yet.':
-        ngram_data = get_multiple_ngrams(text_content)
-
-        # Use the proper word frequency analysis function
-        word_freq_data = analyze_word_frequency(text_content)
-
-        session['word_freq_data'] = word_freq_data
-    else:
-        ngram_data = None
-
-    # Render the visualization template with the analysis data
-    rendered_template = render_template(
-        'visualization.html', 
+    # Get previous analysis results for the current user
+    previous_analyses = _get_previous_analyses()
+    
+    # Render the analysis template with the analysis data
+    return render_template(
+        'analyze.html', 
         sentiment_data=sentiment_data,
         ngram_data=ngram_data, 
         ner_data=ner_data,
         word_freq_data=word_freq_data,
-        analyzed_text=text_content
+        analyzed_text=text_content,
+        previous_analyses=previous_analyses
     )
-    
-    # Save the analysis result to the database if it doesn't already exist
-    if upload_id and sentiment_data and ngram_data and ner_data and word_freq_data:
-        # Get the uploaded text
-        uploaded_text = UploadedText.query.get(upload_id)
-        if uploaded_text and uploaded_text.user_id == current_user.id:
-            # Check if we already have a result for this specific upload_id
-            existing_results = AnalysisResult.query.filter_by(
-                upload_id=upload_id,
-                owner_id=current_user.id
-            ).all()
-            
-            # If there's at least one existing result, update it instead of creating a new one
-            if existing_results:
-                # Use the first existing result and update it
-                result_to_update = existing_results[0]
-                
-                # If there are multiple results (duplicates), remove the extras
-                if len(existing_results) > 1:
-                    for result in existing_results[1:]:
-                        db.session.delete(result)
-                
-                # Create consistent title format
-                title = f"Analysis Result: {uploaded_text.title or 'Untitled Text'}"
-            
-            # Capture the important parts of the analysis as HTML
-            sentiment_section = render_template_string("""
-                <h3>Sentiment Analysis</h3>
-                <p>Overall Sentiment: <strong>{{ sentiment.sentiment }}</strong></p>
-                <p>Compound Score: <strong>{{ sentiment.compound_score|round(2) }}</strong></p>
-                <p>Positive: {{ (sentiment.positive_score*100)|round(1) }}%, 
-                   Neutral: {{ (sentiment.neutral_score*100)|round(1) }}%, 
-                   Negative: {{ (sentiment.negative_score*100)|round(1) }}%</p>
-            """, sentiment=sentiment_data)
-            
-            word_freq_section = render_template_string("""
-                <h3>Word Frequency Analysis</h3>
-                <p>Total Words: {{ freq.total_words }}</p>
-                <p>Unique Words: {{ freq.unique_words }}</p>
-                <p>Top 5 Words:</p>
-                <ul>
-                {% for word in freq.top_words[:5] %}
-                    <li>{{ word.word }}: {{ word.count }}</li>
-                {% endfor %}
-                </ul>
-            """, freq=word_freq_data)
-            
-            # Combine the sections
-            content = f"""
-                <div class="analysis-result">
-                    <h2>Analysis Results for: {uploaded_text.title or 'Untitled'}</h2>
-                    <div class="analysis-text">
-                        <h3>Analyzed Text Preview</h3>
-                        <p>{text_content[:300]}...</p>
-                    </div>
-                    <div class="analysis-sections">
-                        {sentiment_section}
-                        {word_freq_section}
-                    </div>
-                    <p><em>Analysis generated on {datetime.now().strftime('%Y-%m-%d %H:%M')}</em></p>
-                </div>
-            """
-            
-            # Use our utility function to save or update the analysis result
-            from app.utils.analysis_utils import save_or_update_analysis_result
-            save_or_update_analysis_result(
-                title=title,
-                content=content,
-                owner_id=current_user.id,
-                upload_id=upload_id
-            )
-    
-    # Return the rendered template
-    return rendered_template
 
 @main_bp.route('/protected-route')
 @login_required
@@ -150,6 +239,11 @@ def protected_route():
 @main_bp.route('/upload')
 @login_required
 def upload():
+    # Check if there's a pending flash message
+    if 'pending_flash' in session:
+        flash_data = session.pop('pending_flash')
+        flash(flash_data['message'], flash_data['category'])
+    
     return render_template('upload.html')
 
 @main_bp.route('/profile')
@@ -158,80 +252,36 @@ def profile():
     """Redirect to the auth profile page."""
     return redirect(url_for('auth.profile'))
 
-@main_bp.route('/analyze/<int:upload_id>')
+@main_bp.route('/api/latest_analysis')
 @login_required
-def analyze_upload(upload_id):
-    """Direct analysis of a previously uploaded text"""
-    from app.models import UploadedText, AnalysisResult
-    from flask_login import current_user
-    from ..utils.sentiment_utils import get_sentiment_summary
-    from ..utils.ngram_utils import get_multiple_ngrams
-    from ..utils.ner_utils import perform_ner_analysis
-    from ..utils.word_frequency_utils import analyze_word_frequency
-    from app import db
-    
+def get_latest_analysis():
+    """
+    API endpoint to retrieve the latest analysis result ID for the current user
+    Returns the latest result ID or indicates no results exist
+    """
     try:
-        # Get the uploaded text from the database
-        upload = UploadedText.query.get_or_404(upload_id)
+        # Find the most recent analysis result for the current user
+        latest_result = AnalysisResult.query.filter_by(owner_id=current_user.id) \
+                                    .order_by(AnalysisResult.created_at.desc()) \
+                                    .first()
         
-        # Security check - ensure user can only see their own uploads
-        if upload.user_id != current_user.id:
-            flash("You don't have permission to view this upload", 'danger')
-            return redirect(url_for('main.upload'))
-            
-        # Get the content
-        text_content = upload.content
-        
-        # Instead of deleting and re-creating, we'll use our save_or_update utility
-        # which will properly handle existing results and ensure consistent title formatting
-        from app.utils.analysis_utils import save_or_update_analysis_result
-        
-        # This will ensure any existing results are properly updated 
-        # or new ones created with proper title formatting
-        analysis_title = f"Analysis Result: {upload.title or 'Untitled Text'}"
-        
-        if text_content:
-            # Perform all analysis again (or for the first time)
-            sentiment_data = get_sentiment_summary(text_content)
-            ngram_data = get_multiple_ngrams(text_content)
-            ner_data = perform_ner_analysis(text_content)
-            word_freq_data = analyze_word_frequency(text_content)
-            
-            # Use our utility function to create or update the analysis result with proper formatting
-            # This will avoid creating duplicate entries or entries with incorrect title formats
-            save_or_update_analysis_result(
-                title=analysis_title,
-                content=text_content,
-                owner_id=current_user.id,
-                upload_id=upload_id
-            )
-            
-            # Store in session for the visualization page
-            session['sentiment_data'] = sentiment_data
-            session['ngram_data'] = ngram_data
-            session['ner_data'] = ner_data
-            session['word_freq_data'] = word_freq_data
-            session['upload_id'] = upload_id
-            session['text_content'] = text_content[:500] + "..." if len(text_content) > 500 else text_content
-            
-            # Redirect to visualization page
-            return redirect(url_for('main.visualization'))
+        if latest_result:
+            return jsonify({"success": True, "url_path": latest_result.url_path})
         else:
-            flash('No content available for analysis', 'warning')
-            return redirect(url_for('main.upload'))
-            
+            # Set flash message in session without displaying it yet
+            session['pending_flash'] = {
+                'message': 'You have no analysis results yet. Please upload content first.',
+                'category': 'info'
+            }
+            return jsonify({"success": False, "message": "No analysis results found"})
+    
     except Exception as e:
-        flash(f'Error retrieving upload: {str(e)}', 'danger')
-        return redirect(url_for('main.upload'))
+        return jsonify({"success": False, "message": f"Error retrieving analysis results: {str(e)}"}), 500
 
 @main_bp.route('/cleanup-orphaned-results')
 @login_required
 def cleanup_orphaned_results():
     """Utility route to clean up orphaned analysis results"""
-    from app.models import AnalysisResult
-    from app import db
-    from flask_login import current_user
-    
     try:
         # Get all analysis results for the current user
         results = AnalysisResult.query.filter_by(owner_id=current_user.id).all()
@@ -255,4 +305,6 @@ def cleanup_orphaned_results():
         db.session.rollback()
         flash(f'Error cleaning up orphaned results: {str(e)}', 'danger')
         return redirect(url_for('main.home'))
+
+# The view_analysis_by_path route has been merged with the analyze route
 
