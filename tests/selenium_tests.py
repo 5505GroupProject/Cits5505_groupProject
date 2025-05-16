@@ -1,11 +1,15 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
 import unittest
+import os
 
 class TestSelenium(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.Chrome(executable_path='chromedriver.exe')
+        chromedriver_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'chromedriver.exe')
+        service = Service(chromedriver_path)
+        self.driver = webdriver.Chrome(service=service)
         self.driver.get('http://localhost:5000')
 
     def tearDown(self):

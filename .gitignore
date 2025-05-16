@@ -173,3 +173,25 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 .DS_Store
+
+# Project specific files
+instance/sentinews.db
+# Keep instance directory structure but ignore database files
+!instance/.gitkeep
+
+# User-uploaded files (keep directory structure but ignore uploaded files)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+app/static/uploads/avatars/*
+!app/static/uploads/avatars/.gitkeep
+
+# Test related files
+# Keep Chrome WebDriver
+!tests/chromedriver.exe
+# Other executable files
+*.exe
+!tests/*.exe
+
+# VS Code
+.vscode/
+*.code-workspace
