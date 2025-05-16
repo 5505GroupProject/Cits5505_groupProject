@@ -314,17 +314,20 @@ document.addEventListener('DOMContentLoaded', function() {
             resultItem.addEventListener('click', function() {
                 selectArticle(article);
             });
-            
-            newsResultsList.appendChild(resultItem);
+              newsResultsList.appendChild(resultItem);
         });
-    }    // Function to select and preview an article
+    }
+    
+    // Function to select and preview an article
     function selectArticle(article) {
         if (!selectedArticlePreview || !previewArticleTitle || !previewArticleContent) return;
         
         // Check if the article has insufficient content flag
         if (article.contentInsufficient === true) {
-            // Show alert for insufficient content
-            alert(`Article "${article.title}" has insufficient content. The article may be behind a paywall or not accessible.`);
+            // Show confirmation dialog with a button to visit source URL
+            if (confirm(`Article "${article.title}" has insufficient content. The article may be behind a paywall or not accessible.\n\nWould you like to visit the original source website?`)) {
+                window.open(article.url, '_blank');
+            }
             return; // Stop processing this article
         }
           
