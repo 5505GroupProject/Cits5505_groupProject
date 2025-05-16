@@ -91,3 +91,9 @@ python tests/selenium_tests.py
 ## Notes
 - The database file (`sentinews.db`) must be present in the `instance/` directory
 - Make sure your Chrome browser version matches the ChromeDriver version for Selenium tests
+
+## Declaration of AI Tools Usage 
+- Our team have used AI tools to assist completing the project by following ways: 
+  - Write codes and comments directly. 
+  - Write the documents about the project. 
+  - Query doubts and receive suggestions to improve the codes, documents or project quality. 
