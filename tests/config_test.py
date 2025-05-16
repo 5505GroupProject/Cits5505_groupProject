@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append('..')
 from config import Config
 
 class TestConfig(Config):

@@ -5,7 +5,8 @@ import unittest
 class TestSelenium(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.Chrome(executable_path='./chromedriver.exe')
+        # 使用当前目录下的chromedriver.exe，它现在位于tests文件夹中
+        self.driver = webdriver.Chrome(executable_path='chromedriver.exe')
         self.driver.get('http://localhost:5000')
 
     def tearDown(self):
@@ -20,7 +21,7 @@ class TestSelenium(unittest.TestCase):
 
     def test_upload_page_navigation(self):
         self.driver.get('http://localhost:5000/upload')
-        # 允许未登录时跳转到登录页
+
         self.assertTrue('Upload' in self.driver.title or 'Login' in self.driver.title)
 
     def test_analyze_requires_login(self):
