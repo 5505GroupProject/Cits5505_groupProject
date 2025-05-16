@@ -61,7 +61,7 @@ class TestRoutes(unittest.TestCase):
         db.session.commit()
         self.client.post('/login', data={'username': 'otheruser', 'password': 'password'})
         response = self.client.get(f'/analyze/{upload.id}', follow_redirects=True)
-        # 检查是否重定向到登录页、权限提示、或404/403
+        # Check whether it is redirected to the login page, permission prompts, or 404/403
         self.assertTrue(
             b"don't have permission" in response.data or
             b'No content available' in response.data or
