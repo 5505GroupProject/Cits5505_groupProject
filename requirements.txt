@@ -9,3 +9,6 @@ nltk==3.8.1
 requests==2.32.3
 beautifulsoup4==4.13.4
 numpy==2.2.5
+Flask-Testing==0.8.1
+coverage==6.4.2
+selenium==4.1.0
