@@ -1,12 +1,14 @@
 import unittest
 import sys
-sys.path.append('.')
+import os
+# 添加项目根目录到 Python 路径
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from flask import session
 from app import create_app, db
 from app.models import UploadedText, AnalysisResult
 from app.models.user import User
 from app.models.upload import UploadedText
-from config_test import TestConfig
+from tests.config_test import TestConfig
 
 class TestRoutes(unittest.TestCase):
 
