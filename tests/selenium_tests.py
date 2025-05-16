@@ -5,7 +5,6 @@ import unittest
 class TestSelenium(unittest.TestCase):
 
     def setUp(self):
-        # 使用当前目录下的chromedriver.exe，它现在位于tests文件夹中
         self.driver = webdriver.Chrome(executable_path='chromedriver.exe')
         self.driver.get('http://localhost:5000')
 
